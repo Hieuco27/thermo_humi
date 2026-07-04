@@ -1,0 +1,86 @@
+name: thermo_humi
+description: "Ứng dụng giám sát nhiệt độ và độ ẩm theo thời gian thực."
+
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  #  State Management
+  flutter_bloc: ^8.1.6
+  equatable: ^2.0.5
+
+  #  Dependency Injection
+  get_it: ^8.0.2
+  injectable: ^2.5.0
+
+  #  Networking
+  dio: ^5.7.0
+  pretty_dio_logger: ^1.4.0
+  connectivity_plus: ^6.1.0
+
+  #  Router
+  go_router: ^14.6.2
+
+  #  Local Storage
+  shared_preferences: ^2.3.3
+  flutter_secure_storage: ^9.2.2
+
+  #  Serialization
+  json_annotation: ^4.9.0
+  freezed_annotation: ^2.4.4
+
+  #  Error Handling
+  dartz: ^0.10.1
+
+  #  Environment
+  flutter_dotenv: ^5.2.1
+
+  #  Charts (nhiệt độ & độ ẩm)
+  fl_chart: ^0.69.0
+
+  #  QR Code
+  qr_flutter: ^4.1.0
+  mobile_scanner: ^5.0.0
+
+  #  Permissions
+  permission_handler: ^11.3.1
+
+  #  Push Notification
+  flutter_local_notifications: ^17.0.0
+
+  #  UI Utilities
+  shimmer: ^3.0.0
+  cached_network_image: ^3.4.1
+  intl: ^0.19.0
+  lottie: ^3.1.0
+  cupertino_icons: ^1.0.8
+  flutter_screenutil: ^5.9.3
+  google_fonts: ^6.3.2
+  flutter_svg: ^2.3.0
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^5.0.0
+  flutter_launcher_icons: "^0.14.4"
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/icon.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/images/icon.png"
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/env/.env
+    - assets/images/
+    - assets/icons/navbar/
+    - assets/icons/appbar/
+    - assets/icons/room/
