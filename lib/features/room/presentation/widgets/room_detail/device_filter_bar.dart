@@ -24,7 +24,7 @@ class DeviceFilterBar extends StatelessWidget {
 
     return Container(
       color: bg,
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
       child: Row(
         children: [
           _DeviceFilterChip(
@@ -32,21 +32,21 @@ class DeviceFilterBar extends StatelessWidget {
             isActive: activeFilter == DeviceFilterType.all,
             onTap: () => onFilterChanged(DeviceFilterType.all),
           ),
-          SizedBox(width: 8.w),
+          SizedBox(width: 4.w),
           _DeviceFilterChip(
             label: 'Online',
             isActive: activeFilter == DeviceFilterType.online,
             onTap: () => onFilterChanged(DeviceFilterType.online),
             activeColor: const Color(0xFF34C759),
           ),
-          SizedBox(width: 8.w),
+          SizedBox(width: 4.w),
           _DeviceFilterChip(
             label: 'Offline',
             isActive: activeFilter == DeviceFilterType.offline,
             onTap: () => onFilterChanged(DeviceFilterType.offline),
             activeColor: const Color(0xFF8E8E93),
           ),
-          SizedBox(width: 8.w),
+          SizedBox(width: 4.w),
           _DeviceFilterChip(
             label: 'Cảnh báo',
             isActive: activeFilter == DeviceFilterType.alert,

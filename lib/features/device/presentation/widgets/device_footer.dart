@@ -5,10 +5,7 @@ import 'package:thermo_humi/core/theme/text_styles.dart';
 class DeviceFooter extends StatelessWidget {
   final Color cardBg;
 
-  const DeviceFooter({
-    super.key,
-    required this.cardBg,
-  });
+  const DeviceFooter({super.key, required this.cardBg});
 
   @override
   Widget build(BuildContext context) {
@@ -17,10 +14,7 @@ class DeviceFooter extends StatelessWidget {
       decoration: BoxDecoration(
         color: cardBg,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(
-          color: const Color(0xFFE5E5EA),
-          width: 1,
-        ),
+        border: Border.all(color: const Color(0xFFE5E5EA), width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.2),

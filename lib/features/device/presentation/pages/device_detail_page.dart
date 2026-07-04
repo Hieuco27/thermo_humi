@@ -5,7 +5,7 @@ import 'package:thermo_humi/core/theme/text_styles.dart';
 import 'package:thermo_humi/features/device/data/repositories/device_repository_impl.dart';
 import 'package:thermo_humi/features/device/presentation/bloc/device_detail/device_history_cubit.dart';
 import 'package:thermo_humi/features/device/presentation/bloc/device_detail/device_history_state.dart';
-import 'package:thermo_humi/features/device/presentation/pages/device_report_page.dart';
+import 'package:thermo_humi/features/report/presentation/pages/report_page.dart';
 import 'package:thermo_humi/features/device/presentation/widgets/device_gauge.dart';
 import 'package:thermo_humi/features/device/presentation/widgets/history_combo_chart.dart';
 import 'package:thermo_humi/features/device/presentation/widgets/device_footer.dart';
@@ -151,10 +151,8 @@ class _DeviceDetailView extends StatelessWidget {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => DeviceReportPage(
-                                      deviceId: deviceId,
-                                      deviceName: deviceName,
-                                    ),
+                                    builder: (_) =>
+                                        ReportPage(initialDeviceId: deviceId),
                                   ),
                                 );
                               },
