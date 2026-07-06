@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
 
-/// Hàng tiêu đề cố định của bảng báo cáo (Giờ / Nhiệt độ / Độ ẩm / Tình trạng).
+/// Hàng tiêu đề cố định của bảng báo cáo (Thời gian / Nhiệt độ / Độ ẩm / Tình trạng).
 class ReportTableHeader extends StatelessWidget {
   const ReportTableHeader({super.key});
 
@@ -13,7 +13,7 @@ class ReportTableHeader extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       child: Row(
         children: [
-          Expanded(flex: 2, child: _headerText('Giờ')),
+          Expanded(flex: 2, child: _headerText('Thời gian')),
           Expanded(
             flex: 3,
             child: _headerText('Nhiệt độ', align: TextAlign.center),
@@ -35,8 +35,9 @@ class ReportTableHeader extends StatelessWidget {
     return Text(
       text,
       textAlign: align,
-      style: AppTextStyles.labelMedium(color: Colors.black)
-          .copyWith(fontWeight: FontWeight.w600),
+      style: AppTextStyles.labelMedium(
+        color: Colors.black,
+      ).copyWith(fontWeight: FontWeight.w600),
     );
   }
 }

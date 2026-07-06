@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
 
 enum DeviceFilterType { all, online, offline, alert }
@@ -20,7 +21,7 @@ class DeviceFilterBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color bg = const Color(0xFFF2F2F7);
+    final Color bg = AppColors.background;
 
     return Container(
       color: bg,
@@ -37,14 +38,14 @@ class DeviceFilterBar extends StatelessWidget {
             label: 'Online',
             isActive: activeFilter == DeviceFilterType.online,
             onTap: () => onFilterChanged(DeviceFilterType.online),
-            activeColor: const Color(0xFF34C759),
+            activeColor: AppColors.dashboardSuccess,
           ),
           SizedBox(width: 4.w),
           _DeviceFilterChip(
             label: 'Offline',
             isActive: activeFilter == DeviceFilterType.offline,
             onTap: () => onFilterChanged(DeviceFilterType.offline),
-            activeColor: const Color(0xFF8E8E93),
+            activeColor: AppColors.textSecondary,
           ),
           SizedBox(width: 4.w),
           _DeviceFilterChip(
@@ -52,7 +53,7 @@ class DeviceFilterBar extends StatelessWidget {
             isActive: activeFilter == DeviceFilterType.alert,
             badge: alertCount > 0 ? '$alertCount' : null,
             onTap: () => onFilterChanged(DeviceFilterType.alert),
-            activeColor: const Color(0xFFFF9800),
+            activeColor: AppColors.dashboardWarning,
           ),
         ],
       ),
@@ -77,8 +78,8 @@ class _DeviceFilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color bgColor = isActive ? activeColor : const Color(0xFFFFFFFF);
-    final Color textColor = isActive ? Colors.white : Colors.black;
+    final Color bgColor = isActive ? activeColor : AppColors.background;
+    final Color textColor = isActive ? Colors.white : AppColors.textPrimary;
 
     return GestureDetector(
       onTap: () {
@@ -92,7 +93,7 @@ class _DeviceFilterChip extends StatelessWidget {
           color: bgColor,
           borderRadius: BorderRadius.circular(20.r),
           border: Border.all(
-            color: isActive ? activeColor : const Color(0xFFE5E5EA),
+            color: isActive ? activeColor : AppColors.textFieldBorder,
             width: 1,
           ),
           boxShadow: isActive
@@ -122,7 +123,7 @@ class _DeviceFilterChip extends StatelessWidget {
                       : const Color(0xFFFF9800),
                   borderRadius: BorderRadius.circular(8.r),
                 ),
-                child: Text(badge!, style: AppTextStyles.labelLarge()),
+                child: Text(badge!, style: AppTextStyles.titleSmall()),
               ),
             ],
           ],

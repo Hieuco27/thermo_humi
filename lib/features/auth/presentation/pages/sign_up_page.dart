@@ -93,7 +93,7 @@ class SignUpPage extends StatelessWidget {
                               child: Text(
                                 'Đăng nhập',
                                 style: AppTextStyles.titleSmall().copyWith(
-                                  color: AppColors.gradientStart,
+                                  color: AppColors.primary,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),

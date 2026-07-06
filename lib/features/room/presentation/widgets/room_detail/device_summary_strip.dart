@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
 
 class DeviceSummaryStrip extends StatelessWidget {
@@ -19,33 +20,33 @@ class DeviceSummaryStrip extends StatelessWidget {
     final offlineCount = totalDevices - onlineCount;
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
       child: Row(
         children: [
           _StatCard(
             label: 'Tổng',
             value: '$totalDevices',
-            color: const Color(0xFF007AFF),
+            color: AppColors.backgroundColor,
           ),
           SizedBox(width: 8.w),
           _StatCard(
             label: 'Online',
             value: '$onlineCount',
-            color: const Color(0xFF34C759),
+            color: AppColors.dashboardSuccess,
           ),
           SizedBox(width: 8.w),
           _StatCard(
             label: 'Offline',
             value: '$offlineCount',
-            color: const Color(0xFF8E8E93),
+            color: AppColors.textSecondary,
           ),
           SizedBox(width: 8.w),
           _StatCard(
             label: 'Cảnh báo',
             value: '$alertCount',
             color: alertCount > 0
-                ? const Color(0xFFFF9800)
-                : const Color(0xFF8E8E93),
+                ? AppColors.dashboardWarning
+                : AppColors.textSecondary,
           ),
         ],
       ),
@@ -68,7 +69,7 @@ class _StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 8.h),
+        padding: EdgeInsets.symmetric(vertical: 10.h),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12.r),

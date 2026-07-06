@@ -6,9 +6,10 @@ import 'package:thermo_humi/features/device/data/repositories/device_repository_
 import 'package:thermo_humi/features/device/presentation/bloc/device_detail/device_history_cubit.dart';
 import 'package:thermo_humi/features/device/presentation/bloc/device_detail/device_history_state.dart';
 import 'package:thermo_humi/features/report/presentation/pages/report_page.dart';
-import 'package:thermo_humi/features/device/presentation/widgets/device_gauge.dart';
-import 'package:thermo_humi/features/device/presentation/widgets/history_combo_chart.dart';
-import 'package:thermo_humi/features/device/presentation/widgets/device_footer.dart';
+import 'package:thermo_humi/features/device/presentation/widgets/device/device_gauge.dart';
+import 'package:thermo_humi/features/device/presentation/widgets/chart/history_tab_chart.dart';
+import 'package:thermo_humi/features/device/presentation/widgets/device/device_footer.dart';
+import 'package:thermo_humi/core/theme/app_colors.dart';
 
 class DeviceDetailPage extends StatelessWidget {
   final String deviceId;
@@ -40,25 +41,34 @@ class _DeviceDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color bg = Color(0xFFF2F2F7);
-    const Color cardBg = Color(0xFFFFFFFF);
+    final Color cardBg = AppColors.gradientEnd;
+    final Color backgroundColor = AppColors.background;
 
     return Scaffold(
-      backgroundColor: bg,
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         backgroundColor: cardBg,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: Colors.black),
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.white,
+            size: 24.sp,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: Column(
           children: [
-            Text('Chi tiết thiết bị', style: AppTextStyles.titleMedium()),
+            Text(
+              'Chi tiết thiết bị',
+              style: AppTextStyles.titleMediumAppBar(
+                color: AppColors.background,
+              ),
+            ),
             Text(
               '($deviceName)',
-              style: AppTextStyles.bodySmall(color: Colors.black54),
+              style: AppTextStyles.bodySmall(color: AppColors.background),
             ),
           ],
         ),
@@ -82,11 +92,11 @@ class _DeviceDetailView extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.all(20.w),
                     decoration: BoxDecoration(
-                      color: cardBg,
+                      color: backgroundColor,
                       borderRadius: BorderRadius.circular(16.r),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
+                          color: Colors.black.withValues(alpha: 0.3),
                           blurRadius: 8.r,
                           offset: Offset(0, 3.h),
                         ),
@@ -124,7 +134,7 @@ class _DeviceDetailView extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.all(10.w),
                     decoration: BoxDecoration(
-                      color: cardBg,
+                      color: backgroundColor,
                       borderRadius: BorderRadius.circular(16.r),
                       boxShadow: [
                         BoxShadow(
@@ -141,7 +151,7 @@ class _DeviceDetailView extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Lịch sử',
+                              'Biểu đồ',
                               style: AppTextStyles.titleMedium(
                                 color: Colors.black,
                               ),
@@ -161,14 +171,13 @@ class _DeviceDetailView extends StatelessWidget {
                             ),
                           ],
                         ),
-                        HistoryComboChart(historyData: data),
+                        HistoryTabChart(historyData: data),
                       ],
                     ),
                   ),
                   SizedBox(height: 16.h),
-
                   // Footer
-                  DeviceFooter(cardBg: cardBg),
+                  DeviceFooter(cardBg: backgroundColor),
                 ],
               ),
             );

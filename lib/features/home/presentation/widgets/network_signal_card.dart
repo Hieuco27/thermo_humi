@@ -10,7 +10,7 @@ class NetworkSignalCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 12),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AppColors.background,
         borderRadius: BorderRadius.all(Radius.circular(16)),
         boxShadow: [
           BoxShadow(

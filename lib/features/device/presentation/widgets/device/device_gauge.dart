@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
 
 class DeviceGauge extends StatelessWidget {
@@ -43,7 +44,7 @@ class DeviceGauge extends StatelessWidget {
               min: min,
               max: max,
               color: color,
-              bgColor: const Color(0xFFE5E5EA),
+              bgColor: AppColors.textFieldHint,
             ),
           ),
         ),
@@ -61,7 +62,7 @@ class DeviceGauge extends StatelessWidget {
               borderRadius: BorderRadius.circular(4.r),
             ),
             child: Text(
-              'High Alert',
+              'Cảnh báo cao',
               style: AppTextStyles.bodySmall(color: alertColor),
             ),
           ),

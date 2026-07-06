@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
 import 'package:thermo_humi/features/device/data/repositories/device_repository_impl.dart';
 import 'package:thermo_humi/features/report/presentation/bloc/report/device_report_cubit.dart';
@@ -9,10 +10,6 @@ import 'package:thermo_humi/features/report/presentation/widgets/report_data_row
 import 'package:thermo_humi/features/report/presentation/widgets/report_filter_section.dart';
 import 'package:thermo_humi/features/report/presentation/widgets/report_table_header.dart';
 
-/// Trang Báo cáo Nhiệt độ - Độ ẩm.
-/// Hỗ trợ 2 luồng vào:
-///   1. Từ navbar → [initialDeviceId] = null, hiển thị form trống.
-///   2. Từ trang chi tiết thiết bị → truyền [initialDeviceId], tự chọn phòng/thiết bị.
 class ReportPage extends StatelessWidget {
   final String? initialDeviceId;
 
@@ -29,9 +26,6 @@ class ReportPage extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Private: View chính
-// ---------------------------------------------------------------------------
 class _ReportView extends StatelessWidget {
   const _ReportView();
 
@@ -42,16 +36,20 @@ class _ReportView extends StatelessWidget {
     return Scaffold(
       backgroundColor: bg,
       appBar: AppBar(
-        backgroundColor: bg,
+        backgroundColor: AppColors.gradientEnd,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.white,
+            size: 22.sp,
+          ),
           onPressed: () => Navigator.of(context).maybePop(),
         ),
         title: Text(
           'Báo cáo',
-          style: AppTextStyles.titleMediumAppBar(color: Colors.black),
+          style: AppTextStyles.titleMediumAppBar(color: Colors.white),
         ),
       ),
       body: BlocBuilder<DeviceReportCubit, DeviceReportState>(
@@ -87,9 +85,6 @@ class _ReportView extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Private: Bảng dữ liệu theo giờ
-// ---------------------------------------------------------------------------
 class _ReportDataTable extends StatelessWidget {
   final DeviceReportState state;
 
@@ -118,7 +113,7 @@ class _ReportDataTable extends StatelessWidget {
     if (state.reportData.isEmpty) {
       return Center(
         child: Text(
-          'Không có dữ liệu — hãy nhấn "Xem báo cáo"',
+          'Không có dữ liệu',
           style: AppTextStyles.bodyMedium(color: Colors.grey),
           textAlign: TextAlign.center,
         ),

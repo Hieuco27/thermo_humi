@@ -25,13 +25,13 @@ class AreaListItem extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: AppColors.background,
           borderRadius: BorderRadius.all(Radius.circular(16.r)),
-          border: Border.all(color: const Color(0xFFE5E5EA), width: 1),
+          border: Border.all(color: AppColors.border, width: 1),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.12),
-              blurRadius: 8,
+              color: Colors.black.withValues(alpha: 0.3),
+              blurRadius: 6,
               offset: Offset(0, 3),
             ),
           ],

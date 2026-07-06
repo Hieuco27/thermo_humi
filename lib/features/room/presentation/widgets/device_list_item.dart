@@ -2,10 +2,13 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
 import 'package:thermo_humi/features/device/domain/entities/device_entity.dart';
+import 'package:thermo_humi/features/device/presentation/widgets/device/device_bottom_sheet.dart';
 
 String _formatRelativeTime(DateTime? dt) {
   if (dt == null) return '--';
@@ -16,7 +19,7 @@ String _formatRelativeTime(DateTime? dt) {
   return '${diff.inDays} ngày';
 }
 
-class DeviceListItem extends StatelessWidget {
+class DeviceListItem extends StatefulWidget {
   final DeviceEntity device;
   final VoidCallback? onTap;
   final VoidCallback? onSettings;
@@ -31,43 +34,68 @@ class DeviceListItem extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final bool isAlert = device.hasAlert;
+  State<DeviceListItem> createState() => _DeviceListItemState();
+}
 
-    final Color cardBg = isAlert
-        ? const Color(0xFFFFF3E0)
-        : const Color(0xFFFFFFFF);
+class _DeviceListItemState extends State<DeviceListItem> {
+  bool _isActive = false;
+
+  Future<void> _handleTap() async {
+    HapticFeedback.selectionClick();
+    setState(() => _isActive = true);
+
+    if (widget.onTap != null) {
+      widget.onTap!();
+      // Nếu có onTap bên ngoài truyền vào, giả lập delay nhỏ rồi reset
+      await Future.delayed(const Duration(milliseconds: 300));
+      if (mounted) setState(() => _isActive = false);
+    } else {
+      await DeviceBottomSheet.show(context, widget.device);
+      if (mounted) {
+        setState(() => _isActive = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isAlert = widget.device.hasAlert;
+
+    Color cardBg = isAlert ? AppColors.dashboardAlertBg : Colors.white;
+
+    if (_isActive) {
+      cardBg = const Color(0xFFF0F0F5); // Màu xám nhạt khi đang chọn
+    }
 
     final Color borderColor = isAlert
-        ? const Color(0xFFFF9800)
-        : const Color(0xFFE5E5EA);
+        ? AppColors.dashboardWarning
+        : (_isActive ? const Color(0xFFD1D1D6) : const Color(0xFFE5E5EA));
 
     return GestureDetector(
-      onTap: onTap,
+      onTap: _handleTap,
       child: Stack(
         children: [
           AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 5.h),
+            margin: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
             decoration: BoxDecoration(
               color: cardBg,
-              borderRadius: BorderRadius.circular(14.r),
+              borderRadius: BorderRadius.circular(12.r),
               border: Border.all(color: borderColor, width: 1),
               boxShadow: [
                 BoxShadow(
                   color: isAlert
-                      ? const Color(0xFFFF9800).withValues(alpha: 0.2)
-                      : Colors.black.withValues(alpha: 0.2),
+                      ? AppColors.dashboardWarning.withValues(alpha: 0.2)
+                      : AppColors.backgroundColor.withValues(alpha: 0.3),
                   blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
               ],
             ),
             child: Padding(
-              padding: EdgeInsets.fromLTRB(14.w, 12.h, 40.w, 12.h),
+              padding: EdgeInsets.fromLTRB(8.w, 12.h, 16.w, 12.h),
               child: Row(
                 children: [
-                  // ── Device name & alert badge ──
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,13 +103,13 @@ class DeviceListItem extends StatelessWidget {
                         Row(
                           children: [
                             _StatusDot(
-                              isOnline: device.isOnline,
+                              isOnline: widget.device.isOnline,
                               hasAlert: isAlert,
                             ),
                             SizedBox(width: 8.w),
                             Flexible(
                               child: Text(
-                                device.name,
+                                widget.device.name,
                                 style: AppTextStyles.titleSmall3(),
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -94,18 +122,18 @@ class DeviceListItem extends StatelessWidget {
                           children: [
                             _MetricChip(
                               icon: Icons.thermostat_outlined,
-                              value: device.currentTemperature != null
-                                  ? '${device.currentTemperature!.toStringAsFixed(1)}°C'
+                              value: widget.device.currentTemperature != null
+                                  ? '${widget.device.currentTemperature!.toStringAsFixed(1)}°C'
                                   : '--',
-                              isAlert: device.isTemperatureAlert,
+                              isAlert: widget.device.isTemperatureAlert,
                             ),
                             SizedBox(width: 10.w),
                             _MetricChip(
                               icon: Icons.water_drop_outlined,
-                              value: device.currentHumidity != null
-                                  ? '${device.currentHumidity!.toStringAsFixed(0)}%'
+                              value: widget.device.currentHumidity != null
+                                  ? '${widget.device.currentHumidity!.toStringAsFixed(0)}%'
                                   : '--',
-                              isAlert: device.isHumidityAlert,
+                              isAlert: widget.device.isHumidityAlert,
                             ),
                           ],
                         ),
@@ -120,7 +148,7 @@ class DeviceListItem extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      _ConnectivityWidget(status: device.connectivity),
+                      _ConnectivityWidget(status: widget.device.connectivity),
                       SizedBox(height: 4.h),
                       Row(
                         mainAxisSize: MainAxisSize.min,
@@ -132,11 +160,8 @@ class DeviceListItem extends StatelessWidget {
                           ),
                           SizedBox(width: 3.w),
                           Text(
-                            _formatRelativeTime(device.lastUpdatedAt),
-                            style: GoogleFonts.inter(
-                              fontSize: 10.sp,
-                              color: const Color(0xFF8E8E93),
-                            ),
+                            _formatRelativeTime(widget.device.lastUpdatedAt),
+                            style: AppTextStyles.titleSmall(),
                           ),
                         ],
                       ),
@@ -144,16 +169,6 @@ class DeviceListItem extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
-          ),
-
-          // ── More menu (top-right corner) ──
-          Positioned(
-            top: 2.h,
-            right: 10.w,
-            child: _DeviceMoreMenu(
-              onSettings: onSettings,
-              onViewReport: onViewReport,
             ),
           ),
         ],
@@ -278,82 +293,6 @@ class _ConnectivityWidget extends StatelessWidget {
         Icon(icon, size: 14.sp, color: color),
         SizedBox(width: 3.w),
         Text(label, style: AppTextStyles.titleSmall()),
-      ],
-    );
-  }
-}
-
-// ── More menu ─────────────────────────────────────────────────────────────────
-enum _DeviceMenuAction { settings, report }
-
-class _DeviceMoreMenu extends StatelessWidget {
-  final VoidCallback? onSettings;
-  final VoidCallback? onViewReport;
-
-  const _DeviceMoreMenu({this.onSettings, this.onViewReport});
-
-  @override
-  Widget build(BuildContext context) {
-    return PopupMenuButton<_DeviceMenuAction>(
-      padding: EdgeInsets.zero,
-      icon: Icon(
-        Icons.more_vert_rounded,
-        size: 20.sp,
-        color: const Color(0xFF8E8E93),
-      ),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-      color: Colors.white,
-      elevation: 4,
-      onSelected: (action) {
-        if (action == _DeviceMenuAction.settings) {
-          onSettings?.call();
-        } else if (action == _DeviceMenuAction.report) {
-          onViewReport?.call();
-        }
-      },
-      itemBuilder: (_) => [
-        PopupMenuItem(
-          value: _DeviceMenuAction.settings,
-          child: Row(
-            children: [
-              Icon(
-                Icons.settings_outlined,
-                size: 18.sp,
-                color: const Color(0xFF007AFF),
-              ),
-              SizedBox(width: 10.w),
-              Text(
-                'Cài đặt thiết bị',
-                style: GoogleFonts.inter(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
-                  color: const Color(0xFF1C1C1E),
-                ),
-              ),
-            ],
-          ),
-        ),
-        PopupMenuItem(
-          value: _DeviceMenuAction.report,
-          child: Row(
-            children: [
-              Icon(
-                Icons.bar_chart_rounded,
-                size: 18.sp,
-                color: const Color(0xFF34C759),
-              ),
-              SizedBox(width: 10.w),
-              Text(
-                'Xem báo cáo',
-                style: GoogleFonts.inter(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
-                  color: const Color(0xFF1C1C1E),
-                ),
-              ),
-            ],
-          ),
-        ),
       ],
     );
   }

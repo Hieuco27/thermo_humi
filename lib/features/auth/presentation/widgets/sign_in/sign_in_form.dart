@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:thermo_humi/core/router/route_names.dart';
 import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
 import 'package:thermo_humi/features/auth/presentation/bloc/login/login_bloc.dart';
@@ -103,7 +104,7 @@ class _SignInFormState extends State<SignInForm> {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Login Successful!')),
               );
-              context.go('/dashboard');
+              context.go('/home');
             } else if (state is LoginError) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(

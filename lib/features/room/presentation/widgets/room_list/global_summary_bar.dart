@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
 
 class GlobalSummaryBar extends StatelessWidget {
@@ -7,7 +8,6 @@ class GlobalSummaryBar extends StatelessWidget {
   final int totalDevices;
   final int totalOnline;
   final int totalAlerts;
-  final bool isDark;
 
   const GlobalSummaryBar({
     super.key,
@@ -15,7 +15,6 @@ class GlobalSummaryBar extends StatelessWidget {
     required this.totalDevices,
     required this.totalOnline,
     required this.totalAlerts,
-    required this.isDark,
   });
 
   @override
@@ -29,28 +28,28 @@ class GlobalSummaryBar extends StatelessWidget {
           _GStat(
             label: 'Phòng',
             value: '$totalRooms',
-            color: const Color(0xFF007AFF),
+            color: AppColors.backgroundColor,
             textSec: textSec,
           ),
           SizedBox(width: 8.w),
           _GStat(
             label: 'Thiết bị',
             value: '$totalDevices',
-            color: Colors.black,
+            color: AppColors.backgroundColor,
             textSec: textSec,
           ),
           SizedBox(width: 8.w),
           _GStat(
             label: 'Online',
             value: '$totalOnline',
-            color: const Color(0xFF34C759),
+            color: AppColors.appBarBg,
             textSec: textSec,
           ),
           SizedBox(width: 8.w),
           _GStat(
-            label: 'Alerts',
+            label: 'Cảnh báo',
             value: '$totalAlerts',
-            color: const Color(0xFFFF9800),
+            color: AppColors.dashboardWarning,
             textSec: textSec,
           ),
         ],
@@ -84,17 +83,17 @@ class _GStat extends StatelessWidget {
           borderRadius: BorderRadius.circular(12.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
-              blurRadius: 8,
+              color: Colors.black.withValues(alpha: 0.3),
+              blurRadius: 6,
               offset: const Offset(0, 2),
             ),
           ],
         ),
         child: Column(
           children: [
-            Text(value, style: AppTextStyles.titleMedium(color: color)),
+            Text(value, style: AppTextStyles.labelLarge(color: color)),
             SizedBox(height: 4.h),
-            Text(label, style: AppTextStyles.bodySmall()),
+            Text(label, style: AppTextStyles.labelLarge()),
           ],
         ),
       ),

@@ -4,15 +4,15 @@ library;
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
 import 'package:thermo_humi/core/router/route_names.dart';
-import 'package:thermo_humi/features/home/presentation/pages/dashboard_page.dart';
+import 'package:thermo_humi/features/home/presentation/pages/home_page.dart';
 import 'package:thermo_humi/features/notification/presentation/pages/notification_page.dart';
-import 'package:thermo_humi/features/report/presentation/pages/report_page.dart';
 import 'package:thermo_humi/features/profile/presentation/pages/profile_page.dart';
+import 'package:thermo_humi/features/report/presentation/pages/report_page.dart';
 import 'package:thermo_humi/features/room/presentation/pages/room_list_page.dart';
 import 'package:thermo_humi/features/room/presentation/pages/room_detail_page.dart';
 import 'package:thermo_humi/features/sharing/presentation/pages/scan_qr_page.dart';
 import 'package:thermo_humi/features/sharing/presentation/pages/share_via_contact_page.dart';
-import 'package:thermo_humi/shared/widgets/app_shell.dart';
+import 'package:thermo_humi/common/widgets/nav_bar.dart';
 import 'package:thermo_humi/features/auth/presentation/pages/sign_in_page.dart';
 import 'package:thermo_humi/features/auth/presentation/pages/sign_up_page.dart';
 
@@ -58,9 +58,9 @@ class AppRouter {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: RouteNames.dashboard,
-                name: 'dashboard',
-                builder: (_, __) => const DashboardPage(),
+                path: RouteNames.home,
+                name: 'home',
+                builder: (_, __) => const HomePage(),
                 routes: [
                   GoRoute(
                     path: 'room/:roomId',
@@ -102,8 +102,6 @@ class AppRouter {
               ),
             ],
           ),
-
-          // Tab 3: Report
           StatefulShellBranch(
             routes: [
               GoRoute(

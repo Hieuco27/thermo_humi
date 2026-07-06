@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:thermo_humi/core/theme/text_styles.dart';
+import 'package:thermo_humi/common/mock/mock_room_data.dart';
+import 'package:thermo_humi/common/widgets/animated_list_item.dart';
+import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/features/device/domain/entities/device_entity.dart';
 import 'package:thermo_humi/features/room/domain/entities/room_entity.dart';
 import 'package:thermo_humi/features/room/presentation/models/room_with_devices.dart';
@@ -13,9 +15,7 @@ import 'package:thermo_humi/features/room/presentation/widgets/device_list_item.
 import 'package:thermo_humi/features/room/presentation/widgets/room_detail/device_summary_strip.dart';
 import 'package:thermo_humi/features/room/presentation/widgets/room_detail/device_filter_bar.dart';
 import 'package:thermo_humi/features/room/presentation/widgets/device_empty_state.dart';
-import 'package:thermo_humi/shared/widgets/animated_list_item.dart';
-import 'package:thermo_humi/features/device/presentation/pages/device_detail_page.dart';
-import 'package:thermo_humi/shared/mock/mock_room_data.dart';
+import 'package:thermo_humi/features/room/presentation/widgets/room_detail/room_detail_app_bar.dart';
 
 class RoomDetailPage extends StatefulWidget {
   /// Chỉ cần roomId — page tự lookup data từ mock/repository
@@ -113,14 +113,19 @@ class _RoomDeviceListPageState extends State<RoomDetailPage>
 
   @override
   Widget build(BuildContext context) {
-    const Color bg = Color(0xFFF2F2F7);
-    const Color appBarBg = Color(0xFFFFFFFF);
-    const Color textPrimary = Color(0xFF1C1C1E);
-    const Color textSecondary = Color(0xFF6D6D71);
+    const Color bg = Color.fromARGB(255, 255, 255, 255);
+    const Color appBarBg = AppColors.appBarBg;
+    const Color textPrimary = AppColors.textPrimary;
 
     return Scaffold(
       backgroundColor: bg,
-      appBar: _buildAppBar(appBarBg, textPrimary, textSecondary),
+      appBar: RoomDetailAppBar(
+        roomName: _rwd.room.name,
+        backgroundColor: AppColors.gradientEnd,
+        textColor: Colors.white,
+        onSearch: _onSearch,
+        onMoreOptions: _onMoreOptions,
+      ),
       body: FadeTransition(
         opacity: _fadeAnim,
         child: Column(
@@ -155,8 +160,6 @@ class _RoomDeviceListPageState extends State<RoomDetailPage>
                             index: index,
                             child: DeviceListItem(
                               device: _filteredDevices[index],
-                              onTap: () =>
-                                  _onDeviceTap(_filteredDevices[index]),
                             ),
                           );
                         },
@@ -165,69 +168,6 @@ class _RoomDeviceListPageState extends State<RoomDetailPage>
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar(
-    Color bg,
-    Color textPrimary,
-    Color textSecondary,
-  ) {
-    return AppBar(
-      backgroundColor: bg,
-      elevation: 0,
-      surfaceTintColor: Colors.transparent,
-      systemOverlayStyle: SystemUiOverlayStyle.dark,
-      leading: IconButton(
-        icon: Icon(
-          Icons.arrow_back_ios_new_rounded,
-          color: textPrimary,
-          size: 20.sp,
-        ),
-        onPressed: () => Navigator.of(context).pop(),
-      ),
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(_rwd.room.name, style: AppTextStyles.titleMediumAppBar()),
-          Text(
-            '${_rwd.devices.length} thiết bị · $_alertCount Cảnh báo',
-            style: AppTextStyles.titleSmall(color: textSecondary),
-          ),
-        ],
-      ),
-      actions: [
-        // Search button
-        IconButton(
-          icon: Icon(Icons.search_rounded, color: textPrimary, size: 22.sp),
-          onPressed: _onSearch,
-        ),
-        // More options
-        IconButton(
-          icon: Icon(Icons.more_vert_rounded, color: textPrimary, size: 22.sp),
-          onPressed: _onMoreOptions,
-        ),
-        SizedBox(width: 4.w),
-      ],
-      bottom: PreferredSize(
-        preferredSize: Size.fromHeight(1.h),
-        child: Divider(
-          height: 1,
-          thickness: 0.5,
-          color: const Color(0xFFE5E5EA),
-        ),
-      ),
-    );
-  }
-
-  void _onDeviceTap(DeviceEntity device) {
-    HapticFeedback.selectionClick();
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) =>
-            DeviceDetailPage(deviceId: device.id, deviceName: device.name),
       ),
     );
   }

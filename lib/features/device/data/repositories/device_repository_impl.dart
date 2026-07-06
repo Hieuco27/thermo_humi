@@ -5,7 +5,7 @@ import 'package:thermo_humi/features/device/domain/entities/device_history_entit
 import 'package:thermo_humi/features/device/domain/entities/hourly_report_entity.dart';
 import 'package:thermo_humi/features/device/domain/repositories/device_repository.dart';
 import 'package:thermo_humi/features/room/domain/entities/room_entity.dart';
-import 'package:thermo_humi/shared/mock/mock_room_data.dart';
+import 'package:thermo_humi/common/mock/mock_room_data.dart';
 
 class DeviceRepositoryImpl implements DeviceRepository {
   final _mockRooms = buildMockRooms();

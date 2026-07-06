@@ -22,7 +22,11 @@ class AppTextStyles {
 
   // Title styles
   static TextStyle titleLarge({Color? color}) {
-    return GoogleFonts.inter(fontSize: 22.sp, fontWeight: FontWeight.w600, color: color);
+    return GoogleFonts.inter(
+      fontSize: 22.sp,
+      fontWeight: FontWeight.w600,
+      color: color,
+    );
   }
 
   static TextStyle titleLargeDiaLog() {
@@ -168,6 +172,23 @@ class AppTextStyles {
       fontWeight: FontWeight.w400,
       color: color ?? AppColors.textPrimary,
       height: 16 / 12,
+    );
+  }
+
+  // 13.sp styles
+  static TextStyle body13({Color? color, FontWeight? fontWeight}) {
+    return GoogleFonts.inter(
+      fontSize: 13.sp,
+      fontWeight: fontWeight ?? FontWeight.w400,
+      color: color ?? AppColors.textPrimary,
+    );
+  }
+
+  static TextStyle label13({Color? color, FontWeight? fontWeight}) {
+    return GoogleFonts.inter(
+      fontSize: 13.sp,
+      fontWeight: fontWeight ?? FontWeight.w500,
+      color: color ?? AppColors.textPrimary,
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
 import 'package:thermo_humi/features/device/domain/entities/device_entity.dart';
 import 'package:thermo_humi/features/room/domain/entities/room_entity.dart';
@@ -11,7 +12,6 @@ import 'package:thermo_humi/features/room/presentation/widgets/device_list_item.
 class RoomCard extends StatelessWidget {
   final RoomWithDevices rwd;
   final bool isExpanded;
-  final bool isDark;
   final VoidCallback onHeaderTap;
   final VoidCallback onViewAll;
 
@@ -19,7 +19,6 @@ class RoomCard extends StatelessWidget {
     super.key,
     required this.rwd,
     required this.isExpanded,
-    required this.isDark,
     required this.onHeaderTap,
     required this.onViewAll,
   });
@@ -39,14 +38,14 @@ class RoomCard extends StatelessWidget {
         color: cardBg,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: hasAlert ? const Color(0xFFFF9800) : borderColor,
+          color: hasAlert ? AppColors.dashboardWarning : borderColor,
           width: hasAlert ? 1 : 0.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -57,7 +56,6 @@ class RoomCard extends StatelessWidget {
             room: rwd.room,
             devices: rwd.devices,
             isExpanded: isExpanded,
-            isDark: isDark,
             textPrimary: textPrimary,
             textSec: textSec,
             hasAlert: hasAlert,
@@ -72,7 +70,6 @@ class RoomCard extends StatelessWidget {
                 : CrossFadeState.showSecond,
             firstChild: _DeviceListSection(
               devices: rwd.devices,
-              isDark: isDark,
               borderColor: borderColor,
               onViewAll: onViewAll,
             ),
@@ -89,7 +86,6 @@ class _RoomCardHeader extends StatelessWidget {
   final RoomEntity room;
   final List<DeviceEntity> devices;
   final bool isExpanded;
-  final bool isDark;
   final Color textPrimary;
   final Color textSec;
   final bool hasAlert;
@@ -99,7 +95,6 @@ class _RoomCardHeader extends StatelessWidget {
     required this.room,
     required this.devices,
     required this.isExpanded,
-    required this.isDark,
     required this.textPrimary,
     required this.textSec,
     required this.hasAlert,
@@ -115,7 +110,7 @@ class _RoomCardHeader extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(16.r),
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+        padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 12.h),
         child: Row(
           children: [
             // Room icon
@@ -133,7 +128,7 @@ class _RoomCardHeader extends StatelessWidget {
                 width: 22.sp,
                 height: 22.sp,
                 colorFilter: ColorFilter.mode(
-                  hasAlert ? const Color(0xFFFF9800) : const Color(0xFF007AFF),
+                  hasAlert ? AppColors.dashboardWarning : AppColors.gradientEnd,
                   BlendMode.srcIn,
                 ),
               ),
@@ -169,15 +164,15 @@ class _RoomCardHeader extends StatelessWidget {
                       _RoomStat(
                         svgAsset: 'assets/icons/room/4g.svg',
                         value: '$onlineCount online',
-                        color: const Color(0xFF34C759),
-                        iconSize: 10,
+                        color: AppColors.appBarBg,
+                        iconSize: 12,
                       ),
                       if (alertCount > 0) ...[
                         SizedBox(width: 10.w),
                         _RoomStat(
                           svgAsset: 'assets/icons/room/canhBao.svg',
-                          value: '$alertCount alert',
-                          color: const Color(0xFFFF9800),
+                          value: '$alertCount cảnh báo',
+                          color: AppColors.dashboardWarning,
                         ),
                       ],
                     ],
@@ -213,7 +208,7 @@ class _RoomStat extends StatelessWidget {
     required this.svgAsset,
     required this.value,
     required this.color,
-    this.iconSize = 12,
+    this.iconSize = 16,
   });
 
   @override
@@ -237,13 +232,11 @@ class _RoomStat extends StatelessWidget {
 // ── Device list section ───────────────────────────────────────────────────────
 class _DeviceListSection extends StatelessWidget {
   final List<DeviceEntity> devices;
-  final bool isDark;
   final Color borderColor;
   final VoidCallback onViewAll;
 
   const _DeviceListSection({
     required this.devices,
-    required this.isDark,
     required this.borderColor,
     required this.onViewAll,
   });
@@ -259,11 +252,7 @@ class _DeviceListSection extends StatelessWidget {
         Divider(height: 1, thickness: 0.5, color: borderColor),
         ...preview.map((d) => DeviceListItem(device: d)),
         if (hasMore)
-          _ViewAllButton(
-            remaining: devices.length - 3,
-            isDark: isDark,
-            onTap: onViewAll,
-          ),
+          _ViewAllButton(remaining: devices.length - 3, onTap: onViewAll),
         SizedBox(height: 6.h),
       ],
     );
@@ -272,19 +261,14 @@ class _DeviceListSection extends StatelessWidget {
 
 class _ViewAllButton extends StatelessWidget {
   final int remaining;
-  final bool isDark;
   final VoidCallback onTap;
 
-  const _ViewAllButton({
-    required this.remaining,
-    required this.isDark,
-    required this.onTap,
-  });
+  const _ViewAllButton({required this.remaining, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
       child: GestureDetector(
         onTap: () {
           HapticFeedback.selectionClick();

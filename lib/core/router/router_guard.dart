@@ -26,9 +26,9 @@ class RouterGuard {
       return RouteNames.login;
     }
 
-    // Đã đăng nhập mà vào login → về dashboard
+    // Đã đăng nhập mà vào login → về home
     if (isAuthenticated && isOnLogin) {
-      return RouteNames.dashboard;
+      return RouteNames.home;
     }
 
     return null; // Không redirect

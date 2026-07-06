@@ -9,8 +9,10 @@ import 'package:thermo_humi/features/room/presentation/pages/room_detail_page.da
 import 'package:thermo_humi/features/room/presentation/widgets/room_list/animated_item.dart';
 import 'package:thermo_humi/features/room/presentation/widgets/room_list/global_summary_bar.dart';
 import 'package:thermo_humi/features/room/presentation/widgets/room_list/room_card.dart';
+import 'package:thermo_humi/common/widgets/app_background.dart';
+import 'package:thermo_humi/features/room/presentation/widgets/room_list/room_list_app_bar.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
-import 'package:thermo_humi/shared/mock/mock_room_data.dart';
+import 'package:thermo_humi/common/mock/mock_room_data.dart';
 
 class RoomListPage extends StatefulWidget {
   const RoomListPage({super.key});
@@ -42,7 +44,7 @@ class _RoomListPageState extends State<RoomListPage>
 
     _rooms = buildMockRooms();
     // Mặc định mở phòng đầu tiên
-    if (_rooms.isNotEmpty) _expandedRooms.add(_rooms.first.room.id);
+    //if (_rooms.isNotEmpty) _expandedRooms.add(_rooms.first.room.id);
   }
 
   @override
@@ -91,8 +93,6 @@ class _RoomListPageState extends State<RoomListPage>
 
   @override
   Widget build(BuildContext context) {
-    const bool isDark = false; // Bỏ dark mode ở trang này
-    const Color bg = Color(0xFFF2F2F7);
     const Color appBarBg = Colors.transparent;
     const Color textPrimary = Color(0xFF1C1C1E);
 
@@ -106,17 +106,16 @@ class _RoomListPageState extends State<RoomListPage>
     );
     final int totalAlerts = _rooms.fold(0, (sum, r) => sum + r.room.alertCount);
 
-    return Container(
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('assets/images/background.png'),
-          fit: BoxFit.cover,
-          opacity: 0.4,
-        ),
-      ),
+    return AppBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: _buildAppBar(appBarBg, textPrimary),
+        appBar: RoomListAppBar(
+          backgroundColor: appBarBg,
+          textColor: textPrimary,
+          onSearch: () {
+            // TODO: Search action
+          },
+        ),
         body: FadeTransition(
           opacity: _fadeAnim,
           child: Column(
@@ -127,14 +126,12 @@ class _RoomListPageState extends State<RoomListPage>
                 totalDevices: totalDevices,
                 totalOnline: totalOnline,
                 totalAlerts: totalAlerts,
-                isDark: isDark,
               ),
 
               // ── Room list ──
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: _onRefresh,
-                  color: const Color(0xFF007AFF),
                   backgroundColor: Colors.white,
                   child: ListView.builder(
                     padding: EdgeInsets.only(top: 8.h, bottom: 24.h),
@@ -147,7 +144,6 @@ class _RoomListPageState extends State<RoomListPage>
                         child: RoomCard(
                           rwd: rwd,
                           isExpanded: isExpanded,
-                          isDark: isDark,
                           onHeaderTap: () => _toggleRoom(rwd.room.id),
                           onViewAll: () => _navigateToRoomDetail(rwd),
                         ),
@@ -159,42 +155,6 @@ class _RoomListPageState extends State<RoomListPage>
             ],
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            // TODO: Navigate to add room page
-            HapticFeedback.lightImpact();
-          },
-          backgroundColor: const Color(0xFF007AFF),
-          elevation: 4,
-          child: Icon(Icons.add, color: Colors.white, size: 24.sp),
-        ),
-      ),
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar(Color bg, Color textPrimary) {
-    return AppBar(
-      backgroundColor: bg,
-      elevation: 0,
-      surfaceTintColor: Colors.transparent,
-      centerTitle: true,
-
-      title: Text(
-        'Phòng & Thiết bị',
-        textAlign: TextAlign.center,
-        style: AppTextStyles.titleMediumAppBar(color: textPrimary),
-      ),
-      actions: [
-        IconButton(
-          icon: Icon(Icons.search_rounded, color: textPrimary, size: 22.sp),
-          onPressed: () {},
-          tooltip: 'Tìm kiếm',
-        ),
-        SizedBox(width: 4.w),
-      ],
-      bottom: PreferredSize(
-        preferredSize: Size.fromHeight(1.h),
-        child: Divider(height: 1, color: const Color(0xFFE5E5EA)),
       ),
     );
   }

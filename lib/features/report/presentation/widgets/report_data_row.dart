@@ -13,7 +13,7 @@ class ReportDataRow extends StatelessWidget {
 
   static const Color _normalText = Color(0xFF333333);
   static const Color _alertText = Color(0xFFC62828); // Deep red
-  static const Color _alertBg = Color(0xFFFDE8E8);   // Light red bg
+  static const Color _alertBg = Color(0xFFFDE8E8); // Light red bg
 
   @override
   Widget build(BuildContext context) {
@@ -25,12 +25,12 @@ class ReportDataRow extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
       child: Row(
         children: [
-          // Giờ
+          // Thời gian
           Expanded(
             flex: 2,
             child: Text(
               DateFormat('HH:mm').format(item.time),
-              style: AppTextStyles.bodyMedium(color: _normalText),
+              style: AppTextStyles.titleSmall2(color: _normalText),
             ),
           ),
 
@@ -40,12 +40,14 @@ class ReportDataRow extends StatelessWidget {
             child: Text(
               '${item.temperature.toStringAsFixed(1)}°C',
               textAlign: TextAlign.center,
-              style: AppTextStyles.bodyMedium(
-                color: item.isTempAlert ? _alertText : _normalText,
-              ).copyWith(
-                fontWeight:
-                    item.isTempAlert ? FontWeight.w600 : FontWeight.normal,
-              ),
+              style:
+                  AppTextStyles.titleSmall2(
+                    color: item.isTempAlert ? _alertText : _normalText,
+                  ).copyWith(
+                    fontWeight: item.isTempAlert
+                        ? FontWeight.w600
+                        : FontWeight.normal,
+                  ),
             ),
           ),
 
@@ -55,12 +57,14 @@ class ReportDataRow extends StatelessWidget {
             child: Text(
               '${item.humidity.toStringAsFixed(0)}%',
               textAlign: TextAlign.center,
-              style: AppTextStyles.bodyMedium(
-                color: item.isHumidityAlert ? _alertText : _normalText,
-              ).copyWith(
-                fontWeight:
-                    item.isHumidityAlert ? FontWeight.w600 : FontWeight.normal,
-              ),
+              style:
+                  AppTextStyles.titleSmall2(
+                    color: item.isHumidityAlert ? _alertText : _normalText,
+                  ).copyWith(
+                    fontWeight: item.isHumidityAlert
+                        ? FontWeight.w600
+                        : FontWeight.normal,
+                  ),
             ),
           ),
 
@@ -70,16 +74,18 @@ class ReportDataRow extends StatelessWidget {
             child: Text(
               _statusLabel(item.connectionStatus),
               textAlign: TextAlign.right,
-              style: AppTextStyles.bodyMedium(
-                color: item.connectionStatus == ConnectionStatus.disconnected
-                    ? _alertText
-                    : _normalText,
-              ).copyWith(
-                fontWeight:
-                    item.connectionStatus == ConnectionStatus.disconnected
+              style:
+                  AppTextStyles.titleSmall2(
+                    color:
+                        item.connectionStatus == ConnectionStatus.disconnected
+                        ? _alertText
+                        : _normalText,
+                  ).copyWith(
+                    fontWeight:
+                        item.connectionStatus == ConnectionStatus.disconnected
                         ? FontWeight.w600
                         : FontWeight.normal,
-              ),
+                  ),
             ),
           ),
         ],
