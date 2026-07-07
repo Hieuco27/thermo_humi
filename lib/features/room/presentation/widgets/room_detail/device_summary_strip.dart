@@ -20,7 +20,7 @@ class DeviceSummaryStrip extends StatelessWidget {
     final offlineCount = totalDevices - onlineCount;
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 7.w, vertical: 8.h),
       child: Row(
         children: [
           _StatCard(
@@ -28,19 +28,19 @@ class DeviceSummaryStrip extends StatelessWidget {
             value: '$totalDevices',
             color: AppColors.backgroundColor,
           ),
-          SizedBox(width: 8.w),
+          SizedBox(width: 7.w),
           _StatCard(
             label: 'Online',
             value: '$onlineCount',
             color: AppColors.dashboardSuccess,
           ),
-          SizedBox(width: 8.w),
+          SizedBox(width: 7.w),
           _StatCard(
             label: 'Offline',
             value: '$offlineCount',
             color: AppColors.textSecondary,
           ),
-          SizedBox(width: 8.w),
+          SizedBox(width: 7.w),
           _StatCard(
             label: 'Cảnh báo',
             value: '$alertCount',

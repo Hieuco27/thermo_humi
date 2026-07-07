@@ -24,6 +24,9 @@ class DeviceListItem extends StatefulWidget {
   final VoidCallback? onTap;
   final VoidCallback? onSettings;
   final VoidCallback? onViewReport;
+  final bool isSelectionMode;
+  final bool isSelected;
+  final ValueChanged<String>? onToggleSelect;
 
   const DeviceListItem({
     super.key,
@@ -31,6 +34,9 @@ class DeviceListItem extends StatefulWidget {
     this.onTap,
     this.onSettings,
     this.onViewReport,
+    this.isSelectionMode = false,
+    this.isSelected = false,
+    this.onToggleSelect,
   });
 
   @override
@@ -43,6 +49,13 @@ class _DeviceListItemState extends State<DeviceListItem> {
   Future<void> _handleTap() async {
     HapticFeedback.selectionClick();
     setState(() => _isActive = true);
+
+    if (widget.isSelectionMode && widget.onToggleSelect != null) {
+      widget.onToggleSelect!(widget.device.id);
+      await Future.delayed(const Duration(milliseconds: 150));
+      if (mounted) setState(() => _isActive = false);
+      return;
+    }
 
     if (widget.onTap != null) {
       widget.onTap!();
@@ -96,6 +109,24 @@ class _DeviceListItemState extends State<DeviceListItem> {
               padding: EdgeInsets.fromLTRB(8.w, 12.h, 16.w, 12.h),
               child: Row(
                 children: [
+                  if (widget.isSelectionMode) ...[
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      margin: EdgeInsets.only(right: 12.w, left: 4.w),
+                      width: 20.w,
+                      height: 20.w,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: widget.isSelected
+                              ? AppColors.wardroRedText
+                              : Colors.grey.shade400,
+                          width: widget.isSelected ? 6.w : 1.5.w,
+                        ),
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

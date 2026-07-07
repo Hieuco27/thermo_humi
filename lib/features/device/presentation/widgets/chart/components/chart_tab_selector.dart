@@ -19,10 +19,10 @@ class ChartTabSelector extends StatelessWidget {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 250),
       curve: Curves.easeInOut,
-      height: 40.h,
+      height: 35.h,
       decoration: BoxDecoration(
         color: const Color(0xFFF2F2F7),
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: BorderRadius.circular(12.r),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -72,16 +72,7 @@ class _TabItem extends StatelessWidget {
           curve: Curves.easeInOut,
           decoration: BoxDecoration(
             color: isSelected ? activeColor : Colors.transparent,
-            borderRadius: BorderRadius.circular(16.r),
-            boxShadow: isSelected
-                ? [
-                    BoxShadow(
-                      color: activeColor.withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
-                    ),
-                  ]
-                : [],
+            borderRadius: BorderRadius.circular(12.r),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -91,7 +82,7 @@ class _TabItem extends StatelessWidget {
                 size: 16.sp,
                 color: isSelected ? Colors.white : Colors.grey,
               ),
-              SizedBox(width: 5.w),
+              SizedBox(width: 3.w),
               Text(
                 label,
                 style:

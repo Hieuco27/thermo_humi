@@ -119,7 +119,7 @@ class ThresholdSettingsScreen extends StatelessWidget {
                     ),
                   )
                 : Text(
-                    'Lưu',
+                    'Lưu cho thiết bị ${device.name}',
                     style: AppTextStyles.labelLarge(color: Colors.white),
                   ),
           ),

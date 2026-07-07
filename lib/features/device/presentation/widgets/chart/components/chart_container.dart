@@ -6,7 +6,11 @@ class ChartContainerWidget extends StatelessWidget {
   final List<ChartLegendItem> legendItems;
   final Widget chart;
 
-  const ChartContainerWidget({super.key, required this.legendItems, required this.chart});
+  const ChartContainerWidget({
+    super.key,
+    required this.legendItems,
+    required this.chart,
+  });
 
   @override
   Widget build(BuildContext context) {

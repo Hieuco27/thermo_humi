@@ -10,8 +10,6 @@ import 'package:thermo_humi/features/profile/presentation/pages/profile_page.dar
 import 'package:thermo_humi/features/report/presentation/pages/report_page.dart';
 import 'package:thermo_humi/features/room/presentation/pages/room_list_page.dart';
 import 'package:thermo_humi/features/room/presentation/pages/room_detail_page.dart';
-import 'package:thermo_humi/features/sharing/presentation/pages/scan_qr_page.dart';
-import 'package:thermo_humi/features/sharing/presentation/pages/share_via_contact_page.dart';
 import 'package:thermo_humi/common/widgets/nav_bar.dart';
 import 'package:thermo_humi/features/auth/presentation/pages/sign_in_page.dart';
 import 'package:thermo_humi/features/auth/presentation/pages/sign_up_page.dart';
@@ -32,21 +30,6 @@ class AppRouter {
         path: '/register',
         name: 'register',
         builder: (_, __) => const SignUpPage(),
-      ),
-
-      // ── Sharing standalone ────────────────────────────────────────────────
-      GoRoute(
-        path: RouteNames.shareContact,
-        name: 'share-contact',
-        builder: (context, state) => ShareViaContactPage(
-          resourceType: state.uri.queryParameters['type'] ?? '',
-          resourceId: state.uri.queryParameters['id'] ?? '',
-        ),
-      ),
-      GoRoute(
-        path: RouteNames.scanQr,
-        name: 'scan-qr',
-        builder: (_, __) => const ScanQrPage(),
       ),
 
       // ── Shell Route (Bottom Nav) ───────────────────────────────────────────

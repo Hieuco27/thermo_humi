@@ -36,8 +36,8 @@ class DeviceGauge extends StatelessWidget {
         Text(title, style: AppTextStyles.bodyLarge(color: Colors.black)),
         SizedBox(height: 16.h),
         SizedBox(
-          width: 120.w,
-          height: 60.w, // Half circle
+          width: 130.w,
+          height: 60.w,
           child: CustomPaint(
             painter: _HalfCircleGaugePainter(
               value: value,
