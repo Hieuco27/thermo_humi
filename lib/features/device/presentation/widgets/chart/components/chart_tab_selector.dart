@@ -76,7 +76,7 @@ class _TabItem extends StatelessWidget {
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                      color: activeColor.withValues(alpha: 0.35),
+                      color: activeColor.withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 3),
                     ),
@@ -95,11 +95,11 @@ class _TabItem extends StatelessWidget {
               Text(
                 label,
                 style:
-                    AppTextStyles.bodyMedium(
+                    AppTextStyles.labelLarge(
                       color: isSelected ? Colors.white : Colors.grey,
                     ).copyWith(
                       fontWeight: isSelected
-                          ? FontWeight.w700
+                          ? FontWeight.w600
                           : FontWeight.w500,
                     ),
               ),

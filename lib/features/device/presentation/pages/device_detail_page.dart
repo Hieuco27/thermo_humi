@@ -152,7 +152,7 @@ class _DeviceDetailView extends StatelessWidget {
                           children: [
                             Text(
                               'Biểu đồ',
-                              style: AppTextStyles.titleMedium(
+                              style: AppTextStyles.labelLarge(
                                 color: Colors.black,
                               ),
                             ),
@@ -166,8 +166,17 @@ class _DeviceDetailView extends StatelessWidget {
                                   ),
                                 );
                               },
-                              icon: const Icon(Icons.list_alt, size: 14),
-                              label: const Text('Báo cáo'),
+                              icon: Icon(
+                                Icons.list_alt,
+                                size: 18.sp,
+                                color: AppColors.primary,
+                              ),
+                              label: Text(
+                                'Báo cáo',
+                                style: AppTextStyles.labelLarge(
+                                  color: AppColors.primary,
+                                ),
+                              ),
                             ),
                           ],
                         ),

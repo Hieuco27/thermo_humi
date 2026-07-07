@@ -17,9 +17,9 @@ class DeviceFooter extends StatelessWidget {
         border: Border.all(color: const Color(0xFFE5E5EA), width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 8.r,
-            offset: Offset(0, 3.h),
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 6.r,
+            offset: Offset(0, 2),
           ),
         ],
       ),
@@ -28,7 +28,7 @@ class DeviceFooter extends StatelessWidget {
         children: [
           _buildFooterItem(
             icon: Icons.signal_cellular_alt,
-            title: '4G Signal Strength',
+            title: 'Cường độ tín hiệu',
             value: 'Weak',
             valueColor: const Color(0xFFFF3B30),
           ),

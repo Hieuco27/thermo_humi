@@ -6,6 +6,7 @@ import 'package:thermo_humi/core/theme/text_styles.dart';
 import 'package:thermo_humi/features/device/domain/entities/device_entity.dart';
 import 'package:thermo_humi/features/device/presentation/pages/device_detail_page.dart';
 import 'package:thermo_humi/features/report/presentation/pages/report_page.dart';
+import '../../pages/threshold_settings/threshold_settings_screen.dart';
 
 class DeviceBottomSheet extends StatelessWidget {
   final DeviceEntity device;
@@ -30,9 +31,9 @@ class DeviceBottomSheet extends StatelessWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.12),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 8,
-            offset: const Offset(0, -3),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -52,13 +53,7 @@ class DeviceBottomSheet extends StatelessWidget {
               child: Row(
                 children: [
                   Expanded(
-                    child: Text(
-                      device.name,
-                      style: AppTextStyles.titleMedium().copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.backgroundColor,
-                      ),
-                    ),
+                    child: Text(device.name, style: AppTextStyles.labelLarge()),
                   ),
                 ],
               ),
@@ -76,10 +71,17 @@ class DeviceBottomSheet extends StatelessWidget {
                 children: [
                   _MenuItem(
                     iconPath: 'assets/icons/room/dieuChinh.svg',
-                    iconColor: const Color(0xFF6366F1), // Indigo
-                    label: 'Cài đặt',
+                    iconColor: const Color(0xFF6366F1),
+                    label: 'Cấu hình',
                     onTap: () {
                       Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              ThresholdSettingsScreen(device: device),
+                        ),
+                      );
                     },
                   ),
                   _MenuItem(
@@ -152,13 +154,13 @@ class _MenuItem extends StatelessWidget {
               color: AppColors.background,
               borderRadius: BorderRadius.circular(12.r),
               border: Border.all(
-                color: AppColors.backgroundColor.withValues(alpha: 0.8),
+                color: AppColors.backgroundColor.withValues(alpha: 0.6),
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.12),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
+                  color: Colors.black.withValues(alpha: 0.3),
+                  blurRadius: 6,
+                  offset: const Offset(0, 3),
                 ),
               ],
             ),
@@ -174,9 +176,7 @@ class _MenuItem extends StatelessWidget {
           SizedBox(height: 10.h),
           Text(
             label,
-            style: AppTextStyles.label13(
-              color: AppColors.textPrimary,
-            ).copyWith(fontWeight: FontWeight.w600),
+            style: AppTextStyles.label13(color: AppColors.textPrimary),
             textAlign: TextAlign.center,
           ),
         ],
