@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:thermo_humi/core/di/injection_container.dart';
 import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
@@ -62,55 +63,73 @@ class SignInPage extends StatelessWidget {
                     topRight: Radius.circular(32.r),
                   ),
                 ),
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 120.h),
-                  child: SafeArea(
-                    top: false,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const SignInHeader(),
-                        SizedBox(height: 32.h),
-                        const SignInForm(),
-                        SizedBox(height: 16.h),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                child: Stack(
+                  alignment: Alignment.bottomCenter,
+                  children: [
+                    SingleChildScrollView(
+                      padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 140.h),
+                      child: SafeArea(
+                        top: false,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(
-                              "Chưa có tài khoản? ",
-                              style: AppTextStyles.titleSmall2().copyWith(
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                context.push('/register');
-                              },
-                              style: TextButton.styleFrom(
-                                padding: EdgeInsets.zero,
-                                minimumSize: Size.zero,
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              ),
-                              child: Text(
-                                'Đăng ký',
-                                style: AppTextStyles.titleSmall().copyWith(
-                                  color: const Color(0xFF3498DB),
-                                  fontWeight: FontWeight.bold,
+                            const SignInHeader(),
+                            SizedBox(height: 32.h),
+                            const SignInForm(),
+                            SizedBox(height: 16.h),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Chưa có tài khoản? ",
+                                  style: AppTextStyles.titleSmall2().copyWith(
+                                    color: AppColors.textSecondary,
+                                  ),
                                 ),
-                              ),
+                                TextButton(
+                                  onPressed: () {
+                                    context.push('/register');
+                                  },
+                                  style: TextButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                    minimumSize: Size.zero,
+                                    tapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                  child: Text(
+                                    'Đăng ký',
+                                    style: AppTextStyles.titleSmall3().copyWith(
+                                      color: AppColors.primary,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                        SizedBox(height: 48.h),
-                        Text(
-                          "Version 1.1.1 (12)",
-                          style: AppTextStyles.labelSmall().copyWith(
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
+                    SafeArea(
+                      top: false,
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom: 24.h),
+                        child: FutureBuilder<PackageInfo>(
+                          future: PackageInfo.fromPlatform(),
+                          builder: (context, snapshot) {
+                            final versionString = snapshot.hasData
+                                ? "Version ${snapshot.data!.version} "
+                                : "Version ...";
+                            return Text(
+                              versionString,
+                              style: AppTextStyles.labelSmall().copyWith(
+                                color: Colors.grey,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

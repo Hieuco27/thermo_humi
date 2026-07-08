@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
+import 'package:thermo_humi/common/widgets/app_background.dart';
 import '../../../domain/entities/device_entity.dart';
 import '../../bloc/threshold_settings/threshold_settings_bloc.dart';
 import '../../bloc/threshold_settings/threshold_settings_event.dart';
@@ -14,71 +15,77 @@ class ThresholdSettingsScreen extends StatelessWidget {
   final DeviceEntity device;
 
   const ThresholdSettingsScreen({super.key, required this.device});
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => ThresholdSettingsBloc(),
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: AppColors.gradientEnd,
-          elevation: 0,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios, color: Colors.white, size: 22.sp),
-            onPressed: () => Navigator.pop(context),
-          ),
-          centerTitle: true,
-          title: Column(
-            children: [
-              Text(
-                'Cấu hình nhiệt độ & độ ẩm',
-                style: AppTextStyles.titleMediumAppBar(color: Colors.white),
+      child: AppBackground(
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            backgroundColor: AppColors.gradientEnd,
+            elevation: 0,
+            leading: IconButton(
+              icon: Icon(
+                Icons.arrow_back_ios,
+                color: Colors.white,
+                size: 22.sp,
               ),
-              Text(
-                '(${device.name})',
-                style: AppTextStyles.bodySmall(color: AppColors.background),
-              ),
-            ],
+              onPressed: () => Navigator.pop(context),
+            ),
+            centerTitle: true,
+            title: Column(
+              children: [
+                Text(
+                  'Cấu hình nhiệt độ & độ ẩm',
+                  style: AppTextStyles.titleMediumAppBar(color: Colors.white),
+                ),
+                Text(
+                  '(${device.name})',
+                  style: AppTextStyles.bodySmall(color: AppColors.background),
+                ),
+              ],
+            ),
           ),
-        ),
-        body: SafeArea(
-          child: BlocListener<ThresholdSettingsBloc, ThresholdSettingsState>(
-            listenWhen: (previous, current) =>
-                previous.status != current.status,
-            listener: (context, state) {
-              if (state.status == ThresholdSettingsStatus.success) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Settings applied successfully!'),
-                    backgroundColor: Color(0xFF4CAF50),
-                  ),
-                );
-              } else if (state.status == ThresholdSettingsStatus.error) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.errorMessage ?? 'An error occurred'),
-                    backgroundColor: Color(0xFFF44336),
-                  ),
-                );
-              }
-            },
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(12.w),
-              child: Column(
-                children: [
-                  TemperatureThresholdCard(
-                    currentTemperature: device.currentTemperature,
-                  ),
-                  SizedBox(height: 16.h),
-                  HumidityThresholdCard(
-                    currentHumidity: device.currentHumidity,
-                  ),
-                  SizedBox(height: 32.h),
-                  _buildPrimaryButton(),
-                  SizedBox(height: 16.h),
-                  _buildSecondaryButton(),
-                ],
+          body: SafeArea(
+            child: BlocListener<ThresholdSettingsBloc, ThresholdSettingsState>(
+              listenWhen: (previous, current) =>
+                  previous.status != current.status,
+              listener: (context, state) {
+                if (state.status == ThresholdSettingsStatus.success) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Settings applied successfully!'),
+                      backgroundColor: Color(0xFF4CAF50),
+                    ),
+                  );
+                } else if (state.status == ThresholdSettingsStatus.error) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(state.errorMessage ?? 'An error occurred'),
+                      backgroundColor: Color(0xFFF44336),
+                    ),
+                  );
+                }
+              },
+              child: SingleChildScrollView(
+                padding: EdgeInsets.all(12.w),
+                child: Column(
+                  children: [
+                    _buildAlertBanner(device),
+                    TemperatureThresholdCard(
+                      currentTemperature: device.currentTemperature,
+                    ),
+                    SizedBox(height: 16.h),
+                    HumidityThresholdCard(
+                      currentHumidity: device.currentHumidity,
+                    ),
+                    SizedBox(height: 32.h),
+                    _buildPrimaryButton(),
+                    SizedBox(height: 16.h),
+                    _buildSecondaryButton(),
+                  ],
+                ),
               ),
             ),
           ),
@@ -196,6 +203,55 @@ class ThresholdSettingsScreen extends StatelessWidget {
               ),
             ),
             child: const Text('Confirm', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAlertBanner(DeviceEntity device) {
+    if (!device.hasAlert) return const SizedBox.shrink();
+
+    return Container(
+      margin: EdgeInsets.only(bottom: 12.h),
+      padding: EdgeInsets.all(6.w),
+      decoration: BoxDecoration(
+        color: Colors.red.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(8.r),
+        border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.warning_amber_rounded, color: Colors.red, size: 24.sp),
+          SizedBox(width: 6.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${device.name} đang vượt ngưỡng',
+                  style: AppTextStyles.labelMedium(
+                    color: Colors.red,
+                  ).copyWith(fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 4.h),
+                if (device.isTemperatureAlert)
+                  Text(
+                    '· Nhiệt độ: ${device.currentTemperature}°C (ngưỡng ${device.threshold!.tempLow}°C–${device.threshold!.tempHigh}°C)',
+                    style: AppTextStyles.titleSmall2(
+                      color: Colors.red,
+                    ).copyWith(height: 1.5),
+                  ),
+                if (device.isHumidityAlert)
+                  Text(
+                    '· Độ ẩm: ${device.currentHumidity}% (ngưỡng ${device.threshold!.humidLow}%–${device.threshold!.humidHigh}%)',
+                    style: AppTextStyles.titleSmall2(
+                      color: Colors.red,
+                    ).copyWith(height: 1.5),
+                  ),
+              ],
+            ),
           ),
         ],
       ),

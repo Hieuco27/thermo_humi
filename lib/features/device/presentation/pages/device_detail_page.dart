@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:thermo_humi/common/widgets/app_background.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
 import 'package:thermo_humi/features/device/data/repositories/device_repository_impl.dart';
 import 'package:thermo_humi/features/device/presentation/bloc/device_detail/device_history_cubit.dart';
@@ -42,157 +43,160 @@ class _DeviceDetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color cardBg = AppColors.gradientEnd;
-    final Color backgroundColor = AppColors.background;
 
-    return Scaffold(
-      backgroundColor: backgroundColor,
-      appBar: AppBar(
-        backgroundColor: cardBg,
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios_new,
-            color: Colors.white,
-            size: 24.sp,
+    return AppBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: cardBg,
+          elevation: 0,
+          centerTitle: true,
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back_ios_new,
+              color: Colors.white,
+              size: 24.sp,
+            ),
+            onPressed: () => Navigator.pop(context),
           ),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Column(
-          children: [
-            Text(
-              'Chi tiết thiết bị',
-              style: AppTextStyles.titleMediumAppBar(
-                color: AppColors.background,
+          title: Column(
+            children: [
+              Text(
+                'Chi tiết thiết bị',
+                style: AppTextStyles.titleMediumAppBar(
+                  color: AppColors.background,
+                ),
               ),
-            ),
-            Text(
-              '($deviceName)',
-              style: AppTextStyles.bodySmall(color: AppColors.background),
-            ),
-          ],
+              Text(
+                '($deviceName)',
+                style: AppTextStyles.bodySmall(color: AppColors.background),
+              ),
+            ],
+          ),
         ),
-      ),
-      body: BlocBuilder<DeviceHistoryCubit, DeviceHistoryState>(
-        builder: (context, state) {
-          if (state is DeviceHistoryLoading || state is DeviceHistoryInitial) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state is DeviceHistoryError) {
-            return Center(child: Text('Error: ${state.message}'));
-          } else if (state is DeviceHistoryLoaded) {
-            final data = state.data;
-            final latestPoint = data.points.last;
+        body: BlocBuilder<DeviceHistoryCubit, DeviceHistoryState>(
+          builder: (context, state) {
+            if (state is DeviceHistoryLoading ||
+                state is DeviceHistoryInitial) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is DeviceHistoryError) {
+              return Center(child: Text('Error: ${state.message}'));
+            } else if (state is DeviceHistoryLoaded) {
+              final data = state.data;
+              final latestPoint = data.points.last;
 
-            return SingleChildScrollView(
-              padding: EdgeInsets.all(16.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Gauges Card
-                  Container(
-                    padding: EdgeInsets.all(20.w),
-                    decoration: BoxDecoration(
-                      color: backgroundColor,
-                      borderRadius: BorderRadius.circular(16.r),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.3),
-                          blurRadius: 8.r,
-                          offset: Offset(0, 3.h),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: DeviceGauge(
-                            title: 'Nhiệt độ:',
-                            value: latestPoint.temperature,
-                            unit: '°C',
-                            hasAlert:
-                                latestPoint.temperature >
-                                data.threshold.tempHigh,
+              return SingleChildScrollView(
+                padding: EdgeInsets.all(10.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Gauges Card
+                    Container(
+                      padding: EdgeInsets.all(20.w),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16.r),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.3),
+                            blurRadius: 8.r,
+                            offset: Offset(0, 3.h),
                           ),
-                        ),
-                        Expanded(
-                          child: DeviceGauge(
-                            title: 'Độ ẩm:',
-                            value: latestPoint.humidity,
-                            unit: '%',
-                            hasAlert:
-                                latestPoint.humidity > data.threshold.humidHigh,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 16.h),
-
-                  // History Chart Card
-                  Container(
-                    padding: EdgeInsets.all(10.w),
-                    decoration: BoxDecoration(
-                      color: backgroundColor,
-                      borderRadius: BorderRadius.circular(16.r),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          blurRadius: 8.r,
-                          offset: Offset(0, 3.h),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Biểu đồ',
-                              style: AppTextStyles.labelLarge(
-                                color: Colors.black,
-                              ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: DeviceGauge(
+                              title: 'Nhiệt độ:',
+                              value: latestPoint.temperature,
+                              unit: '°C',
+                              hasAlert:
+                                  latestPoint.temperature >
+                                  data.threshold.tempHigh,
                             ),
-                            TextButton.icon(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) =>
-                                        ReportPage(initialDeviceId: deviceId),
-                                  ),
-                                );
-                              },
-                              icon: Icon(
-                                Icons.list_alt,
-                                size: 18.sp,
-                                color: AppColors.primary,
-                              ),
-                              label: Text(
-                                'Báo cáo',
+                          ),
+                          Expanded(
+                            child: DeviceGauge(
+                              title: 'Độ ẩm:',
+                              value: latestPoint.humidity,
+                              unit: '%',
+                              hasAlert:
+                                  latestPoint.humidity >
+                                  data.threshold.humidHigh,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 16.h),
+
+                    // History Chart Card
+                    Container(
+                      padding: EdgeInsets.all(10.w),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16.r),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            blurRadius: 8.r,
+                            offset: Offset(0, 3.h),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Biểu đồ',
                                 style: AppTextStyles.labelLarge(
-                                  color: AppColors.primary,
+                                  color: Colors.black,
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                        HistoryTabChart(historyData: data),
-                      ],
+                              TextButton.icon(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          ReportPage(initialDeviceId: deviceId),
+                                    ),
+                                  );
+                                },
+                                icon: Icon(
+                                  Icons.list_alt,
+                                  size: 18.sp,
+                                  color: AppColors.primary,
+                                ),
+                                label: Text(
+                                  'Báo cáo',
+                                  style: AppTextStyles.labelLarge(
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          HistoryTabChart(historyData: data),
+                        ],
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 16.h),
-                  // Footer
-                  DeviceFooter(cardBg: backgroundColor),
-                ],
-              ),
-            );
-          }
-          return const SizedBox.shrink();
-        },
+                    SizedBox(height: 16.h),
+                    // Footer
+                    DeviceFooter(cardBg: Colors.white),
+                  ],
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          },
+        ),
       ),
     );
   }

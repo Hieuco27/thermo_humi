@@ -22,7 +22,7 @@ class GlobalSummaryBar extends StatelessWidget {
     final Color textSec = const Color(0xFF6D6D71);
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
       child: Row(
         children: [
           _GStat(
@@ -31,21 +31,21 @@ class GlobalSummaryBar extends StatelessWidget {
             color: AppColors.backgroundColor,
             textSec: textSec,
           ),
-          SizedBox(width: 8.w),
+          SizedBox(width: 6.w),
           _GStat(
             label: 'Thiết bị',
             value: '$totalDevices',
             color: AppColors.backgroundColor,
             textSec: textSec,
           ),
-          SizedBox(width: 8.w),
+          SizedBox(width: 6.w),
           _GStat(
             label: 'Online',
             value: '$totalOnline',
             color: AppColors.appBarBg,
             textSec: textSec,
           ),
-          SizedBox(width: 8.w),
+          SizedBox(width: 6.w),
           _GStat(
             label: 'Cảnh báo',
             value: '$totalAlerts',
@@ -77,7 +77,7 @@ class _GStat extends StatelessWidget {
 
     return Expanded(
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 8.h),
+        padding: EdgeInsets.symmetric(vertical: 6.h),
         decoration: BoxDecoration(
           color: cardBg.withValues(alpha: 0.9),
           borderRadius: BorderRadius.circular(12.r),

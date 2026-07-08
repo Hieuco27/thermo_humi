@@ -60,7 +60,7 @@ class DeviceBottomSheet extends StatelessWidget {
             ),
             // Grid menu
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
               child: GridView.count(
                 crossAxisCount: 3,
                 shrinkWrap: true,
@@ -104,7 +104,7 @@ class DeviceBottomSheet extends StatelessWidget {
 
                   _MenuItem(
                     iconPath: 'assets/icons/navbar/report.svg',
-                    iconColor: const Color(0xFF34C759), // Green
+                    iconColor: const Color(0xFF34C759),
                     label: 'Xem báo cáo',
                     onTap: () {
                       Navigator.push(

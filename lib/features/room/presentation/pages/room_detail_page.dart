@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:thermo_humi/common/widgets/animated_list_item.dart';
+import 'package:thermo_humi/common/widgets/app_background.dart';
 import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/features/device/domain/entities/device_entity.dart';
 import 'package:thermo_humi/features/room/presentation/bloc/room_detail_cubit.dart';
@@ -123,93 +124,99 @@ class _RoomDeviceListViewState extends State<_RoomDeviceListView>
         final onlineCount = allDevices.where((d) => d.isOnline).length;
         final alertCount = allDevices.where((d) => d.hasAlert).length;
 
-        return Scaffold(
-          backgroundColor: Colors.white,
-          appBar: RoomDetailAppBar(
-            roomName: room.name,
-            backgroundColor: AppColors.gradientEnd,
-            textColor: Colors.white,
-            onSearch: () {},
-            onMoreOptions: () {},
-          ),
-          body: FadeTransition(
-            opacity: _fadeAnim,
-            child: Column(
-              children: [
-                // ── Summary strip ──
-                DeviceSummaryStrip(
-                  totalDevices: allDevices.length,
-                  onlineCount: onlineCount,
-                  alertCount: alertCount,
-                ),
-
-                // ── Filter chips ──
-                DeviceFilterBar(
-                  activeFilter: state.activeFilter,
-                  totalCount: allDevices.length,
-                  onlineCount: onlineCount,
-                  offlineCount: allDevices.length - onlineCount,
-                  alertCount: alertCount,
-                  isSelectionMode: state.isSelectionMode,
-                  onFilterChanged: (f) =>
-                      context.read<RoomDetailCubit>().changeFilter(f),
-                  onSelectModeToggle: () =>
-                      context.read<RoomDetailCubit>().toggleSelectionMode(),
-                  onCancelSelection: () =>
-                      context.read<RoomDetailCubit>().toggleSelectionMode(),
-                  onShareTap: () {
-                    final selectedDeviceIds = state.selectedDeviceIds.toList();
-                    if (selectedDeviceIds.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Vui lòng chọn ít nhất 1 thiết bị để chia sẻ')),
-                      );
-                      return;
-                    }
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => SharePage(
-                          initialDeviceIds: selectedDeviceIds,
-                          roomId: room.id,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-
-                // ── Device list ──
-                Expanded(
-                  child: RefreshIndicator(
-                    onRefresh: () => _onRefresh(context),
-                    color: const Color(0xFF007AFF),
-                    backgroundColor: Colors.white,
-                    child: filteredDevices.isEmpty
-                        ? DeviceEmptyState(filter: state.activeFilter)
-                        : ListView.builder(
-                            padding: EdgeInsets.only(top: 8.h, bottom: 32.h),
-                            itemCount: filteredDevices.length,
-                            itemBuilder: (context, index) {
-                              final device = filteredDevices[index];
-                              return AnimatedListItem(
-                                index: index,
-                                child: DeviceListItem(
-                                  device: device,
-                                  isSelectionMode: state.isSelectionMode,
-                                  isSelected: state.selectedDeviceIds.contains(
-                                    device.id,
-                                  ),
-                                  onToggleSelect: (id) {
-                                    context
-                                        .read<RoomDetailCubit>()
-                                        .toggleDeviceSelection(id);
-                                  },
-                                ),
-                              );
-                            },
-                          ),
+        return AppBackground(
+          child: Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: RoomDetailAppBar(
+              roomName: room.name,
+              backgroundColor: AppColors.gradientEnd,
+              textColor: Colors.white,
+              onSearch: () {},
+              onMoreOptions: () {},
+            ),
+            body: FadeTransition(
+              opacity: _fadeAnim,
+              child: Column(
+                children: [
+                  // ── Summary strip ──
+                  DeviceSummaryStrip(
+                    totalDevices: allDevices.length,
+                    onlineCount: onlineCount,
+                    alertCount: alertCount,
                   ),
-                ),
-              ],
+
+                  // ── Filter chips ──
+                  DeviceFilterBar(
+                    activeFilter: state.activeFilter,
+                    totalCount: allDevices.length,
+                    onlineCount: onlineCount,
+                    offlineCount: allDevices.length - onlineCount,
+                    alertCount: alertCount,
+                    isSelectionMode: state.isSelectionMode,
+                    onFilterChanged: (f) =>
+                        context.read<RoomDetailCubit>().changeFilter(f),
+                    onSelectModeToggle: () =>
+                        context.read<RoomDetailCubit>().toggleSelectionMode(),
+                    onCancelSelection: () =>
+                        context.read<RoomDetailCubit>().toggleSelectionMode(),
+                    onShareTap: () {
+                      final selectedDeviceIds = state.selectedDeviceIds
+                          .toList();
+                      if (selectedDeviceIds.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Vui lòng chọn ít nhất 1 thiết bị để chia sẻ',
+                            ),
+                          ),
+                        );
+                        return;
+                      }
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => SharePage(
+                            initialDeviceIds: selectedDeviceIds,
+                            roomId: room.id,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+
+                  // ── Device list ──
+                  Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: () => _onRefresh(context),
+                      color: const Color(0xFF007AFF),
+                      backgroundColor: Colors.white,
+                      child: filteredDevices.isEmpty
+                          ? DeviceEmptyState(filter: state.activeFilter)
+                          : ListView.builder(
+                              padding: EdgeInsets.only(top: 8.h, bottom: 32.h),
+                              itemCount: filteredDevices.length,
+                              itemBuilder: (context, index) {
+                                final device = filteredDevices[index];
+                                return AnimatedListItem(
+                                  index: index,
+                                  child: DeviceListItem(
+                                    device: device,
+                                    isSelectionMode: state.isSelectionMode,
+                                    isSelected: state.selectedDeviceIds
+                                        .contains(device.id),
+                                    onToggleSelect: (id) {
+                                      context
+                                          .read<RoomDetailCubit>()
+                                          .toggleDeviceSelection(id);
+                                    },
+                                  ),
+                                );
+                              },
+                            ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );

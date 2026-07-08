@@ -41,7 +41,7 @@ class BaseLineChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 200.h,
+      height: 250.h,
       child: LineChart(
         LineChartData(
           minX: minX,
@@ -84,12 +84,9 @@ class BaseLineChart extends StatelessWidget {
               sideTitles: SideTitles(
                 showTitles: true,
                 interval: yInterval ?? (maxY - minY) / 4,
-                reservedSize: 42.w,
+                reservedSize: 32.w,
                 getTitlesWidget: (value, meta) {
-                  // Nếu dùng fixed interval, hiển thị tất cả mốc kể cả 0 và max
-                  if (yInterval == null && (value == minY || value == maxY)) {
-                    return const SizedBox.shrink();
-                  }
+                  // Luôn hiển thị mốc
                   return Padding(
                     padding: EdgeInsets.only(right: 4.w),
                     child: Text(
@@ -109,9 +106,8 @@ class BaseLineChart extends StatelessWidget {
                 interval: 4,
                 reservedSize: 30.h,
                 getTitlesWidget: (value, meta) {
-                  if (value == 0 || value == 24) return const SizedBox.shrink();
-                  return Padding(
-                    padding: EdgeInsets.only(top: 8.h),
+                  return SideTitleWidget(
+                    axisSide: meta.axisSide,
                     child: Text(
                       '${value.toInt()}h',
                       style: AppTextStyles.labelSmall(
@@ -129,7 +125,21 @@ class BaseLineChart extends StatelessWidget {
               sideTitles: SideTitles(showTitles: false),
             ),
           ),
-          borderData: FlBorderData(show: false),
+          borderData: FlBorderData(
+            show: true,
+            border: Border(
+              bottom: BorderSide(
+                color: isDark ? Colors.white24 : Colors.black26,
+                width: 1,
+              ),
+              left: BorderSide(
+                color: isDark ? Colors.white24 : Colors.black26,
+                width: 1,
+              ),
+              right: BorderSide.none,
+              top: BorderSide.none,
+            ),
+          ),
           lineBarsData: [
             LineChartBarData(
               spots: spots,
@@ -148,19 +158,10 @@ class BaseLineChart extends StatelessWidget {
                   );
                 },
               ),
-              belowBarData: BarAreaData(
-                show: true,
-                gradient: LinearGradient(
-                  colors: gradientColors,
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-              ),
+              belowBarData: BarAreaData(show: false),
             ),
           ],
-          extraLinesData: ExtraLinesData(
-            horizontalLines: horizontalLines,
-          ),
+          extraLinesData: ExtraLinesData(horizontalLines: horizontalLines),
         ),
       ),
     );

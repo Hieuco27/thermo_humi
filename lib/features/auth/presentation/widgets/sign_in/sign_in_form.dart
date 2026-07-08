@@ -73,9 +73,8 @@ class _SignInFormState extends State<SignInForm> {
                 SizedBox(width: 8.w),
                 Text(
                   'Duy trì đăng nhập',
-                  style: AppTextStyles.labelMedium().copyWith(
+                  style: AppTextStyles.titleSmall2().copyWith(
                     color: AppColors.textFieldHint,
-                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
@@ -89,10 +88,7 @@ class _SignInFormState extends State<SignInForm> {
               ),
               child: Text(
                 'Quên mật khẩu?',
-                style: AppTextStyles.labelMedium().copyWith(
-                  color: Colors.red,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: AppTextStyles.titleSmall2().copyWith(color: Colors.red),
               ),
             ),
           ],
@@ -101,9 +97,6 @@ class _SignInFormState extends State<SignInForm> {
         BlocConsumer<LoginBloc, LoginState>(
           listener: (context, state) {
             if (state is LoginSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Login Successful!')),
-              );
               context.go('/home');
             } else if (state is LoginError) {
               ScaffoldMessenger.of(context).showSnackBar(

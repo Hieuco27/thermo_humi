@@ -32,9 +32,9 @@ class PrimaryButton extends StatelessWidget {
         boxShadow: gradient != null
             ? [
                 BoxShadow(
-                  color: gradient!.colors.last.withOpacity(0.3),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
+                  color: gradient!.colors.last.withAlpha(80),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
                 ),
               ]
             : null,
@@ -45,7 +45,7 @@ class PrimaryButton extends StatelessWidget {
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.r),
+            borderRadius: BorderRadius.circular(24.r),
           ),
         ),
         child: isLoading
@@ -64,7 +64,6 @@ class PrimaryButton extends StatelessWidget {
                     text,
                     style: AppTextStyles.titleMedium().copyWith(
                       color: Colors.white,
-                      fontWeight: FontWeight.w600,
                     ),
                   ),
                   if (trailingIcon != null) ...[

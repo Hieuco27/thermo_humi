@@ -128,21 +128,42 @@ class _HalfCircleGaugePainter extends CustomPainter {
     );
 
     // Draw Needle
-    final needlePaint = Paint()
-      ..color = Colors.black
-      ..strokeWidth = 3
-      ..strokeCap = StrokeCap.round;
-
     final needleAngle = pi + sweepAngle;
-    final needleLength = radius - strokeWidth;
+    final needleLength =
+        radius - strokeWidth - 2.w; // Rút ngắn một chút để không chạm sát viền
     final needleEnd = Offset(
       center.dx + needleLength * cos(needleAngle),
       center.dy + needleLength * sin(needleAngle),
     );
 
-    // Needle base
-    canvas.drawCircle(center, 6.r, Paint()..color = const Color(0xFF333333));
-    canvas.drawLine(center, needleEnd, needlePaint);
+    final baseRadius = 4.w; // Bán kính vòng tròn ở gốc kim
+    final leftBase = Offset(
+      center.dx + baseRadius * cos(needleAngle - pi / 2),
+      center.dy + baseRadius * sin(needleAngle - pi / 2),
+    );
+    final rightBase = Offset(
+      center.dx + baseRadius * cos(needleAngle + pi / 2),
+      center.dy + baseRadius * sin(needleAngle + pi / 2),
+    );
+
+    final needlePath = Path()
+      ..moveTo(leftBase.dx, leftBase.dy)
+      ..lineTo(needleEnd.dx, needleEnd.dy)
+      ..lineTo(rightBase.dx, rightBase.dy)
+      ..close()
+      ..addOval(Rect.fromCircle(center: center, radius: 7.w));
+
+    // Bóng của kim để tạo độ nổi (3D)
+    canvas.drawShadow(needlePath, Colors.black, 4, false);
+
+    // Tô màu trắng cho thân kim và gốc kim
+    final needleFillPaint = Paint()
+      ..color = Colors.black54
+      ..style = PaintingStyle.fill;
+    canvas.drawPath(needlePath, needleFillPaint);
+
+    // Chấm tròn nhỏ ở giữa kim
+    canvas.drawCircle(center, 2.w, Paint()..color = Colors.grey.shade300);
   }
 
   @override

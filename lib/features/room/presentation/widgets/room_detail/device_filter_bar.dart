@@ -78,8 +78,19 @@ class DeviceFilterBar extends StatelessWidget {
     final activeColor = _getColor(activeFilter);
 
     return Container(
-      color: Colors.white,
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+      margin: EdgeInsets.symmetric(horizontal: 5.w),
+      padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 6.h),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       alignment: Alignment.centerLeft,
       child: Row(
         children: [

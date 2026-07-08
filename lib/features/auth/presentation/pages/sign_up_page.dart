@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
 import 'package:thermo_humi/features/auth/presentation/bloc/register/register_bloc.dart';
@@ -32,7 +33,7 @@ class SignUpPage extends StatelessWidget {
               child: Align(
                 alignment: Alignment.topCenter,
                 child: Padding(
-                  padding: EdgeInsets.only(top: 60.h),
+                  padding: EdgeInsets.only(top: 70.h),
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
@@ -61,55 +62,73 @@ class SignUpPage extends StatelessWidget {
                     topRight: Radius.circular(32.r),
                   ),
                 ),
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 100.h),
-                  child: SafeArea(
-                    top: false,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const SignUpHeader(),
-                        SizedBox(height: 32.h),
-                        const SignUpForm(),
-                        SizedBox(height: 16.h),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                child: Stack(
+                  alignment: Alignment.bottomCenter,
+                  children: [
+                    SingleChildScrollView(
+                      padding: EdgeInsets.fromLTRB(24.w, 24.h, 24.w, 120.h),
+                      child: SafeArea(
+                        top: false,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(
-                              "Đã có tài khoản? ",
-                              style: AppTextStyles.titleSmall2().copyWith(
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                context.pop(); // Go back to login
-                              },
-                              style: TextButton.styleFrom(
-                                padding: EdgeInsets.zero,
-                                minimumSize: Size.zero,
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              ),
-                              child: Text(
-                                'Đăng nhập',
-                                style: AppTextStyles.titleSmall().copyWith(
-                                  color: AppColors.primary,
-                                  fontWeight: FontWeight.bold,
+                            const SignUpHeader(),
+                            SizedBox(height: 32.h),
+                            const SignUpForm(),
+                            SizedBox(height: 16.h),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Đã có tài khoản? ",
+                                  style: AppTextStyles.titleSmall2().copyWith(
+                                    color: AppColors.textSecondary,
+                                  ),
                                 ),
-                              ),
+                                TextButton(
+                                  onPressed: () {
+                                    context.pop(); // Go back to login
+                                  },
+                                  style: TextButton.styleFrom(
+                                    padding: EdgeInsets.zero,
+                                    minimumSize: Size.zero,
+                                    tapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                  ),
+                                  child: Text(
+                                    'Đăng nhập',
+                                    style: AppTextStyles.titleSmall3().copyWith(
+                                      color: AppColors.primary,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                        SizedBox(height: 48.h),
-                        Text(
-                          "Version 1.1.1 (12)",
-                          style: AppTextStyles.labelSmall().copyWith(
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
+                    SafeArea(
+                      top: false,
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom: 24.h),
+                        child: FutureBuilder<PackageInfo>(
+                          future: PackageInfo.fromPlatform(),
+                          builder: (context, snapshot) {
+                            final versionString = snapshot.hasData
+                                ? "Version ${snapshot.data!.version} "
+                                : "Version ...";
+                            return Text(
+                              versionString,
+                              style: AppTextStyles.labelSmall().copyWith(
+                                color: Colors.grey,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

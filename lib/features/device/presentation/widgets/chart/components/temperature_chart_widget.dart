@@ -37,9 +37,8 @@ class TemperatureChartWidget extends StatelessWidget {
     final spots = points
         .map((p) => FlSpot(toHour(p.timestamp), p.temperature))
         .toList();
-    final values = spots.map((s) => s.y).toList();
-    final minY = (values.reduce((a, b) => a < b ? a : b) - 5).clamp(0.0, 200.0);
-    final maxY = (values.reduce((a, b) => a > b ? a : b) + 8).clamp(0.0, 200.0);
+    final minY = 0.0;
+    final maxY = 50.0;
 
     return ChartContainerWidget(
       legendItems: [
@@ -57,6 +56,7 @@ class TemperatureChartWidget extends StatelessWidget {
         maxX: 24,
         minY: minY,
         maxY: maxY,
+        yInterval: 10.0,
         isDark: isDark,
         startOfDay: startOfDay,
         unit: '°C',

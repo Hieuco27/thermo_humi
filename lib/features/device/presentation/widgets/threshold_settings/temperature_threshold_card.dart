@@ -21,17 +21,16 @@ class TemperatureThresholdCard extends StatefulWidget {
 
 class _TemperatureThresholdCardState extends State<TemperatureThresholdCard> {
   RangeValues? _localRange;
-
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(8.w),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
+        borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
+            color: Colors.black.withValues(alpha: 0.4),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
