@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
 
@@ -43,7 +44,9 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
               height: 24.w,
             ),
           ),
-          onPressed: () {},
+          onPressed: () {
+            context.goNamed('request-access-list');
+          },
         ),
         SizedBox(width: 8.w),
       ],
