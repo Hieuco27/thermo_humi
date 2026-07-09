@@ -34,18 +34,21 @@ class SignInPage extends StatelessWidget {
               child: Align(
                 alignment: Alignment.topCenter,
                 child: Padding(
-                  padding: EdgeInsets.only(top: 60.h),
+                  padding: EdgeInsets.only(top: 80.h),
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20.r),
                     ),
                     padding: EdgeInsets.all(16.r),
-                    child: Image.asset(
-                      'assets/images/icon.png',
-                      width: 60.w,
-                      height: 60.w,
-                      fit: BoxFit.contain,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12.r),
+                      child: Image.asset(
+                        'assets/images/logo_hms.png',
+                        width: 60.w,
+                        height: 60.w,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),

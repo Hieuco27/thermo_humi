@@ -80,27 +80,27 @@ class _RoomDeviceListViewState extends State<_RoomDeviceListView>
     }
   }
 
-  Future<void> _onRefresh(BuildContext context) async {
-    HapticFeedback.lightImpact();
-    context.read<RoomDetailCubit>().refreshRoomData(widget.roomId);
+  // Future<void> _onRefresh(BuildContext context) async {
+  //   HapticFeedback.lightImpact();
+  //   context.read<RoomDetailCubit>().refreshRoomData(widget.roomId);
 
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Đã cập nhật dữ liệu',
-            style: GoogleFonts.inter(fontSize: 13.sp),
-          ),
-          backgroundColor: const Color(0xFF1C1C1E),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.r),
-          ),
-          duration: const Duration(seconds: 2),
-        ),
-      );
-    }
-  }
+  //   if (mounted) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text(
+  //           'Đã cập nhật dữ liệu',
+  //           style: GoogleFonts.inter(fontSize: 13.sp),
+  //         ),
+  //         backgroundColor: const Color(0xFF1C1C1E),
+  //         behavior: SnackBarBehavior.floating,
+  //         shape: RoundedRectangleBorder(
+  //           borderRadius: BorderRadius.circular(10.r),
+  //         ),
+  //         duration: const Duration(seconds: 2),
+  //       ),
+  //     );
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -186,34 +186,30 @@ class _RoomDeviceListViewState extends State<_RoomDeviceListView>
 
                   // ── Device list ──
                   Expanded(
-                    child: RefreshIndicator(
-                      onRefresh: () => _onRefresh(context),
-                      color: const Color(0xFF007AFF),
-                      backgroundColor: Colors.white,
-                      child: filteredDevices.isEmpty
-                          ? DeviceEmptyState(filter: state.activeFilter)
-                          : ListView.builder(
-                              padding: EdgeInsets.only(top: 8.h, bottom: 32.h),
-                              itemCount: filteredDevices.length,
-                              itemBuilder: (context, index) {
-                                final device = filteredDevices[index];
-                                return AnimatedListItem(
-                                  index: index,
-                                  child: DeviceListItem(
-                                    device: device,
-                                    isSelectionMode: state.isSelectionMode,
-                                    isSelected: state.selectedDeviceIds
-                                        .contains(device.id),
-                                    onToggleSelect: (id) {
-                                      context
-                                          .read<RoomDetailCubit>()
-                                          .toggleDeviceSelection(id);
-                                    },
+                    child: filteredDevices.isEmpty
+                        ? DeviceEmptyState(filter: state.activeFilter)
+                        : ListView.builder(
+                            padding: EdgeInsets.only(top: 8.h, bottom: 32.h),
+                            itemCount: filteredDevices.length,
+                            itemBuilder: (context, index) {
+                              final device = filteredDevices[index];
+                              return AnimatedListItem(
+                                index: index,
+                                child: DeviceListItem(
+                                  device: device,
+                                  isSelectionMode: state.isSelectionMode,
+                                  isSelected: state.selectedDeviceIds.contains(
+                                    device.id,
                                   ),
-                                );
-                              },
-                            ),
-                    ),
+                                  onToggleSelect: (id) {
+                                    context
+                                        .read<RoomDetailCubit>()
+                                        .toggleDeviceSelection(id);
+                                  },
+                                ),
+                              );
+                            },
+                          ),
                   ),
                 ],
               ),

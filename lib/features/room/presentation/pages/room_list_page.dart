@@ -4,6 +4,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/features/room/presentation/models/room_with_devices.dart';
 import 'package:thermo_humi/features/room/presentation/pages/room_detail_page.dart';
 import 'package:thermo_humi/features/room/presentation/widgets/room_list/animated_item.dart';
@@ -53,27 +54,6 @@ class _RoomListPageState extends State<RoomListPage>
     super.dispose();
   }
 
-  Future<void> _onRefresh() async {
-    HapticFeedback.lightImpact();
-    await Future.delayed(const Duration(seconds: 1));
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Đã cập nhật dữ liệu',
-            style: AppTextStyles.bodyMedium(),
-          ),
-          backgroundColor: const Color(0xFF1C1C1E),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.r),
-          ),
-          duration: const Duration(seconds: 2),
-        ),
-      );
-    }
-  }
-
   void _toggleRoom(String roomId) {
     HapticFeedback.selectionClick();
     setState(() {
@@ -93,8 +73,8 @@ class _RoomListPageState extends State<RoomListPage>
 
   @override
   Widget build(BuildContext context) {
-    const Color appBarBg = Colors.transparent;
-    const Color textPrimary = Color(0xFF1C1C1E);
+    const Color appBarBg = AppColors.gradientEnd;
+    const Color textPrimary = AppColors.background;
 
     final int totalDevices = _rooms.fold(
       0,
@@ -112,9 +92,7 @@ class _RoomListPageState extends State<RoomListPage>
         appBar: RoomListAppBar(
           backgroundColor: appBarBg,
           textColor: textPrimary,
-          onSearch: () {
-            // TODO: Search action
-          },
+          onSearch: () {},
         ),
         body: FadeTransition(
           opacity: _fadeAnim,
@@ -130,26 +108,22 @@ class _RoomListPageState extends State<RoomListPage>
 
               // ── Room list ──
               Expanded(
-                child: RefreshIndicator(
-                  onRefresh: _onRefresh,
-                  backgroundColor: Colors.white,
-                  child: ListView.builder(
-                    padding: EdgeInsets.only(top: 8.h, bottom: 24.h),
-                    itemCount: _rooms.length,
-                    itemBuilder: (context, index) {
-                      final rwd = _rooms[index];
-                      final isExpanded = _expandedRooms.contains(rwd.room.id);
-                      return AnimatedItem(
-                        index: index,
-                        child: RoomCard(
-                          rwd: rwd,
-                          isExpanded: isExpanded,
-                          onHeaderTap: () => _toggleRoom(rwd.room.id),
-                          onViewAll: () => _navigateToRoomDetail(rwd),
-                        ),
-                      );
-                    },
-                  ),
+                child: ListView.builder(
+                  padding: EdgeInsets.only(top: 8.h, bottom: 24.h),
+                  itemCount: _rooms.length,
+                  itemBuilder: (context, index) {
+                    final rwd = _rooms[index];
+                    final isExpanded = _expandedRooms.contains(rwd.room.id);
+                    return AnimatedItem(
+                      index: index,
+                      child: RoomCard(
+                        rwd: rwd,
+                        isExpanded: isExpanded,
+                        onHeaderTap: () => _toggleRoom(rwd.room.id),
+                        onViewAll: () => _navigateToRoomDetail(rwd),
+                      ),
+                    );
+                  },
                 ),
               ),
             ],

@@ -50,6 +50,7 @@ class _NotificationPageState extends State<NotificationPage> {
         appBar: AppBar(
           backgroundColor: AppColors.gradientEnd,
           elevation: 0,
+          centerTitle: true,
           title: Text(
             'Thông báo',
             style: AppTextStyles.titleMedium(color: Colors.white),

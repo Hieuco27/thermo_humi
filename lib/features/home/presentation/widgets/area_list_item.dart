@@ -1,5 +1,7 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
@@ -25,14 +27,13 @@ class AreaListItem extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
-          color: AppColors.background,
+          color: Colors.white.withValues(alpha: 0.9),
           borderRadius: BorderRadius.all(Radius.circular(16.r)),
-          border: Border.all(color: AppColors.border, width: 1),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.3),
               blurRadius: 6,
-              offset: Offset(0, 3),
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -45,7 +46,7 @@ class AreaListItem extends StatelessWidget {
                 Icon(
                   Icons.chevron_right,
                   color: AppColors.textSecondary,
-                  size: 20.sp,
+                  size: 22.sp,
                 ),
               ],
             ),
@@ -53,19 +54,25 @@ class AreaListItem extends StatelessWidget {
             Row(
               children: [
                 // Thiết bị
-                Icon(
-                  Icons.devices_rounded,
-                  color: AppColors.textSecondary,
-                  size: 16.sp,
+                Opacity(
+                  opacity: 0.6,
+                  child: SvgPicture.asset(
+                    'assets/icons/home/device.svg',
+                    width: 20.sp,
+                    height: 20.sp,
+                    colorFilter: ColorFilter.mode(
+                      AppColors.textSecondary,
+                      BlendMode.srcIn,
+                    ),
+                  ),
                 ),
-                SizedBox(width: 4.w),
                 Text(
                   '${room.totalDevices} thiết bị',
                   style: AppTextStyles.labelLarge(
                     color: AppColors.textSecondary,
                   ),
                 ),
-                SizedBox(width: 12.w),
+                SizedBox(width: 20.w),
                 // Online
                 Icon(Icons.circle, color: const Color(0xFF34C759), size: 8.sp),
                 SizedBox(width: 4.w),
@@ -78,10 +85,13 @@ class AreaListItem extends StatelessWidget {
                 const Spacer(),
                 // Alert
                 if (hasAlert) ...[
-                  Icon(
-                    Icons.warning_amber_rounded,
-                    color: const Color(0xFFFF9800),
-                    size: 16.sp,
+                  Opacity(
+                    opacity: 0.6,
+                    child: SvgPicture.asset(
+                      'assets/icons/home/canhBao.svg',
+                      width: 16.sp,
+                      height: 16.sp,
+                    ),
                   ),
                   SizedBox(width: 3.w),
                   Text(

@@ -5,6 +5,9 @@ import 'package:thermo_humi/features/auth/data/repositories/auth_repository_impl
 import 'package:thermo_humi/features/auth/domain/repositories/auth_repository.dart';
 import 'package:thermo_humi/features/auth/domain/usecases/sign_in_usecase.dart';
 import 'package:thermo_humi/features/auth/presentation/bloc/login/login_bloc.dart';
+import 'package:thermo_humi/features/history/data/datasources/threshold_log_mock_data_source.dart';
+import 'package:thermo_humi/features/history/data/repositories/threshold_log_repository_impl.dart';
+import 'package:thermo_humi/features/history/domain/repositories/threshold_log_repository.dart';
 
 import 'package:thermo_humi/features/notification/data/datasources/mock_alert_data_source.dart';
 import 'package:thermo_humi/features/notification/data/repositories/alert_repository_impl.dart';
@@ -14,6 +17,18 @@ import 'package:thermo_humi/features/notification/domain/usecases/resolve_alert_
 import 'package:thermo_humi/features/notification/domain/usecases/watch_alert_events_usecase.dart';
 import 'package:thermo_humi/features/notification/presentation/cubit/alert_cubit.dart';
 
+import 'package:thermo_humi/features/history/presentation/bloc/threshold_log_cubit.dart';
+
+import 'package:thermo_humi/features/member_management/data/repositories/fake_member_repository.dart';
+import 'package:thermo_humi/features/member_management/domain/repositories/member_repository.dart';
+import 'package:thermo_humi/features/member_management/presentation/cubit/member_cubit.dart';
+
+import 'package:thermo_humi/features/request_access/data/datasources/access_request_remote_data_source.dart';
+import 'package:thermo_humi/features/request_access/data/repositories/access_request_repository_impl.dart';
+import 'package:thermo_humi/features/request_access/domain/repositories/access_request_repository.dart';
+import 'package:thermo_humi/features/request_access/presentation/cubit/access_request_detail_cubit.dart';
+import 'package:thermo_humi/features/request_access/presentation/cubit/device_access_request_list_cubit.dart';
+import 'package:thermo_humi/features/request_access/presentation/cubit/room_access_request_list_cubit.dart';
 final sl = GetIt.instance;
 
 void init() {
@@ -46,4 +61,25 @@ void init() {
   // --- Capture Feature ---
 
   // --- Try_On Feature ---
+
+  // --- History Feature ---
+  sl.registerLazySingleton<ThresholdLogDataSource>(
+    () => MockThresholdLogDataSource(),
+  );
+  sl.registerLazySingleton<ThresholdLogRepository>(
+    () => ThresholdLogRepositoryImpl(dataSource: sl()),
+  );
+  sl.registerFactory(() => ThresholdLogCubit(repository: sl()));
+
+  // --- Member Management Feature ---
+  sl.registerLazySingleton<MemberRepository>(() => FakeMemberRepository());
+  sl.registerFactory(() => MemberCubit(repository: sl()));
+
+  // --- Request Access Feature ---
+  sl.registerLazySingleton<AccessRequestRemoteDataSource>(() => MockAccessRequestRemoteDataSource());
+  sl.registerLazySingleton<AccessRequestRepository>(() => AccessRequestRepositoryImpl(remoteDataSource: sl()));
+  
+  sl.registerFactory(() => RoomAccessRequestListCubit(repository: sl()));
+  sl.registerFactory(() => DeviceAccessRequestListCubit(repository: sl()));
+  sl.registerFactory(() => AccessRequestDetailCubit(repository: sl()));
 }

@@ -22,7 +22,7 @@ class GlobalSummaryBar extends StatelessWidget {
     final Color textSec = const Color(0xFF6D6D71);
 
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
+      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 12.h),
       child: Row(
         children: [
           _GStat(
