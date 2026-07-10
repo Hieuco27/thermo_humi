@@ -16,7 +16,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       centerTitle: true,
       leading: IconButton(
         icon: SvgPicture.asset(
-          'assets/icons/appbar/view_list.svg',
+          'assets/icons/appbar/add.svg',
           colorFilter: const ColorFilter.mode(
             AppColors.background,
             BlendMode.srcIn,
@@ -35,7 +35,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
           icon: Badge(
             label: const Text('3'),
             child: SvgPicture.asset(
-              'assets/icons/navbar/thongBao.svg',
+              'assets/icons/appbar/request.svg',
               colorFilter: const ColorFilter.mode(
                 AppColors.background,
                 BlendMode.srcIn,
@@ -45,7 +45,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
           onPressed: () {
-            context.goNamed('request-access-list');
+            context.pushNamed('request-access-list');
           },
         ),
         SizedBox(width: 8.w),

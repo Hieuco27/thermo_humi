@@ -3,19 +3,28 @@ import 'package:thermo_humi/features/request_access/domain/entities/access_reque
 abstract class AccessRequestRemoteDataSource {
   Future<List<AccessRequest>> getDeviceRequests({int page = 1});
   Future<AccessRequest> getDeviceRequestDetail(String id);
-  Future<void> respondToDeviceRequest(String id, bool accept, AccessRole? roleToGrant);
+  Future<void> respondToDeviceRequest(
+    String id,
+    bool accept,
+    AccessRole? roleToGrant,
+  );
 
   Future<List<AccessRequest>> getRoomRequests({int page = 1});
   Future<AccessRequest> getRoomRequestDetail(String id);
-  Future<void> respondToRoomRequest(String id, bool accept, AccessRole? roleToGrant);
+  Future<void> respondToRoomRequest(
+    String id,
+    bool accept,
+    AccessRole? roleToGrant,
+  );
 }
 
-class MockAccessRequestRemoteDataSource implements AccessRequestRemoteDataSource {
+class MockAccessRequestRemoteDataSource
+    implements AccessRequestRemoteDataSource {
   final List<AccessRequest> _mockData = [
     AccessRequest(
       id: 'req_01',
       requesterId: 'user_t',
-      requesterName: 'tình',
+      requesterName: 'Bắc',
       resourceId: 'dev_03',
       resourceName: 'Thiết bị 03',
       type: AccessRequestType.device,
@@ -43,7 +52,7 @@ class MockAccessRequestRemoteDataSource implements AccessRequestRemoteDataSource
     AccessRequest(
       id: 'req_03',
       requesterId: 'user_tt',
-      requesterName: 'tào xuân trường',
+      requesterName: 'Quân',
       resourceId: 'dev_01',
       resourceName: 'Thiết bị 01',
       type: AccessRequestType.device,
@@ -56,14 +65,14 @@ class MockAccessRequestRemoteDataSource implements AccessRequestRemoteDataSource
     AccessRequest(
       id: 'req_04',
       requesterId: 'user_expired',
-      requesterName: 'Nguyễn Văn Cũ',
+      requesterName: 'Nguyễn Văn Bùi',
       resourceId: 'room_01',
       resourceName: 'Phòng khách',
       type: AccessRequestType.room,
       roleRequested: AccessRole.member,
       status: AccessRequestStatus.pending,
       createdAt: DateTime.now().subtract(const Duration(days: 2)),
-      expiresAt: DateTime.now().subtract(const Duration(days: 1)), 
+      expiresAt: DateTime.now().subtract(const Duration(days: 1)),
     ),
   ];
 
@@ -76,13 +85,21 @@ class MockAccessRequestRemoteDataSource implements AccessRequestRemoteDataSource
   @override
   Future<AccessRequest> getDeviceRequestDetail(String id) async {
     await Future.delayed(const Duration(milliseconds: 500));
-    return _mockData.firstWhere((e) => e.id == id && e.type == AccessRequestType.device);
+    return _mockData.firstWhere(
+      (e) => e.id == id && e.type == AccessRequestType.device,
+    );
   }
 
   @override
-  Future<void> respondToDeviceRequest(String id, bool accept, AccessRole? roleToGrant) async {
+  Future<void> respondToDeviceRequest(
+    String id,
+    bool accept,
+    AccessRole? roleToGrant,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 1000));
-    final index = _mockData.indexWhere((e) => e.id == id && e.type == AccessRequestType.device);
+    final index = _mockData.indexWhere(
+      (e) => e.id == id && e.type == AccessRequestType.device,
+    );
     if (index != -1) {
       _mockData[index] = AccessRequest(
         id: _mockData[index].id,
@@ -92,7 +109,9 @@ class MockAccessRequestRemoteDataSource implements AccessRequestRemoteDataSource
         resourceName: _mockData[index].resourceName,
         type: _mockData[index].type,
         roleRequested: roleToGrant ?? _mockData[index].roleRequested,
-        status: accept ? AccessRequestStatus.accepted : AccessRequestStatus.declined,
+        status: accept
+            ? AccessRequestStatus.accepted
+            : AccessRequestStatus.declined,
         createdAt: _mockData[index].createdAt,
         expiresAt: _mockData[index].expiresAt,
         macAddress: _mockData[index].macAddress,
@@ -112,13 +131,21 @@ class MockAccessRequestRemoteDataSource implements AccessRequestRemoteDataSource
   @override
   Future<AccessRequest> getRoomRequestDetail(String id) async {
     await Future.delayed(const Duration(milliseconds: 500));
-    return _mockData.firstWhere((e) => e.id == id && e.type == AccessRequestType.room);
+    return _mockData.firstWhere(
+      (e) => e.id == id && e.type == AccessRequestType.room,
+    );
   }
 
   @override
-  Future<void> respondToRoomRequest(String id, bool accept, AccessRole? roleToGrant) async {
+  Future<void> respondToRoomRequest(
+    String id,
+    bool accept,
+    AccessRole? roleToGrant,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 1000));
-    final index = _mockData.indexWhere((e) => e.id == id && e.type == AccessRequestType.room);
+    final index = _mockData.indexWhere(
+      (e) => e.id == id && e.type == AccessRequestType.room,
+    );
     if (index != -1) {
       _mockData[index] = AccessRequest(
         id: _mockData[index].id,
@@ -128,7 +155,9 @@ class MockAccessRequestRemoteDataSource implements AccessRequestRemoteDataSource
         resourceName: _mockData[index].resourceName,
         type: _mockData[index].type,
         roleRequested: roleToGrant ?? _mockData[index].roleRequested,
-        status: accept ? AccessRequestStatus.accepted : AccessRequestStatus.declined,
+        status: accept
+            ? AccessRequestStatus.accepted
+            : AccessRequestStatus.declined,
         createdAt: _mockData[index].createdAt,
         expiresAt: _mockData[index].expiresAt,
         requesterPhone: _mockData[index].requesterPhone,

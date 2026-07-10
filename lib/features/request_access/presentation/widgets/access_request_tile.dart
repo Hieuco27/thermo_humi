@@ -10,7 +10,11 @@ class AccessRequestTile extends StatelessWidget {
   final AccessRequest request;
   final VoidCallback onTap;
 
-  const AccessRequestTile({super.key, required this.request, required this.onTap});
+  const AccessRequestTile({
+    super.key,
+    required this.request,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +24,8 @@ class AccessRequestTile extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
-        padding: EdgeInsets.all(16.w),
+        margin: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+        padding: EdgeInsets.all(8.w),
         decoration: BoxDecoration(
           color: isPending ? const Color(0xFFFFF7E6) : Colors.white,
           borderRadius: BorderRadius.circular(12.r),
@@ -32,10 +36,10 @@ class AccessRequestTile extends StatelessWidget {
               ? []
               : [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.02),
-                    blurRadius: 4,
+                    color: Colors.black.withValues(alpha: 0.3),
+                    blurRadius: 6,
                     offset: const Offset(0, 2),
-                  )
+                  ),
                 ],
         ),
         child: Row(
@@ -46,14 +50,18 @@ class AccessRequestTile extends StatelessWidget {
               width: 44.w,
               height: 44.w,
               decoration: BoxDecoration(
-                color: isPending ? Colors.orange.shade100 : const Color(0xFFD6E4FF),
+                color: isPending
+                    ? Colors.orange.shade100
+                    : const Color(0xFFD6E4FF),
                 shape: BoxShape.circle,
               ),
               child: Center(
                 child: Text(
                   request.requesterInitials,
                   style: AppTextStyles.titleMedium(
-                    color: isPending ? Colors.orange.shade800 : AppColors.primary,
+                    color: isPending
+                        ? Colors.orange.shade800
+                        : AppColors.primary,
                   ).copyWith(fontWeight: FontWeight.w600),
                 ),
               ),
@@ -74,7 +82,9 @@ class AccessRequestTile extends StatelessWidget {
                   SizedBox(height: 4.h),
                   Text(
                     'Xin quyền ${request.roleRequested.displayName} · ${request.type == AccessRequestType.device ? 'Thiết bị' : 'Phòng'}',
-                    style: AppTextStyles.bodyMedium(color: Colors.grey.shade600),
+                    style: AppTextStyles.bodyMedium(
+                      color: Colors.grey.shade600,
+                    ),
                   ),
                   SizedBox(height: 8.h),
                   StatusChip(status: status),
@@ -85,7 +95,7 @@ class AccessRequestTile extends StatelessWidget {
             // Time
             Text(
               DateFormat('HH:mm').format(request.createdAt),
-              style: AppTextStyles.labelMedium(color: Colors.grey.shade500),
+              style: AppTextStyles.titleSmall2(color: Colors.grey.shade500),
             ),
           ],
         ),

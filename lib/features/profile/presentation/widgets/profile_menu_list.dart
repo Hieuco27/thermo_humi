@@ -53,6 +53,9 @@ class ProfileMenuList extends StatelessWidget {
               iconPath: 'assets/icons/profile/room.svg',
               label: 'Quản lý phòng',
               badgeCount: '4',
+              onTap: () {
+                context.goNamed('room-management');
+              },
             ),
             const Divider(height: 1, color: Color(0xFFEEEEEE)),
             _ProfileMenuItem(

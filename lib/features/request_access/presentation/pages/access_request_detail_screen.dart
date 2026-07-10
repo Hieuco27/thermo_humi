@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart' as intl;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -46,215 +47,292 @@ class _DetailContentState extends State<_DetailContent> {
       listener: (context, state) {
         if (state.errorMessage != null) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.errorMessage!), backgroundColor: Colors.red),
+            SnackBar(
+              content: Text(state.errorMessage!),
+              backgroundColor: Colors.red,
+            ),
           );
         }
       },
       builder: (context, state) {
         if (state.status == AccessRequestDetailStatus.initial ||
-            (state.status == AccessRequestDetailStatus.loading && state.request == null)) {
+            (state.status == AccessRequestDetailStatus.loading &&
+                state.request == null)) {
           return Scaffold(
+            backgroundColor: Colors.white,
             appBar: AppBar(
-              backgroundColor: AppColors.gradientEnd,
+              backgroundColor: Colors.white,
               elevation: 0,
-              iconTheme: const IconThemeData(color: Colors.white),
+              iconTheme: const IconThemeData(color: Colors.black),
             ),
             body: const Center(child: CircularProgressIndicator()),
           );
         }
         if (state.status == AccessRequestDetailStatus.notFound) {
           return Scaffold(
-            appBar: AppBar(title: const Text('Chi tiết yêu cầu')),
+            backgroundColor: Colors.white,
+            appBar: AppBar(
+              backgroundColor: Colors.white,
+              elevation: 0,
+              iconTheme: const IconThemeData(color: Colors.black),
+              title: Text(
+                'Chi tiết yêu cầu',
+                style: AppTextStyles.titleMedium(color: Colors.black),
+              ),
+            ),
             body: const Center(child: Text('Không tìm thấy yêu cầu')),
           );
         }
 
         final request = state.request!;
-        _selectedRole ??= request.roleRequested; 
+        _selectedRole ??= request.roleRequested;
 
         return Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
             backgroundColor: AppColors.gradientEnd,
             elevation: 0,
-            iconTheme: const IconThemeData(color: Colors.white),
             centerTitle: true,
+            leading: IconButton(
+              icon: Icon(
+                Icons.arrow_back_ios,
+                color: Colors.white,
+                size: 22.sp,
+              ),
+              onPressed: () => context.pop(),
+            ),
             title: Text(
-              'Chi tiết yêu cầu',
-              style: AppTextStyles.titleMedium(color: Colors.white),
+              'Chấp nhận yêu cầu',
+              style: AppTextStyles.titleMediumAppBar(color: Colors.white),
             ),
           ),
-          body: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 24.h),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Avatar Large
-                Container(
-                  width: 80.w,
-                  height: 80.w,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      request.requesterInitials,
-                      style: AppTextStyles.headlineMedium().copyWith(
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 16.h),
-                Text(
-                  request.formattedRequesterName,
-                  style: AppTextStyles.titleLarge(color: AppColors.textPrimary),
-                ),
-                if (request.requesterPhone != null) ...[
-                  SizedBox(height: 4.h),
-                  Text(
-                    request.requesterPhone!,
-                    style: AppTextStyles.bodyMedium(color: Colors.grey.shade600),
-                  ),
-                ],
-                SizedBox(height: 24.h),
-                
-                // Info Box
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(16.w),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF9F9F9),
-                    borderRadius: BorderRadius.circular(12.r),
-                    border: Border.all(color: Colors.grey.shade200),
+          body: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 8.h,
                   ),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildInfoRow('Loại truy cập', request.type == AccessRequestType.device ? 'Thiết bị' : 'Phòng'),
+                      // Section 1: Thông tin người yêu cầu
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Thông tin người yêu cầu :',
+                          style: AppTextStyles.bodyMedium(color: Colors.black),
+                        ),
+                      ),
                       SizedBox(height: 12.h),
-                      _buildInfoRow('Tên ${request.type == AccessRequestType.device ? 'thiết bị' : 'phòng'}', request.resourceName),
-                      if (request.macAddress != null) ...[
-                        SizedBox(height: 12.h),
-                        _buildInfoRow('MAC Address', request.macAddress!),
-                      ],
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12.w,
+                          vertical: 8.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12.r),
+                          border: Border.all(color: Colors.grey.shade300),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.3),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            // Avatar
+                            Container(
+                              width: 50.w,
+                              height: 50.w,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade300,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.person,
+                                color: Colors.white,
+                                size: 30.w,
+                              ),
+                            ),
+                            SizedBox(width: 20.w),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    request.requesterName,
+                                    style: AppTextStyles.titleMediumBlack(),
+                                  ),
+                                  SizedBox(height: 8.h),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        'Số điện thoại:  ',
+                                        style: AppTextStyles.body13(
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                      Text(
+                                        request.requesterPhone ?? '-',
+                                        style: AppTextStyles.bodyMedium(
+                                          color: Colors.grey.shade500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 4.h),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        'Thời gian:  ',
+                                        style: AppTextStyles.body13(
+                                          color: Colors.black,
+                                        ),
+                                      ),
+
+                                      Text(
+                                        '12:08  27-02-2026',
+                                        style: AppTextStyles.bodyMedium(
+                                          color: Colors.grey.shade500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      SizedBox(height: 24.h),
+
+                      // Section 2: Thiết bị yêu cầu
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Thiết bị yêu cầu :',
+                          style: AppTextStyles.bodyMedium(color: Colors.black),
+                        ),
+                      ),
                       SizedBox(height: 12.h),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Trạng thái', style: AppTextStyles.bodyMedium(color: Colors.grey.shade600)),
-                          StatusChip(status: request.currentStatus),
-                        ],
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12.w,
+                          vertical: 8.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12.r),
+                          border: Border.all(color: Colors.grey.shade300),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.3),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // Device Image
+                            Container(
+                              width: 50.w,
+                              height: 50.w,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade200,
+                                borderRadius: BorderRadius.circular(8.r),
+                              ),
+                              child: Icon(
+                                request.type == AccessRequestType.room
+                                    ? Icons.door_front_door
+                                    : Icons.ad_units,
+                                color: Colors.grey.shade500,
+                                size: 30.w,
+                              ),
+                            ),
+                            SizedBox(width: 20.w),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    request.resourceName,
+                                    style: AppTextStyles.titleMediumBlack(),
+                                  ),
+                                  SizedBox(height: 8.h),
+                                  RichText(
+                                    text: TextSpan(
+                                      text: 'Quyền hạn:  ',
+                                      style: AppTextStyles.body13(
+                                        color: Colors.black,
+                                      ),
+                                      children: [
+                                        TextSpan(
+                                          text:
+                                              request.roleRequested.displayName,
+                                          style: AppTextStyles.bodyMedium(
+                                            color: Colors.grey.shade500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  if (request.macAddress != null) ...[
+                                    SizedBox(height: 8.h),
+                                    Text(
+                                      request.macAddress!,
+                                      style: AppTextStyles.bodyMedium(
+                                        color: Colors.grey.shade500,
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
-                
-                SizedBox(height: 32.h),
+              ),
 
-                if (request.currentStatus == AccessRequestStatus.pending) ...[
-                  RoleSelector(
-                    selectedRole: _selectedRole!,
-                    onChanged: state.status == AccessRequestDetailStatus.submitting
-                        ? null
-                        : (role) => setState(() => _selectedRole = role),
-                  ),
-                  SizedBox(height: 40.h),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: state.status == AccessRequestDetailStatus.submitting
-                              ? null
-                              : () {
-                                  context.read<AccessRequestDetailCubit>().respondToRequest(
-                                    request.id,
-                                    request.type,
-                                    accept: false,
-                                  );
-                                },
-                          style: OutlinedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(vertical: 14.h),
-                            side: BorderSide(color: Colors.red.shade400),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-                          ),
-                          child: state.isDeclining
-                              ? SizedBox(
-                                  width: 20.w,
-                                  height: 20.w,
-                                  child: CircularProgressIndicator(color: Colors.red.shade400, strokeWidth: 2),
-                                )
-                              : Text(
-                                  'Từ chối',
-                                  style: AppTextStyles.titleMedium(color: Colors.red.shade400),
-                                ),
-                        ),
-                      ),
-                      SizedBox(width: 16.w),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: state.status == AccessRequestDetailStatus.submitting
-                              ? null
-                              : () {
-                                  context.read<AccessRequestDetailCubit>().respondToRequest(
-                                    request.id,
-                                    request.type,
-                                    accept: true,
-                                    roleToGrant: _selectedRole,
-                                  );
-                                },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            padding: EdgeInsets.symmetric(vertical: 14.h),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
-                            elevation: 0,
-                          ),
-                          child: state.isAccepting
-                              ? SizedBox(
-                                  width: 20.w,
-                                  height: 20.w,
-                                  child: const CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                                )
-                              : Text(
-                                  'Chấp nhận',
-                                  style: AppTextStyles.titleMedium(color: Colors.white),
-                                ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ] else ...[
-                  Container(
-                    padding: EdgeInsets.all(16.w),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Yêu cầu này đã được xử lý hoặc hết hạn.',
-                        style: AppTextStyles.bodyMedium(color: AppColors.primary),
-                        textAlign: TextAlign.center,
+              // Bottom Button
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 32.h),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 52.h,
+                  child: ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(
+                        0xFF98F59B,
+                      ), // Light green matching the image
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(100.r),
                       ),
                     ),
+                    child: Text(
+                      'Đã được xác nhận',
+                      style: AppTextStyles.titleMedium(
+                        color: const Color(0xFF7CB37C),
+                      ).copyWith(fontSize: 16.sp), // Grayish green text
+                    ),
                   ),
-                ],
-              ],
-            ),
+                ),
+              ),
+            ],
           ),
         );
       },
-    );
-  }
-
-  Widget _buildInfoRow(String label, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: AppTextStyles.bodyMedium(color: Colors.grey.shade600)),
-        Text(value, style: AppTextStyles.bodyMedium(color: AppColors.textPrimary).copyWith(fontWeight: FontWeight.w600)),
-      ],
     );
   }
 }

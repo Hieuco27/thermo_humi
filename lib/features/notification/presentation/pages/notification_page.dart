@@ -55,15 +55,6 @@ class _NotificationPageState extends State<NotificationPage> {
             'Thông báo',
             style: AppTextStyles.titleMedium(color: Colors.white),
           ),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.person_add_alt_1, color: Colors.white),
-              onPressed: () {
-                context.goNamed('request-access-list');
-              },
-              tooltip: 'Yêu cầu truy cập',
-            ),
-          ],
         ),
         body: BlocBuilder<AlertCubit, AlertState>(
           builder: (context, state) {
