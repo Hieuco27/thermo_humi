@@ -71,12 +71,16 @@ class _UnassignedDevicesSheetState extends State<UnassignedDevicesSheet> {
                         children: [
                           Text(
                             'Chọn thiết bị để gán',
-                            style: AppTextStyles.titleMedium(color: Colors.black),
+                            style: AppTextStyles.titleMedium(
+                              color: Colors.black,
+                            ),
                           ),
                           SizedBox(height: 2.h),
                           Text(
                             'Gán vào: ${widget.roomName}',
-                            style: AppTextStyles.bodyMedium(color: Colors.grey.shade500),
+                            style: AppTextStyles.bodyMedium(
+                              color: Colors.grey.shade500,
+                            ),
                           ),
                         ],
                       ),
@@ -84,12 +88,14 @@ class _UnassignedDevicesSheetState extends State<UnassignedDevicesSheet> {
                     if (_selected.isNotEmpty)
                       Text(
                         '${_selected.length} đã chọn',
-                        style: AppTextStyles.bodyMedium(color: AppColors.primary),
+                        style: AppTextStyles.bodyMedium(
+                          color: AppColors.primary,
+                        ),
                       ),
                   ],
                 ),
               ),
-              SizedBox(height: 12.h),
+              SizedBox(height: 8.h),
               Divider(height: 1, color: Colors.grey.shade200),
 
               // Device list
@@ -97,7 +103,7 @@ class _UnassignedDevicesSheetState extends State<UnassignedDevicesSheet> {
                 child: widget.devices.isEmpty
                     ? Center(
                         child: Padding(
-                          padding: EdgeInsets.all(32.w),
+                          padding: EdgeInsets.all(16.w),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -109,7 +115,9 @@ class _UnassignedDevicesSheetState extends State<UnassignedDevicesSheet> {
                               SizedBox(height: 12.h),
                               Text(
                                 'Không có thiết bị nào chưa được gán phòng',
-                                style: AppTextStyles.bodyMedium(color: Colors.grey.shade500),
+                                style: AppTextStyles.bodyMedium(
+                                  color: Colors.grey.shade500,
+                                ),
                                 textAlign: TextAlign.center,
                               ),
                             ],
@@ -118,7 +126,10 @@ class _UnassignedDevicesSheetState extends State<UnassignedDevicesSheet> {
                       )
                     : ListView.separated(
                         controller: scrollController,
-                        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12.w,
+                          vertical: 8.h,
+                        ),
                         itemCount: widget.devices.length,
                         separatorBuilder: (_, __) => SizedBox(height: 8.h),
                         itemBuilder: (_, index) {
@@ -166,7 +177,9 @@ class _UnassignedDevicesSheetState extends State<UnassignedDevicesSheet> {
                             ? 'Gán vào phòng'
                             : 'Gán ${_selected.length} thiết bị vào phòng',
                         style: AppTextStyles.titleMedium(
-                          color: _selected.isEmpty ? Colors.grey.shade500 : Colors.white,
+                          color: _selected.isEmpty
+                              ? Colors.grey.shade500
+                              : Colors.white,
                         ),
                       ),
                     ),
@@ -198,14 +211,11 @@ class _UnassignedDeviceTile extends StatelessWidget {
     return GestureDetector(
       onTap: onToggle,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 12.h),
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary.withValues(alpha: 0.06) : Colors.white,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(
-            color: isSelected ? AppColors.primary : Colors.grey.shade200,
-            width: isSelected ? 1.5 : 1,
-          ),
+          border: Border.all(color: Colors.grey, width: 0.2),
         ),
         child: Row(
           children: [
@@ -215,7 +225,9 @@ class _UnassignedDeviceTile extends StatelessWidget {
               height: 8.w,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: isOnline ? const Color(0xFF34C759) : Colors.grey.shade400,
+                color: isOnline
+                    ? const Color(0xFF34C759)
+                    : Colors.grey.shade400,
               ),
             ),
             SizedBox(width: 12.w),
@@ -224,11 +236,16 @@ class _UnassignedDeviceTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(device.name, style: AppTextStyles.titleMedium(color: Colors.black)),
+                  Text(
+                    device.name,
+                    style: AppTextStyles.titleMedium(color: Colors.black),
+                  ),
                   SizedBox(height: 2.h),
                   Text(
                     device.serialNumber ?? '-',
-                    style: AppTextStyles.bodyMedium(color: Colors.grey.shade500),
+                    style: AppTextStyles.bodyMedium(
+                      color: Colors.grey.shade500,
+                    ),
                   ),
                 ],
               ),
@@ -238,7 +255,9 @@ class _UnassignedDeviceTile extends StatelessWidget {
               value: isSelected,
               onChanged: (_) => onToggle(),
               activeColor: AppColors.primary,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.r)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4.r),
+              ),
             ),
           ],
         ),

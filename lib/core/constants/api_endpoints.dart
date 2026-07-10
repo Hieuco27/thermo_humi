@@ -6,7 +6,7 @@ class ApiEndpoints {
   ApiEndpoints._();
 
   // ── Auth ──────────────────────────────────────────────────────────────────
-  static const String login = '/api/v1/auth/login';
+  static const String login = '/auth/login';
   static const String logout = '/api/v1/auth/logout';
   static const String refreshToken = '/api/v1/auth/refresh-token';
   static const String me = '/api/v1/auth/me';

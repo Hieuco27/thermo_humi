@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:thermo_humi/core/router/route_names.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
 
 class ProfileLogoutButton extends StatelessWidget {
@@ -19,7 +21,45 @@ class ProfileLogoutButton extends StatelessWidget {
           color: Colors.transparent,
           child: InkWell(
             borderRadius: BorderRadius.circular(12.r),
-            onTap: () {},
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text(
+                    'Xác nhận đăng xuất',
+                    style: AppTextStyles.titleMedium(color: Colors.black),
+                  ),
+                  content: Text(
+                    'Bạn có chắc chắn muốn đăng xuất khỏi ứng dụng không?',
+                    style: AppTextStyles.bodyMedium(
+                      color: Colors.grey.shade700,
+                    ),
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16.r),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        'Hủy',
+                        style: AppTextStyles.labelLarge(color: Colors.grey),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        context.go(RouteNames.login);
+                      },
+                      child: Text(
+                        'Đăng xuất',
+                        style: AppTextStyles.labelLarge(color: Colors.red),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 12.h),
               child: Row(

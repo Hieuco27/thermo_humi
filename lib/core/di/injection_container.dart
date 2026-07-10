@@ -29,14 +29,30 @@ import 'package:thermo_humi/features/request_access/domain/repositories/access_r
 import 'package:thermo_humi/features/request_access/presentation/cubit/access_request_detail_cubit.dart';
 import 'package:thermo_humi/features/request_access/presentation/cubit/device_access_request_list_cubit.dart';
 import 'package:thermo_humi/features/request_access/presentation/cubit/room_access_request_list_cubit.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:thermo_humi/core/network/dio_client.dart';
+import 'package:thermo_humi/core/network/interceptors/auth_interceptor.dart';
+import 'package:thermo_humi/core/network/interceptors/error_interceptor.dart';
+import 'package:thermo_humi/core/storage/secure_storage.dart';
+
 final sl = GetIt.instance;
 
 void init() {
+  // --- Core ---
+  sl.registerLazySingleton(() => const FlutterSecureStorage());
+  sl.registerLazySingleton(() => SecureStorage(sl()));
+  
+  sl.registerLazySingleton(() => AuthInterceptor(sl()));
+  sl.registerLazySingleton(() => ErrorInterceptor());
+  
+  sl.registerLazySingleton<Dio>(() => DioClient.createDio(sl(), sl()));
+
   // --- Auth Feature ---
 
   // 1. Data Sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(),
+    () => AuthRemoteDataSourceImpl(sl(), sl()),
   );
 
   // 2. Repositories

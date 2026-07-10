@@ -1,21 +1,61 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
+import 'package:thermo_humi/core/constants/api_endpoints.dart';
+import 'package:thermo_humi/core/constants/app_constants.dart';
+import 'package:thermo_humi/core/storage/secure_storage.dart';
 import 'package:thermo_humi/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:thermo_humi/features/auth/data/models/user_model.dart';
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
+  final Dio _dio;
+  final SecureStorage _secureStorage;
+
+  AuthRemoteDataSourceImpl(this._dio, this._secureStorage);
+
   @override
   Future<UserModel> signIn(String email, String password) async {
-    // Giả lập delay mạng 1 giây
-    await Future.delayed(const Duration(seconds: 1));
+    final response = await _dio.post(
+      ApiEndpoints.login,
+      data: {'UserName': email, 'Password': password},
+    );
 
-    // Giả lập trả về user thành công
+    if (response.data['success'] != true) {
+      throw Exception(response.data['message'] ?? 'Đăng nhập thất bại');
+    }
+
+    final data = response.data['data'];
+    final accessToken = data['accessToken'] ?? '';
+    final refreshToken = data['refreshToken'] ?? '';
+    final userName = data['userName'] ?? '';
+
+    String realUserId = userName;
+    if (accessToken.isNotEmpty) {
+      try {
+        final parts = accessToken.split('.');
+        if (parts.length == 3) {
+          final payload = parts[1];
+          final normalized = base64Url.normalize(payload);
+          final decoded = utf8.decode(base64Url.decode(normalized));
+          final claims = json.decode(decoded);
+
+          if (claims['sub'] != null) {
+            realUserId = claims['sub'].toString();
+          }
+        }
+      } catch (e) {
+        // Ignored, fallback to userName
+      }
+      await _secureStorage.write(AppConstants.kAccessToken, accessToken);
+    }
+
     return UserModel(
-      id: '1',
-      name: 'HMS User',
+      id: realUserId, // Đã lấy đúng sub (ID) từ JWT
+      name: userName, // Nếu API không trả về name, dùng tạm userName
       email: email,
-      phone: '0123456789',
-      avatar: null,
-      accessToken: 'dummy_access_token',
-      refreshToken: 'dummy_refresh_token',
+      phone: userName,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
     );
   }
 

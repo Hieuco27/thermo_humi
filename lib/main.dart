@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:thermo_humi/core/router/app_router.dart';
 import 'package:thermo_humi/core/di/injection_container.dart' as di;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
+  try {
+    await dotenv.load(fileName: "assets/env/.env");
+  } catch (e) {
+    debugPrint("Failed to load .env file: $e");
+  }
+
   // Khởi tạo Dependency Injection (đăng ký các Bloc, UseCase...)
   di.init();
 
