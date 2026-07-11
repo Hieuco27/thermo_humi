@@ -120,14 +120,9 @@ class _RoomManagementScreenState extends State<RoomManagementScreen> {
                       horizontal: 12.w,
                       vertical: 8.h,
                     ),
-                    itemCount:
-                        _filteredRooms.length +
-                        1, // +1 cho nút "Thêm phòng mới" cuối list
+                    itemCount: _filteredRooms.length,
                     separatorBuilder: (_, __) => SizedBox(height: 8.h),
                     itemBuilder: (context, index) {
-                      if (index == _filteredRooms.length) {
-                        return _AddRoomButton(onTap: _onAddRoom);
-                      }
                       final rwd = _filteredRooms[index];
                       return _RoomManagementCard(
                         rwd: rwd,
@@ -135,6 +130,20 @@ class _RoomManagementScreenState extends State<RoomManagementScreen> {
                       );
                     },
                   ),
+          ),
+
+          // Nút thêm phòng mới ghim ở cuối
+          SafeArea(
+            top: false,
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: 12.w,
+                right: 12.w,
+                bottom: 24.h,
+                top: 8.h,
+              ),
+              child: _AddRoomButton(onTap: _onAddRoom),
+            ),
           ),
         ],
       ),
@@ -167,7 +176,8 @@ class _RoomManagementScreenState extends State<RoomManagementScreen> {
             // Cập nhật lại list gốc
             _allRooms[index] = RoomWithDevices(
               room: updatedRoom,
-              devices: oldRwd.devices, // Danh sách mock devices không quá quan trọng ở màn ngoài
+              devices: oldRwd
+                  .devices, // Danh sách mock devices không quá quan trọng ở màn ngoài
             );
           }
         }
@@ -184,7 +194,7 @@ class _RoomManagementScreenState extends State<RoomManagementScreen> {
   }
 }
 
-// ── Room Card ─────────────────────────────────────────────────────────────
+// ── Room Card
 class _RoomManagementCard extends StatelessWidget {
   final RoomWithDevices rwd;
   final VoidCallback onTap;

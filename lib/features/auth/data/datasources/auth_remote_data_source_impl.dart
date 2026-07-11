@@ -50,8 +50,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
 
     return UserModel(
-      id: realUserId, // Đã lấy đúng sub (ID) từ JWT
-      name: userName, // Nếu API không trả về name, dùng tạm userName
+      id: realUserId,
+      name: userName,
       email: email,
       phone: userName,
       accessToken: accessToken,
@@ -60,8 +60,52 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<UserModel> signUp(String email, String password) {
-    throw UnimplementedError();
+  Future<UserModel> signUp(
+    String userName,
+    String password,
+    String fullname,
+  ) async {
+    final response = await _dio.post(
+      ApiEndpoints.register,
+      data: {'UserName': userName, 'Password': password, 'FullName': fullname},
+    );
+    if (response.data['success'] != true) {
+      throw Exception(response.data['message'] ?? 'Đăng ký thất bại');
+    }
+
+    final data = response.data['data'];
+    final accessToken = data['accessToken'] ?? '';
+    final refreshToken = data['refreshToken'] ?? '';
+    final returnedUserName = data['userName'] ?? userName;
+
+    String realUserId = returnedUserName;
+    if (accessToken.isNotEmpty) {
+      try {
+        final parts = accessToken.split('.');
+        if (parts.length == 3) {
+          final payload = parts[1];
+          final normalized = base64Url.normalize(payload);
+          final decoded = utf8.decode(base64Url.decode(normalized));
+          final claims = json.decode(decoded);
+
+          if (claims['sub'] != null) {
+            realUserId = claims['sub'].toString();
+          }
+        }
+      } catch (e) {
+        // Ignored, fallback to userName
+      }
+      await _secureStorage.write(AppConstants.kAccessToken, accessToken);
+    }
+
+    return UserModel(
+      id: realUserId,
+      name: fullname,
+      email: returnedUserName,
+      phone: returnedUserName,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    );
   }
 
   @override

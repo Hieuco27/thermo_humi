@@ -7,6 +7,7 @@ import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
 import 'package:thermo_humi/features/auth/presentation/bloc/register/register_bloc.dart';
 import 'package:thermo_humi/features/auth/presentation/widgets/sign_up/sign_up_form.dart';
+import 'package:thermo_humi/core/di/injection_container.dart';
 import 'package:thermo_humi/features/auth/presentation/widgets/sign_up/sign_up_header.dart';
 
 class SignUpPage extends StatelessWidget {
@@ -15,7 +16,7 @@ class SignUpPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => RegisterBloc(),
+      create: (context) => sl<RegisterBloc>(),
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.black,

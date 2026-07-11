@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
 import 'package:thermo_humi/features/device/domain/entities/device_entity.dart';
 
 class RoomDeviceTile extends StatelessWidget {
   final DeviceEntity device;
   final VoidCallback onMoreTap;
+  final bool showRoomBadge;
 
   const RoomDeviceTile({
     super.key,
     required this.device,
     required this.onMoreTap,
+    this.showRoomBadge = false,
   });
 
   @override
@@ -69,6 +72,30 @@ class RoomDeviceTile extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 3.h),
+                if (showRoomBadge) ...[
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 8.w,
+                      vertical: 2.h,
+                    ),
+                    decoration: BoxDecoration(
+                      color: device.roomName != null
+                          ? AppColors.primary.withValues(alpha: 0.1)
+                          : Colors.grey.shade200,
+                      borderRadius: BorderRadius.circular(10.r),
+                    ),
+                    child: Text(
+                      device.roomName ?? 'Chưa gán phòng',
+                      style: AppTextStyles.label13(
+                        color: device.roomName != null
+                            ? AppColors.primary
+                            : Colors.grey.shade600,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 3.h),
+                ],
                 Text(
                   device.serialNumber ?? 'Không có SN',
                   style: AppTextStyles.label13(color: Colors.grey.shade500),

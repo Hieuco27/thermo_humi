@@ -18,4 +18,13 @@ abstract class DeviceRepository {
     String deviceId,
     DateTime date,
   );
+
+  Future<Either<String, PaginatedDeviceResult>> getDevices({
+    String? roomId,
+    String? search,
+    String? sortOrder,
+    String? statusFilter,
+    int page = 1,
+    int limit = 20,
+  });
 }

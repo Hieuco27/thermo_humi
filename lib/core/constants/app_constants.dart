@@ -26,11 +26,11 @@ class AppConstants {
   static const int maxRetries = 3;
 
   // ── Realtime (abstracted - configured via env) ────────────────────────────
-  static const String kRealtimeType = 'REALTIME_TYPE'; // MQTT | WS | POLLING
+  static const String kRealtimeType = 'REALTIME_TYPE';
   static const Duration pollingInterval = Duration(seconds: 30);
 
   // ── Chart ─────────────────────────────────────────────────────────────────
-  static const int chart24hPoints = 48; // 1 điểm / 30 phút
+  static const int chart24hPoints = 48;
 
   // ── Validation ────────────────────────────────────────────────────────────
   static const int minPasswordLength = 6;

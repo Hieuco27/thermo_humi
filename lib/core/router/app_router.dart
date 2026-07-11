@@ -10,7 +10,8 @@ import 'package:thermo_humi/features/profile/presentation/pages/profile_page.dar
 import 'package:thermo_humi/features/report/presentation/pages/report_page.dart';
 import 'package:thermo_humi/features/room/presentation/pages/room_list_page.dart';
 import 'package:thermo_humi/features/room/presentation/pages/room_detail_page.dart';
-import 'package:thermo_humi/features/room_management/presentation/pages/room_detail_screen.dart' as rm;
+import 'package:thermo_humi/features/room_management/presentation/pages/room_detail_screen.dart'
+    as rm;
 import 'package:thermo_humi/common/widgets/nav_bar.dart';
 import 'package:thermo_humi/features/auth/presentation/pages/sign_in_page.dart';
 import 'package:thermo_humi/features/auth/presentation/pages/sign_up_page.dart';
@@ -20,12 +21,13 @@ import 'package:thermo_humi/features/request_access/domain/entities/access_reque
 import 'package:thermo_humi/features/request_access/presentation/pages/access_request_list_screen.dart';
 import 'package:thermo_humi/features/request_access/presentation/pages/access_request_detail_screen.dart';
 import 'package:thermo_humi/features/room_management/presentation/pages/room_management_screen.dart';
+import 'package:thermo_humi/features/device/presentation/pages/device_management_screen.dart';
 
 @singleton
 class AppRouter {
   AppRouter._();
   static final GoRouter router = GoRouter(
-    initialLocation: RouteNames.login,
+    initialLocation: RouteNames.home,
     routes: [
       // ── Auth ──────────────────────────────────────────────────────────────
       GoRoute(
@@ -153,6 +155,11 @@ class AppRouter {
                         ),
                       ),
                     ],
+                  ),
+                  GoRoute(
+                    path: 'device-management',
+                    name: 'device-management',
+                    builder: (_, __) => const DeviceManagementScreen(),
                   ),
                 ],
               ),

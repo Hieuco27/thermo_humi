@@ -39,6 +39,13 @@ class _SignUpFormState extends State<SignUpForm> {
     return Column(
       children: [
         AuthTextField(
+          hintText: 'Họ và tên',
+          prefixIcon: Icons.person_outline,
+          controller: _nameController,
+          keyboardType: TextInputType.name,
+        ),
+        SizedBox(height: 10.h),
+        AuthTextField(
           hintText: 'Số điện thoại',
           prefixIcon: Icons.phone_outlined,
           controller: _phoneController,
@@ -85,7 +92,6 @@ class _SignUpFormState extends State<SignUpForm> {
                 context.read<RegisterBloc>().add(
                   RegisterSubmitted(
                     name: _nameController.text,
-                    email: _emailController.text,
                     phone: _phoneController.text,
                     password: _passwordController.text,
                     confirmPassword: _confirmPasswordController.text,

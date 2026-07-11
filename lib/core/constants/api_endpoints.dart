@@ -7,9 +7,9 @@ class ApiEndpoints {
 
   // ── Auth ──────────────────────────────────────────────────────────────────
   static const String login = '/auth/login';
-  static const String logout = '/api/v1/auth/logout';
-  static const String refreshToken = '/api/v1/auth/refresh-token';
-  static const String me = '/api/v1/auth/me';
+  static const String register = '/auth/register';
+  static const String logout = '/auth/logout';
+  static const String refreshToken = '/auth/refresh-token';
 
   // ── Dashboard ─────────────────────────────────────────────────────────────
   static const String dashboardSummary = '/api/v1/dashboard/summary';
@@ -40,8 +40,7 @@ class ApiEndpoints {
   static String markNotificationRead(String id) =>
       '/api/v1/notifications/$id/read';
   static const String registerSms = '/api/v1/notifications/sms/register';
-  static const String registerPushToken =
-      '/api/v1/notifications/push/register';
+  static const String registerPushToken = '/api/v1/notifications/push/register';
 
   // ── Account / Members ─────────────────────────────────────────────────────
   static const String members = '/api/v1/account/members';

@@ -7,6 +7,7 @@ class DeviceEntity extends Equatable {
   final String id;
   final String name;
   final String roomId;
+  final String? roomName;
   final String? serialNumber;
   final DeviceStatus status;
   final ConnectivityStatus connectivity;
@@ -19,6 +20,7 @@ class DeviceEntity extends Equatable {
     required this.id,
     required this.name,
     required this.roomId,
+    this.roomName,
     this.serialNumber,
     required this.status,
     required this.connectivity,
@@ -44,8 +46,36 @@ class DeviceEntity extends Equatable {
 
   bool get hasAlert => isTemperatureAlert || isHumidityAlert;
 
+  DeviceEntity copyWith({
+    String? id,
+    String? name,
+    String? roomId,
+    String? roomName,
+    String? serialNumber,
+    DeviceStatus? status,
+    ConnectivityStatus? connectivity,
+    double? currentTemperature,
+    double? currentHumidity,
+    ThresholdEntity? threshold,
+    DateTime? lastUpdatedAt,
+  }) {
+    return DeviceEntity(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      roomId: roomId ?? this.roomId,
+      roomName: roomName ?? this.roomName,
+      serialNumber: serialNumber ?? this.serialNumber,
+      status: status ?? this.status,
+      connectivity: connectivity ?? this.connectivity,
+      currentTemperature: currentTemperature ?? this.currentTemperature,
+      currentHumidity: currentHumidity ?? this.currentHumidity,
+      threshold: threshold ?? this.threshold,
+      lastUpdatedAt: lastUpdatedAt ?? this.lastUpdatedAt,
+    );
+  }
+
   @override
-  List<Object?> get props => [id, name, roomId, status];
+  List<Object?> get props => [id, name, roomId, roomName, status];
 }
 
 enum DeviceStatus { online, offline, unknown }
@@ -72,4 +102,17 @@ class ThresholdEntity extends Equatable {
 
   @override
   List<Object?> get props => [tempHigh, tempLow, humidHigh, humidLow];
+}
+
+class PaginatedDeviceResult extends Equatable {
+  final List<DeviceEntity> devices;
+  final int totalCount;
+
+  const PaginatedDeviceResult({
+    required this.devices,
+    required this.totalCount,
+  });
+
+  @override
+  List<Object?> get props => [devices, totalCount];
 }

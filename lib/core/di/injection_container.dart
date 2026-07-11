@@ -1,4 +1,6 @@
 import 'package:get_it/get_it.dart';
+import 'package:thermo_humi/features/auth/domain/usecases/sign_up_usecase.dart';
+import 'package:thermo_humi/features/auth/presentation/bloc/register/register_bloc.dart';
 import 'package:thermo_humi/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:thermo_humi/features/auth/data/datasources/auth_remote_data_source_impl.dart';
 import 'package:thermo_humi/features/auth/data/repositories/auth_repository_impl.dart';
@@ -36,16 +38,21 @@ import 'package:thermo_humi/core/network/interceptors/auth_interceptor.dart';
 import 'package:thermo_humi/core/network/interceptors/error_interceptor.dart';
 import 'package:thermo_humi/core/storage/secure_storage.dart';
 
+import 'package:thermo_humi/features/device/presentation/bloc/device_management/device_management_cubit.dart';
+import 'package:thermo_humi/features/device/presentation/bloc/device_detail/device_history_cubit.dart';
+import 'package:thermo_humi/features/device/domain/repositories/device_repository.dart';
+import 'package:thermo_humi/features/device/data/repositories/device_repository_impl.dart';
+
 final sl = GetIt.instance;
 
 void init() {
   // --- Core ---
   sl.registerLazySingleton(() => const FlutterSecureStorage());
   sl.registerLazySingleton(() => SecureStorage(sl()));
-  
+
   sl.registerLazySingleton(() => AuthInterceptor(sl()));
   sl.registerLazySingleton(() => ErrorInterceptor());
-  
+
   sl.registerLazySingleton<Dio>(() => DioClient.createDio(sl(), sl()));
 
   // --- Auth Feature ---
@@ -62,9 +69,11 @@ void init() {
 
   // 3. UseCases
   sl.registerLazySingleton(() => SignInUseCase(sl()));
+  sl.registerLazySingleton(() => SignUpUseCase(sl()));
 
   // 4. Blocs
   sl.registerFactory(() => LoginBloc(signInUseCase: sl()));
+  sl.registerFactory(() => RegisterBloc(signUpUseCase: sl()));
 
   // --- Notification Feature ---
   sl.registerLazySingleton(() => MockAlertDataSource());
@@ -91,10 +100,20 @@ void init() {
   sl.registerLazySingleton<MemberRepository>(() => FakeMemberRepository());
   sl.registerFactory(() => MemberCubit(repository: sl()));
 
+  // --- Device Management Feature ---
+  sl.registerLazySingleton<DeviceRepository>(() => DeviceRepositoryImpl());
+
+  sl.registerFactory(() => DeviceManagementCubit(repository: sl()));
+  sl.registerFactory(() => DeviceHistoryCubit(repository: sl()));
+
   // --- Request Access Feature ---
-  sl.registerLazySingleton<AccessRequestRemoteDataSource>(() => MockAccessRequestRemoteDataSource());
-  sl.registerLazySingleton<AccessRequestRepository>(() => AccessRequestRepositoryImpl(remoteDataSource: sl()));
-  
+  sl.registerLazySingleton<AccessRequestRemoteDataSource>(
+    () => MockAccessRequestRemoteDataSource(),
+  );
+  sl.registerLazySingleton<AccessRequestRepository>(
+    () => AccessRequestRepositoryImpl(remoteDataSource: sl()),
+  );
+
   sl.registerFactory(() => RoomAccessRequestListCubit(repository: sl()));
   sl.registerFactory(() => DeviceAccessRequestListCubit(repository: sl()));
   sl.registerFactory(() => AccessRequestDetailCubit(repository: sl()));

@@ -1,9 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:thermo_humi/features/auth/domain/usecases/sign_up_usecase.dart';
 import 'register_event.dart';
 import 'register_state.dart';
 
 class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
-  RegisterBloc() : super(RegisterInitial()) {
+  final SignUpUseCase signUpUseCase;
+
+  RegisterBloc({required this.signUpUseCase}) : super(RegisterInitial()) {
     on<RegisterSubmitted>(_onRegisterSubmitted);
   }
 
@@ -13,23 +16,22 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
   ) async {
     emit(RegisterLoading());
     try {
-      // Mock API call delay
-      await Future.delayed(const Duration(seconds: 2));
-
       // Validation
       if (event.name.isEmpty ||
-          event.email.isEmpty ||
           event.phone.isEmpty ||
           event.password.isEmpty ||
           event.confirmPassword.isEmpty) {
-        emit(const RegisterError('All fields are required.'));
+        emit(const RegisterError('Vui lòng nhập đầy đủ thông tin.'));
         return;
       }
 
       if (event.password != event.confirmPassword) {
-        emit(const RegisterError('Passwords do not match.'));
+        emit(const RegisterError('Mật khẩu không khớp.'));
         return;
       }
+
+      // API Call
+      await signUpUseCase.execute(event.phone, event.password, event.name);
 
       // Success
       emit(RegisterSuccess());

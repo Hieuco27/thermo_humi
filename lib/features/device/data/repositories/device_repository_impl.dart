@@ -136,4 +136,74 @@ class DeviceRepositoryImpl implements DeviceRepository {
       return Left(e.toString());
     }
   }
+
+  @override
+  Future<Either<String, PaginatedDeviceResult>> getDevices({
+    String? roomId,
+    String? search,
+    String? sortOrder,
+    String? statusFilter,
+    int page = 1,
+    int limit = 20,
+  }) async {
+    // Giả lập network delay
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    try {
+      List<DeviceEntity> allDevices = [];
+
+      // Phẳng hoá danh sách thiết bị từ các phòng và gán tên phòng
+      for (final roomWithDevices in buildMockRooms()) {
+        for (final device in roomWithDevices.devices) {
+          allDevices.add(device.copyWith(roomName: roomWithDevices.room.name));
+        }
+      }
+      
+      // Thêm các thiết bị chưa gán phòng
+      for (final device in buildUnassignedDevices()) {
+         allDevices.add(device.copyWith(roomName: null));
+      }
+
+      // 1. Lọc theo phòng (nếu có)
+      if (roomId != null && roomId.isNotEmpty) {
+        allDevices = allDevices.where((d) => d.roomId == roomId).toList();
+      }
+
+      // 2. Lọc theo trạng thái
+      if (statusFilter != null && statusFilter != 'all') {
+        if (statusFilter == 'online') {
+          allDevices = allDevices.where((d) => d.status == DeviceStatus.online).toList();
+        } else if (statusFilter == 'offline') {
+          allDevices = allDevices.where((d) => d.status == DeviceStatus.offline).toList();
+        }
+      }
+
+      // 3. Tìm kiếm theo tên
+      if (search != null && search.trim().isNotEmpty) {
+        final q = search.trim().toLowerCase();
+        allDevices = allDevices.where((d) => d.name.toLowerCase().contains(q)).toList();
+      }
+
+      // 4. Sắp xếp
+      // Mặc định là A-Z
+      allDevices.sort((a, b) => a.name.compareTo(b.name));
+      if (sortOrder == 'Z-A') {
+        allDevices = allDevices.reversed.toList();
+      }
+
+      // 5. Phân trang
+      final totalCount = allDevices.length;
+      final startIndex = (page - 1) * limit;
+      
+      List<DeviceEntity> pagedDevices = [];
+      if (startIndex < totalCount) {
+        final endIndex = min(startIndex + limit, totalCount);
+        pagedDevices = allDevices.sublist(startIndex, endIndex);
+      }
+
+      return Right(PaginatedDeviceResult(devices: pagedDevices, totalCount: totalCount));
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
 }

@@ -63,6 +63,9 @@ class ProfileMenuList extends StatelessWidget {
               label: 'Quản lý thiết bị',
               badgeCount: '12',
               isLast: true,
+              onTap: () {
+                context.goNamed('device-management');
+              },
             ),
           ],
         ),
