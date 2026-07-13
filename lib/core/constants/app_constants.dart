@@ -12,6 +12,7 @@ class AppConstants {
   static const String kAccessToken = 'access_token';
   static const String kRefreshToken = 'refresh_token';
   static const String kUserId = 'user_id';
+  static const String kUserData = 'user_data';
   static const String kThemeMode = 'theme_mode';
   static const String kLanguage = 'language';
   static const String kFcmToken = 'fcm_token';

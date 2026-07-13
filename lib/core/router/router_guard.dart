@@ -14,7 +14,18 @@ class RouterGuard {
 
   RouterGuard(this._secureStorage);
 
+  static bool _isFirstLaunch = true;
+
   Future<String?> redirect(BuildContext context, GoRouterState state) async {
+    if (_isFirstLaunch) {
+      _isFirstLaunch = false;
+      final rememberMe = await _secureStorage.read('remember_me') == 'true';
+      if (!rememberMe) {
+        await _secureStorage.delete(AppConstants.kAccessToken);
+        await _secureStorage.delete(AppConstants.kRefreshToken);
+      }
+    }
+
     final token = await _secureStorage.read(AppConstants.kAccessToken);
     final isAuthenticated = token != null && token.isNotEmpty;
 

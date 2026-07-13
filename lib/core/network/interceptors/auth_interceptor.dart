@@ -12,6 +12,17 @@ class AuthInterceptor extends Interceptor {
 
   AuthInterceptor(this._secureStorage);
 
+  bool _isRefreshing = false;
+  final Dio _dioForRefresh = Dio(
+    BaseOptions(
+      baseUrl: 'http://192.168.1.19:8999',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    ),
+  );
+
   @override
   Future<void> onRequest(
     RequestOptions options,
@@ -22,5 +33,81 @@ class AuthInterceptor extends Interceptor {
       options.headers['Authorization'] = 'Bearer $token';
     }
     handler.next(options);
+  }
+
+  @override
+  Future<void> onError(
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
+    if (err.response?.statusCode == 401) {
+      final refreshToken = await _secureStorage.read(
+        AppConstants.kRefreshToken,
+      );
+
+      if (refreshToken != null && refreshToken.isNotEmpty) {
+        if (!_isRefreshing) {
+          _isRefreshing = true;
+          try {
+            final response = await _dioForRefresh.post(
+              '/auth/refresh-token',
+              data: {'RefreshToken': refreshToken},
+            );
+
+            final data = response.data['data'];
+            String newAccessToken = '';
+            String newRefreshToken = '';
+
+            if (data is Map) {
+              newAccessToken = data['accessToken'] ?? '';
+              newRefreshToken = data['refreshToken'] ?? '';
+            } else if (data is String) {
+              newAccessToken = data;
+            }
+
+            if (newAccessToken.isNotEmpty) {
+              await _secureStorage.write(
+                AppConstants.kAccessToken,
+                newAccessToken,
+              );
+              if (newRefreshToken.isNotEmpty) {
+                await _secureStorage.write(
+                  AppConstants.kRefreshToken,
+                  newRefreshToken,
+                );
+              }
+
+              // Gọi lại request ban đầu với token mới
+              err.requestOptions.headers['Authorization'] =
+                  'Bearer $newAccessToken';
+              final retryResponse = await _dioForRefresh.request(
+                err.requestOptions.path,
+                options: Options(
+                  method: err.requestOptions.method,
+                  headers: err.requestOptions.headers,
+                ),
+                data: err.requestOptions.data,
+                queryParameters: err.requestOptions.queryParameters,
+              );
+              _isRefreshing = false;
+              return handler.resolve(retryResponse);
+            }
+          } catch (e) {
+            // Refresh thất bại (có thể do refresh token hết hạn)
+            await _secureStorage.delete(AppConstants.kAccessToken);
+            await _secureStorage.delete(AppConstants.kRefreshToken);
+          } finally {
+            _isRefreshing = false;
+          }
+        } else {
+          // TODO: Nếu đang refresh thì có thể queue các request khác lại.
+          // Hiện tại nếu có nhiều request cùng lỗi 401 thì request sau sẽ văng lỗi luôn.
+        }
+      } else {
+        // Không có refresh token (ví dụ do không tick Duy trì đăng nhập)
+        await _secureStorage.delete(AppConstants.kAccessToken);
+      }
+    }
+    handler.next(err);
   }
 }

@@ -207,9 +207,9 @@ class _RoleSelectionSheetState extends State<RoleSelectionSheet> {
                       onPressed: () => Navigator.pop(context),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.black87,
-                        padding: EdgeInsets.symmetric(vertical: 14.h),
+                        padding: EdgeInsets.symmetric(vertical: 12.h),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.r),
+                          borderRadius: BorderRadius.circular(16.r),
                         ),
                       ),
                       child: Text('Huỷ', style: AppTextStyles.bodyMedium()),
@@ -226,9 +226,9 @@ class _RoleSelectionSheetState extends State<RoleSelectionSheet> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.gradientEnd,
                         disabledBackgroundColor: Colors.grey[300],
-                        padding: EdgeInsets.symmetric(vertical: 14.h),
+                        padding: EdgeInsets.symmetric(vertical: 12.h),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.r),
+                          borderRadius: BorderRadius.circular(12.r),
                         ),
                       ),
                       child: Text(
@@ -254,7 +254,7 @@ class _RoleSelectionSheetState extends State<RoleSelectionSheet> {
                   ),
                   padding: EdgeInsets.symmetric(vertical: 12.h),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.r),
+                    borderRadius: BorderRadius.circular(16.r),
                   ),
                 ),
                 icon: const Icon(Icons.person_remove_outlined),

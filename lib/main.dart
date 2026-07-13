@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
       splitScreenMode: true,
       builder: (context, child) {
         return MaterialApp.router(
-          title: 'Fit Check',
+          title: 'Thermo Humi',
           themeMode: ThemeMode.light,
           routerConfig: AppRouter.router,
           debugShowCheckedModeBanner: false,

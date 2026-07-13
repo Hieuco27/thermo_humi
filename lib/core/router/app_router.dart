@@ -7,6 +7,8 @@ import 'package:thermo_humi/core/router/route_names.dart';
 import 'package:thermo_humi/features/home/presentation/pages/home_page.dart';
 import 'package:thermo_humi/features/notification/presentation/pages/notification_page.dart';
 import 'package:thermo_humi/features/profile/presentation/pages/profile_page.dart';
+import 'package:thermo_humi/features/profile/presentation/cubit/profile_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:thermo_humi/features/report/presentation/pages/report_page.dart';
 import 'package:thermo_humi/features/room/presentation/pages/room_list_page.dart';
 import 'package:thermo_humi/features/room/presentation/pages/room_detail_page.dart';
@@ -21,13 +23,18 @@ import 'package:thermo_humi/features/request_access/domain/entities/access_reque
 import 'package:thermo_humi/features/request_access/presentation/pages/access_request_list_screen.dart';
 import 'package:thermo_humi/features/request_access/presentation/pages/access_request_detail_screen.dart';
 import 'package:thermo_humi/features/room_management/presentation/pages/room_management_screen.dart';
+import 'package:thermo_humi/features/room_management/presentation/pages/addroom/add_room_screen.dart';
 import 'package:thermo_humi/features/device/presentation/pages/device_management_screen.dart';
+
+import 'package:thermo_humi/core/router/router_guard.dart';
+import 'package:thermo_humi/core/di/injection_container.dart';
 
 @singleton
 class AppRouter {
   AppRouter._();
   static final GoRouter router = GoRouter(
-    initialLocation: RouteNames.home,
+    initialLocation: RouteNames.login,
+    redirect: sl<RouterGuard>().redirect,
     routes: [
       // ── Auth ──────────────────────────────────────────────────────────────
       GoRoute(
@@ -130,7 +137,10 @@ class AppRouter {
               GoRoute(
                 path: RouteNames.profile,
                 name: 'profile',
-                builder: (_, __) => const ProfilePage(),
+                builder: (_, __) => BlocProvider(
+                  create: (context) => sl<ProfileCubit>()..loadUser(),
+                  child: const ProfilePage(),
+                ),
                 routes: [
                   GoRoute(
                     path: 'threshold-history',
@@ -147,6 +157,16 @@ class AppRouter {
                     name: 'room-management',
                     builder: (_, __) => const RoomManagementScreen(),
                     routes: [
+                      // ⚠️ Literal route phải khai báo TRƯỚC dynamic param :roomId
+                      GoRoute(
+                        path: 'add-room',
+                        name: 'add-room',
+                        builder: (_, state) => AddRoomScreen(
+                          // null = tạo phòng mới; có giá trị = chỉ thêm thiết bị
+                          existingRoomId:
+                              state.uri.queryParameters['existingRoomId'],
+                        ),
+                      ),
                       GoRoute(
                         path: ':roomId',
                         name: 'room-management-detail',

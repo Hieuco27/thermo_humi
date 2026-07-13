@@ -41,12 +41,12 @@ class RoomManageCubit extends Cubit<RoomManageState> {
     );
   }
 
-  // ── Filter ────────────────────────────────────────────────────────────────
+  // Filter
   void changeFilter(DeviceFilterType filter) {
     emit(state.copyWith(activeFilter: filter));
   }
 
-  // ── Selection Mode ────────────────────────────────────────────────────────
+  // Selection Mode
   void toggleSelectionMode() {
     final newMode = !state.isSelectionMode;
     emit(

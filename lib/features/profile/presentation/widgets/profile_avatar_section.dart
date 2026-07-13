@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
+import 'package:thermo_humi/features/auth/data/models/user_model.dart';
 
 class ProfileAvatarSection extends StatelessWidget {
-  const ProfileAvatarSection({super.key});
+  const ProfileAvatarSection({super.key, required this.user});
+  final UserModel user;
 
   @override
   Widget build(BuildContext context) {
@@ -51,10 +53,10 @@ class ProfileAvatarSection extends StatelessWidget {
           ],
         ),
         SizedBox(height: 8.h),
-        Text('Thái Hiếu', style: AppTextStyles.bodyLarge()),
+        Text(user.fullName, style: AppTextStyles.bodyLarge()),
         SizedBox(height: 2.h),
         Text(
-          '+84 912 345 678',
+          user.phone ?? '',
           style: AppTextStyles.titleSmall().copyWith(
             fontWeight: FontWeight.w500,
             color: AppColors.textSecondary,
@@ -68,7 +70,7 @@ class ProfileAvatarSection extends StatelessWidget {
             borderRadius: BorderRadius.circular(12.r),
           ),
           child: Text(
-            'Admin · HMS Technology',
+            'Admin',
             style: AppTextStyles.titleSmall2().copyWith(
               color: AppColors.gradientEnd,
             ),

@@ -9,11 +9,10 @@ class DeviceManagementState extends Equatable {
 
   final List<DeviceEntity> devices;
   final Map<String, List<DeviceEntity>> groupedDevices;
-  final List<RoomEntity> rooms; // For the filter dropdown
-
+  final List<RoomEntity> rooms;
   final String searchQuery;
-  final String sortOrder; // 'A-Z' or 'Z-A'
-  final String statusFilter; // 'all', 'online', 'offline'
+  final String sortOrder;
+  final String statusFilter;
   final String? roomIdFilter;
 
   final int currentPage;

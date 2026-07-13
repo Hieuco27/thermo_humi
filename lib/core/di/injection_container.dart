@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:thermo_humi/core/router/router_guard.dart';
 import 'package:thermo_humi/features/auth/domain/usecases/sign_up_usecase.dart';
 import 'package:thermo_humi/features/auth/presentation/bloc/register/register_bloc.dart';
 import 'package:thermo_humi/features/auth/data/datasources/auth_remote_data_source.dart';
@@ -20,6 +21,11 @@ import 'package:thermo_humi/features/notification/domain/usecases/watch_alert_ev
 import 'package:thermo_humi/features/notification/presentation/cubit/alert_cubit.dart';
 
 import 'package:thermo_humi/features/history/presentation/bloc/threshold_log_cubit.dart';
+import 'package:thermo_humi/features/profile/data/datasources/profile_local_data_source.dart';
+import 'package:thermo_humi/features/profile/data/repositories/profile_repository_impl.dart';
+import 'package:thermo_humi/features/profile/domain/repositories/profile_repository.dart';
+import 'package:thermo_humi/features/profile/domain/usecases/get_user_profile_usecase.dart';
+import 'package:thermo_humi/features/profile/presentation/cubit/profile_cubit.dart';
 
 import 'package:thermo_humi/features/member_management/data/repositories/fake_member_repository.dart';
 import 'package:thermo_humi/features/member_management/domain/repositories/member_repository.dart';
@@ -49,6 +55,7 @@ void init() {
   // --- Core ---
   sl.registerLazySingleton(() => const FlutterSecureStorage());
   sl.registerLazySingleton(() => SecureStorage(sl()));
+  sl.registerLazySingleton(() => RouterGuard(sl()));
 
   sl.registerLazySingleton(() => AuthInterceptor(sl()));
   sl.registerLazySingleton(() => ErrorInterceptor());
@@ -95,6 +102,16 @@ void init() {
     () => ThresholdLogRepositoryImpl(dataSource: sl()),
   );
   sl.registerFactory(() => ThresholdLogCubit(repository: sl()));
+
+  // --- Profile Feature ---
+  sl.registerLazySingleton<ProfileLocalDataSource>(
+    () => ProfileLocalDataSourceImpl(secureStorage: sl()),
+  );
+  sl.registerLazySingleton<ProfileRepository>(
+    () => ProfileRepositoryImpl(localDataSource: sl()),
+  );
+  sl.registerLazySingleton(() => GetUserProfileUseCase(sl()));
+  sl.registerFactory(() => ProfileCubit(sl()));
 
   // --- Member Management Feature ---
   sl.registerLazySingleton<MemberRepository>(() => FakeMemberRepository());

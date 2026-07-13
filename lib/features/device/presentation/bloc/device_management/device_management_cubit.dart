@@ -10,12 +10,12 @@ class DeviceManagementCubit extends Cubit<DeviceManagementState> {
   static const int _limit = 20;
 
   DeviceManagementCubit({required DeviceRepository repository})
-      : _repository = repository,
-        super(const DeviceManagementState());
+    : _repository = repository,
+      super(const DeviceManagementState());
 
   void loadInitialDevices() async {
     if (state.isLoading) return;
-    
+
     emit(state.copyWith(isLoading: true, error: null));
     final result = await _repository.getDevices(
       search: state.searchQuery,
@@ -25,27 +25,28 @@ class DeviceManagementCubit extends Cubit<DeviceManagementState> {
       page: 1,
       limit: _limit,
     );
-    
-    // Also load rooms if not already loaded
+
+    // tải các phòng nếu chưa được tải
     if (state.rooms.isEmpty) {
       final roomsResult = await _repository.getRooms();
-      roomsResult.fold(
-        (l) => null,
-        (r) => emit(state.copyWith(rooms: r)),
-      );
+      roomsResult.fold((l) => null, (r) => emit(state.copyWith(rooms: r)));
     }
 
     result.fold(
       (failure) => emit(state.copyWith(isLoading: false, error: failure)),
       (data) {
         final grouped = _groupDevices(data.devices);
-        emit(state.copyWith(
-          isLoading: false,
-          devices: data.devices,
-          groupedDevices: grouped,
-          currentPage: 1,
-          hasReachedMax: data.devices.length >= data.totalCount,
-        ).clearError());
+        emit(
+          state
+              .copyWith(
+                isLoading: false,
+                devices: data.devices,
+                groupedDevices: grouped,
+                currentPage: 1,
+                hasReachedMax: data.devices.length >= data.totalCount,
+              )
+              .clearError(),
+        );
       },
     );
   }
@@ -55,7 +56,7 @@ class DeviceManagementCubit extends Cubit<DeviceManagementState> {
 
     emit(state.copyWith(isFetchingMore: true, error: null));
     final nextPage = state.currentPage + 1;
-    
+
     final result = await _repository.getDevices(
       search: state.searchQuery,
       sortOrder: state.sortOrder,
@@ -68,16 +69,21 @@ class DeviceManagementCubit extends Cubit<DeviceManagementState> {
     result.fold(
       (failure) => emit(state.copyWith(isFetchingMore: false, error: failure)),
       (data) {
-        final newDevices = List<DeviceEntity>.from(state.devices)..addAll(data.devices);
+        final newDevices = List<DeviceEntity>.from(state.devices)
+          ..addAll(data.devices);
         final grouped = _groupDevices(newDevices);
-        
-        emit(state.copyWith(
-          isFetchingMore: false,
-          devices: newDevices,
-          groupedDevices: grouped,
-          currentPage: nextPage,
-          hasReachedMax: newDevices.length >= data.totalCount,
-        ).clearError());
+
+        emit(
+          state
+              .copyWith(
+                isFetchingMore: false,
+                devices: newDevices,
+                groupedDevices: grouped,
+                currentPage: nextPage,
+                hasReachedMax: newDevices.length >= data.totalCount,
+              )
+              .clearError(),
+        );
       },
     );
   }
@@ -113,8 +119,8 @@ class DeviceManagementCubit extends Cubit<DeviceManagementState> {
   Map<String, List<DeviceEntity>> _groupDevices(List<DeviceEntity> devices) {
     final Map<String, List<DeviceEntity>> groups = {};
     for (final device in devices) {
-      final firstLetter = device.name.trim().isNotEmpty 
-          ? device.name.trim()[0].toUpperCase() 
+      final firstLetter = device.name.trim().isNotEmpty
+          ? device.name.trim()[0].toUpperCase()
           : '#';
       if (!groups.containsKey(firstLetter)) {
         groups[firstLetter] = [];

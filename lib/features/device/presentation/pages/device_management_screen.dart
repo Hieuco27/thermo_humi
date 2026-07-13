@@ -56,12 +56,12 @@ class _DeviceManagementScreenState extends State<DeviceManagementScreen> {
             style: AppTextStyles.titleMediumAppBar(color: Colors.white),
           ),
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            icon: Icon(Icons.arrow_back_ios, color: Colors.white, size: 22.sp),
             onPressed: () => context.pop(),
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.add, color: Colors.white),
+              icon: Icon(Icons.add, color: Colors.white, size: 24.sp),
               onPressed: () {
                 // Navigate to add device logic (can reuse add device sheet later)
               },
@@ -76,35 +76,42 @@ class _DeviceManagementScreenState extends State<DeviceManagementScreen> {
                 // Search Bar
                 Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: 16.w,
+                    horizontal: 12.w,
                     vertical: 8.h,
                   ),
-                  child: TextField(
-                    controller: _searchCtrl,
-                    onChanged: cubit.onSearchChanged,
-                    decoration: InputDecoration(
-                      hintText: 'Tìm theo tên thiết bị',
-                      hintStyle: AppTextStyles.bodyMedium(
-                        color: Colors.grey.shade400,
-                      ),
-                      prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                      filled: true,
-                      fillColor: Colors.grey.shade50,
-                      contentPadding: EdgeInsets.symmetric(
-                        vertical: 0,
-                        horizontal: 16.w,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                        borderSide: BorderSide(color: Colors.grey.shade200),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                        borderSide: BorderSide(color: Colors.grey.shade200),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                        borderSide: const BorderSide(color: AppColors.primary),
+                  child: SizedBox(
+                    height: 40.h,
+                    child: TextField(
+                      controller: _searchCtrl,
+                      onChanged: cubit.onSearchChanged,
+                      style: AppTextStyles.bodyMedium(),
+                      decoration: InputDecoration(
+                        hintText: 'Tìm theo tên thiết bị',
+                        hintStyle: AppTextStyles.bodyMedium(
+                          color: Colors.grey.shade400,
+                        ),
+                        prefixIcon: Icon(
+                          Icons.search,
+                          color: Colors.grey,
+                          size: 22.sp,
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey.shade50,
+                        contentPadding: EdgeInsets.symmetric(horizontal: 12.w),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                          borderSide: BorderSide(color: Colors.grey.shade200),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                          borderSide: BorderSide(color: Colors.grey.shade200),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                          borderSide: const BorderSide(
+                            color: AppColors.primary,
+                          ),
+                        ),
                       ),
                     ),
                   ),

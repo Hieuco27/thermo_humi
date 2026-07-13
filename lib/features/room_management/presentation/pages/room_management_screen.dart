@@ -101,7 +101,7 @@ class _RoomManagementScreenState extends State<RoomManagementScreen> {
 
           // Summary line
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -186,11 +186,18 @@ class _RoomManagementScreenState extends State<RoomManagementScreen> {
     }
   }
 
-  void _onAddRoom() {
-    // TODO: Navigate tới màn Thêm phòng mới
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Màn hình Thêm phòng mới sẽ mở ở đây')),
-    );
+  void _onAddRoom() async {
+    final result = await context.pushNamed<dynamic>('add-room');
+
+    // Cập nhật list phòng nếu tạo mới thành công (không cần gọi lại API)
+    if (result != null && mounted) {
+      // Khi có real model: cast result thành AddRoomResult
+      // Hiện tại reload mock data để thấy phòng mới
+      setState(() {
+        _allRooms = buildMockRooms();
+        _filteredRooms = _allRooms;
+      });
+    }
   }
 }
 
@@ -314,7 +321,7 @@ class _AddRoomButton extends StatelessWidget {
       padding: EdgeInsets.only(top: 4.h, bottom: 16.h),
       child: OutlinedButton.icon(
         onPressed: onTap,
-        icon: Icon(Icons.add_rounded, size: 18.sp),
+        icon: Icon(Icons.add_rounded, size: 20.sp),
         label: const Text('Thêm phòng mới'),
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,

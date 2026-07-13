@@ -170,6 +170,12 @@ class _RoomDetailView extends StatelessWidget {
   }
 
   void _showAddDeviceOptionSheet(BuildContext context, String roomName) {
+    final roomId = context
+        .read<RoomManageCubit>()
+        .state
+        .roomWithDevices
+        ?.room
+        .id;
     showModalBottomSheet(
       context: context,
       useRootNavigator: true,
@@ -177,11 +183,14 @@ class _RoomDetailView extends StatelessWidget {
       builder: (_) => AddDeviceOptionSheet(
         roomName: roomName,
         onAddNew: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Màn hình Thêm thiết bị bằng QR/IMEI sẽ mở ở đây'),
-            ),
-          );
+          Navigator.pop(context); // Đóng sheet trước
+          if (roomId != null) {
+            // Navigate tới AddRoomScreen chế độ "chỉ thêm thiết bị"
+            context.pushNamed(
+              'add-room',
+              queryParameters: {'existingRoomId': roomId},
+            );
+          }
         },
         onSelectUnassigned: () =>
             _showUnassignedDevicesSheet(context, roomName),

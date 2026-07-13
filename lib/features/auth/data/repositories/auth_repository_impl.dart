@@ -9,15 +9,21 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl({required this.authDataSource});
 
   @override
-  Future<UserEntity> signIn(String email, String password) async {
-    // Repository gọi Data Source để lấy UserModel
-    final userModel = await authDataSource.signIn(email, password);
-    // Vì UserModel kế thừa từ UserEntity, ta có thể trả về trực tiếp
+  Future<UserEntity> signIn(
+    String email,
+    String password,
+    bool rememberMe,
+  ) async {
+    final userModel = await authDataSource.signIn(email, password, rememberMe);
     return userModel;
   }
 
   @override
-  Future<UserEntity> signUp(String userName, String password, String fullname) async {
+  Future<UserEntity> signUp(
+    String userName,
+    String password,
+    String fullname,
+  ) async {
     final userModel = await authDataSource.signUp(userName, password, fullname);
     return userModel;
   }
@@ -29,12 +35,10 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<UserEntity> changePassword(UserEntity user, String password) async {
-    // Trong thực tế có thể cần ép kiểu hoặc chuyển đổi từ Entity sang Model
-    // nếu Data Source yêu cầu UserModel
     final userModel = await authDataSource.changePassword(
       UserModel(
         id: user.id,
-        name: user.name,
+        fullName: user.fullName,
         email: user.email,
         phone: user.phone,
         avatar: user.avatar,

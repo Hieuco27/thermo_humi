@@ -3,7 +3,7 @@ import 'package:thermo_humi/features/auth/domain/entities/user_entity.dart';
 class UserModel extends UserEntity {
   UserModel({
     required super.id,
-    required super.name,
+    required super.fullName,
     required super.email,
     super.phone,
     super.avatar,
@@ -14,7 +14,7 @@ class UserModel extends UserEntity {
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       id: json['id'],
-      name: json['name'],
+      fullName: json['fullName'] ?? json['name'] ?? '',
       email: json['email'],
       phone: json['phone'],
       avatar: json['avatar'],
@@ -24,7 +24,7 @@ class UserModel extends UserEntity {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'name': name,
+      'fullName': fullName,
       'email': email,
       'phone': phone,
       'avatar': avatar,
@@ -33,14 +33,14 @@ class UserModel extends UserEntity {
 
   UserModel copyWith({
     String? id,
-    String? name,
+    String? fullName,
     String? email,
     String? phone,
     String? avatar,
   }) {
     return UserModel(
       id: id ?? this.id,
-      name: name ?? this.name,
+      fullName: fullName ?? this.fullName,
       email: email ?? this.email,
       phone: phone ?? this.phone,
       avatar: avatar ?? this.avatar,

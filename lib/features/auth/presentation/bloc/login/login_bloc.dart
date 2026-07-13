@@ -16,7 +16,11 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   ) async {
     emit(LoginLoading());
     try {
-      final user = await signInUseCase.execute(event.email, event.password);
+      final user = await signInUseCase.execute(
+        event.email,
+        event.password,
+        event.rememberMe,
+      );
       emit(LoginSuccess(user));
     } catch (e) {
       emit(LoginError(e.toString()));

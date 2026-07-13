@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:thermo_humi/common/widgets/app_background.dart';
 import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:thermo_humi/features/profile/presentation/widgets/profile_avatar_section.dart';
 import 'package:thermo_humi/features/profile/presentation/widgets/profile_logout_button.dart';
 import 'package:thermo_humi/features/profile/presentation/widgets/profile_menu_list.dart';
+import 'package:thermo_humi/features/profile/presentation/cubit/profile_cubit.dart';
+import 'package:thermo_humi/features/profile/presentation/cubit/profile_state.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -39,7 +43,14 @@ class ProfilePage extends StatelessWidget {
                 child: Column(
                   children: [
                     SizedBox(height: 10.h),
-                    const ProfileAvatarSection(),
+                    BlocBuilder<ProfileCubit, ProfileState>(
+                      builder: (context, state) {
+                        if (state is ProfileLoaded) {
+                          return ProfileAvatarSection(user: state.user);
+                        }
+                        return const Center(child: CircularProgressIndicator());
+                      },
+                    ),
                     SizedBox(height: 20.h),
                     const ProfileMenuList(),
                     SizedBox(height: 20.h),

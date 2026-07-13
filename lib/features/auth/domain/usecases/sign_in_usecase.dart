@@ -6,7 +6,11 @@ class SignInUseCase {
 
   SignInUseCase(this.authRepository);
 
-  Future<UserEntity> execute(String email, String password) async {
-    return await authRepository.signIn(email, password);
+  Future<UserEntity> execute(
+    String email,
+    String password,
+    bool rememberMe,
+  ) async {
+    return await authRepository.signIn(email, password, rememberMe);
   }
 }

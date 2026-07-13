@@ -116,6 +116,7 @@ class _SignInFormState extends State<SignInForm> {
                   LoginSubmitted(
                     email: _emailController.text,
                     password: _passwordController.text,
+                    rememberMe: _rememberMe,
                   ),
                 );
               },

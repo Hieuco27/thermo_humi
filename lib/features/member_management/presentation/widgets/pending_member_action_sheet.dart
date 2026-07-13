@@ -71,7 +71,9 @@ class PendingMemberActionSheet extends StatelessWidget {
                         ),
                         Text(
                           'Đang chờ chấp nhận lời mời',
-                          style: AppTextStyles.labelMedium(color: Colors.orange[800]!),
+                          style: AppTextStyles.labelMedium(
+                            color: Colors.orange[800]!,
+                          ),
                         ),
                       ],
                     ),
@@ -80,9 +82,9 @@ class PendingMemberActionSheet extends StatelessWidget {
               ),
             ),
             const Divider(height: 1, color: Color(0xFFEEEEEE)),
-            
+
             Padding(
-              padding: EdgeInsets.all(16.w),
+              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 16.h),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -93,11 +95,16 @@ class PendingMemberActionSheet extends StatelessWidget {
                     },
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.black87,
-                      padding: EdgeInsets.symmetric(vertical: 14.h),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+                      padding: EdgeInsets.symmetric(vertical: 12.h),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.r),
+                      ),
                     ),
                     icon: const Icon(Icons.send_outlined),
-                    label: Text('Gửi lại lời mời', style: AppTextStyles.bodyMedium()),
+                    label: Text(
+                      'Gửi lại lời mời',
+                      style: AppTextStyles.bodyMedium(),
+                    ),
                   ),
                   SizedBox(height: 12.h),
                   OutlinedButton.icon(
@@ -107,12 +114,16 @@ class PendingMemberActionSheet extends StatelessWidget {
                     },
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.red,
-                      side: const BorderSide(color: Colors.red),
-                      padding: EdgeInsets.symmetric(vertical: 14.h),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),
+                      padding: EdgeInsets.symmetric(vertical: 12.h),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.r),
+                      ),
                     ),
                     icon: const Icon(Icons.close),
-                    label: Text('Thu hồi lời mời', style: AppTextStyles.bodyMedium()),
+                    label: Text(
+                      'Thu hồi lời mời',
+                      style: AppTextStyles.bodyMedium(),
+                    ),
                   ),
                 ],
               ),
