@@ -6,7 +6,11 @@ class SignUpUseCase {
 
   SignUpUseCase(this.authRepository);
 
-  Future<UserEntity> execute(String userName, String password, String fullname) async {
+  Future<UserEntity> execute(
+    String userName,
+    String password,
+    String fullname,
+  ) async {
     return await authRepository.signUp(userName, password, fullname);
   }
 }

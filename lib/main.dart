@@ -13,7 +13,6 @@ void main() async {
     debugPrint("Failed to load .env file: $e");
   }
 
-  // Khởi tạo Dependency Injection (đăng ký các Bloc, UseCase...)
   di.init();
 
   runApp(const MyApp());

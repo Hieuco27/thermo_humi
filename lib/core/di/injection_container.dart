@@ -8,6 +8,8 @@ import 'package:thermo_humi/features/auth/data/repositories/auth_repository_impl
 import 'package:thermo_humi/features/auth/domain/repositories/auth_repository.dart';
 import 'package:thermo_humi/features/auth/domain/usecases/sign_in_usecase.dart';
 import 'package:thermo_humi/features/auth/presentation/bloc/login/login_bloc.dart';
+import 'package:thermo_humi/features/auth/domain/usecases/change_pasword_usecase.dart';
+import 'package:thermo_humi/features/auth/presentation/cubit/change_password/change_password_cubit.dart';
 import 'package:thermo_humi/features/history/data/datasources/threshold_log_mock_data_source.dart';
 import 'package:thermo_humi/features/history/data/repositories/threshold_log_repository_impl.dart';
 import 'package:thermo_humi/features/history/domain/repositories/threshold_log_repository.dart';
@@ -48,6 +50,8 @@ import 'package:thermo_humi/features/device/presentation/bloc/device_management/
 import 'package:thermo_humi/features/device/presentation/bloc/device_detail/device_history_cubit.dart';
 import 'package:thermo_humi/features/device/domain/repositories/device_repository.dart';
 import 'package:thermo_humi/features/device/data/repositories/device_repository_impl.dart';
+import 'package:thermo_humi/features/room_management/data/repositories/room_repository_impl.dart';
+import 'package:thermo_humi/features/room_management/domain/repositories/room_repository.dart';
 
 final sl = GetIt.instance;
 
@@ -77,10 +81,12 @@ void init() {
   // 3. UseCases
   sl.registerLazySingleton(() => SignInUseCase(sl()));
   sl.registerLazySingleton(() => SignUpUseCase(sl()));
+  sl.registerLazySingleton(() => ChangePasswordUseCase(repository: sl()));
 
   // 4. Blocs
   sl.registerFactory(() => LoginBloc(signInUseCase: sl()));
   sl.registerFactory(() => RegisterBloc(signUpUseCase: sl()));
+  sl.registerFactory(() => ChangePasswordCubit(changePasswordUseCase: sl()));
 
   // --- Notification Feature ---
   sl.registerLazySingleton(() => MockAlertDataSource());
@@ -134,4 +140,14 @@ void init() {
   sl.registerFactory(() => RoomAccessRequestListCubit(repository: sl()));
   sl.registerFactory(() => DeviceAccessRequestListCubit(repository: sl()));
   sl.registerFactory(() => AccessRequestDetailCubit(repository: sl()));
+  // --- Room Management Feature ---
+
+  // 1. Nếu có DataSource (ví dụ gọi API) thì đăng ký DataSource trước:
+  // sl.registerLazySingleton<RoomRemoteDataSource>(() => RoomRemoteDataSourceImpl(dio: sl()));
+
+  // 2. Đăng ký Repository (chỉ đăng ký interface RoomRepository)
+  sl.registerLazySingleton<RoomRepository>(
+    () => RoomRepositoryImpl(),
+    // Nếu RoomRepositoryImpl cần DataSource, sẽ viết là: RoomRepositoryImpl(dataSource: sl())
+  );
 }

@@ -67,6 +67,15 @@ class ProfileMenuList extends StatelessWidget {
                 context.goNamed('device-management');
               },
             ),
+            const Divider(height: 1, color: Color(0xFFEEEEEE)),
+            _ProfileMenuItem(
+              iconPath: 'assets/icons/other/change_password.svg',
+              label: 'Đổi mật khẩu',
+              isLast: true,
+              onTap: () {
+                context.goNamed('change-password');
+              },
+            ),
           ],
         ),
       ),

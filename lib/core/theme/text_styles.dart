@@ -114,6 +114,14 @@ class AppTextStyles {
     );
   }
 
+  static TextStyle labelLarge2({Color? color}) {
+    return GoogleFonts.inter(
+      fontSize: 14.sp,
+      fontWeight: FontWeight.w600,
+      color: color,
+    );
+  }
+
   static TextStyle labelMedium({Color? color}) {
     return GoogleFonts.inter(
       fontSize: 12.sp,

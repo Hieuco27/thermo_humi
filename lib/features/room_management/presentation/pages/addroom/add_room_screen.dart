@@ -14,7 +14,8 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
-import 'package:thermo_humi/features/room_management/data/repositories/room_repository_impl.dart';
+import 'package:thermo_humi/core/di/injection_container.dart';
+import 'package:thermo_humi/features/room_management/domain/repositories/room_repository.dart';
 import 'package:thermo_humi/features/room_management/presentation/bloc/add_room/add_room_cubit.dart';
 import 'package:thermo_humi/features/room_management/presentation/bloc/add_room/add_room_state.dart';
 import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/activate_button.dart';
@@ -32,7 +33,7 @@ class AddRoomScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => AddRoomCubit(
-        repository: RoomRepositoryImpl(),
+        repository: sl<RoomRepository>(),
         existingRoomId: existingRoomId,
       ),
       child: const _AddRoomView(),
@@ -101,7 +102,7 @@ class _AddRoomViewState extends State<_AddRoomView> {
                       borderRadius: BorderRadius.circular(12.r),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
+                          color: Colors.black.withValues(alpha: 0.3),
                           blurRadius: 6,
                           offset: const Offset(0, 2),
                         ),
@@ -128,7 +129,7 @@ class _AddRoomViewState extends State<_AddRoomView> {
                               color: Colors.grey.shade400,
                             ),
                           ),
-                          SizedBox(height: 20.h),
+                          SizedBox(height: 10.h),
                           Divider(color: Colors.grey.shade200, height: 1),
                           SizedBox(height: 20.h),
                         ],
@@ -158,18 +159,19 @@ class _AddRoomViewState extends State<_AddRoomView> {
                             source: state.deviceSource,
                           ),
                         ],
+                        // ── Nút Kích hoạt ở cuối container ──
+                        SizedBox(height: 20.h),
+                        ActivateButton(
+                          isEnabled: state.canActivate,
+                          isLoading: state.isSubmitting,
+                          onTap: () => _onActivate(context),
+                        ),
                       ],
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-
-          // Nút Kích hoạt cố định ở đáy
-          bottomNavigationBar: _BottomBar(
-            state: state,
-            onActivate: () => _onActivate(context),
           ),
         );
       },
@@ -318,13 +320,18 @@ class _BottomBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.white,
-      padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 0),
-      child: SafeArea(
-        child: ActivateButton(
-          isEnabled: state.canActivate,
-          isLoading: state.isSubmitting,
-          onTap: onActivate,
-        ),
+      padding: EdgeInsets.fromLTRB(
+        16.w,
+        12.h,
+        16.w,
+        MediaQuery.viewPaddingOf(
+          context,
+        ).bottom, // Chỉ lấy viền màn hình (notch), không bị đẩy bởi bàn phím
+      ),
+      child: ActivateButton(
+        isEnabled: state.canActivate,
+        isLoading: state.isSubmitting,
+        onTap: onActivate,
       ),
     );
   }
@@ -339,9 +346,7 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       label,
-      style: AppTextStyles.titleMedium(
-        color: Colors.black87,
-      ).copyWith(fontSize: 15.sp),
+      style: AppTextStyles.labelLarge().copyWith(fontWeight: FontWeight.w600),
     );
   }
 }
@@ -359,42 +364,38 @@ class _RoomNameInput extends StatelessWidget {
       controller: controller,
       onChanged: onChanged,
       textCapitalization: TextCapitalization.sentences,
-      style: AppTextStyles.bodyMedium(color: Colors.black87),
+      style: AppTextStyles.label13(),
       decoration: InputDecoration(
-        hintText: 'Tên phòng, ví dụ: Phòng ngủ',
-        hintStyle: AppTextStyles.bodyMedium(color: Colors.grey.shade400),
+        hintText: 'Tên phòng',
+        isDense: true,
+        constraints: BoxConstraints(minHeight: 44.h, maxHeight: 44.h),
+        prefixIconConstraints: BoxConstraints(minWidth: 40.w, minHeight: 20.w),
+        hintStyle: AppTextStyles.label13(color: Colors.grey.shade400),
         prefixIcon: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12.w),
+          padding: EdgeInsets.symmetric(horizontal: 8.w),
           child: Icon(
             Icons.meeting_room_outlined,
             color: Colors.grey.shade400,
             size: 20.sp,
           ),
         ),
-        prefixIconConstraints: BoxConstraints(minWidth: 44.w),
         suffixIcon: controller.text.isNotEmpty
             ? GestureDetector(
                 onTap: () {
                   controller.clear();
                   onChanged('');
                 },
-                child: Container(
-                  margin: EdgeInsets.all(8.w),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.grey.shade300,
-                  ),
-                  child: Icon(
-                    Icons.close_rounded,
-                    size: 14.sp,
-                    color: Colors.grey.shade600,
-                  ),
+
+                child: Icon(
+                  Icons.close_rounded,
+                  size: 14.sp,
+                  color: Colors.grey.shade600,
                 ),
               )
             : null,
         filled: true,
         fillColor: Colors.grey.shade50,
-        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+        contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.r),
           borderSide: BorderSide(color: Colors.grey.shade200),
@@ -405,7 +406,7 @@ class _RoomNameInput extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.r),
-          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1),
         ),
       ),
     );
@@ -424,7 +425,7 @@ class _ScanOptionSheet extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
       ),
       child: SafeArea(
         child: Column(
@@ -441,7 +442,7 @@ class _ScanOptionSheet extends StatelessWidget {
             ),
             SizedBox(height: 16.h),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w),
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(

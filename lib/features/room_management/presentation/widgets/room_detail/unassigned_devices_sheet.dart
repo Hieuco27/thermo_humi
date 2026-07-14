@@ -78,9 +78,7 @@ class _UnassignedDevicesSheetState extends State<UnassignedDevicesSheet> {
                           SizedBox(height: 2.h),
                           Text(
                             'Gán vào: ${widget.roomName}',
-                            style: AppTextStyles.bodyMedium(
-                              color: Colors.grey.shade500,
-                            ),
+                            style: AppTextStyles.label13(color: Colors.grey),
                           ),
                         ],
                       ),
@@ -103,7 +101,7 @@ class _UnassignedDevicesSheetState extends State<UnassignedDevicesSheet> {
                 child: widget.devices.isEmpty
                     ? Center(
                         child: Padding(
-                          padding: EdgeInsets.all(16.w),
+                          padding: EdgeInsets.all(12.w),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -166,7 +164,7 @@ class _UnassignedDevicesSheetState extends State<UnassignedDevicesSheet> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         disabledBackgroundColor: Colors.grey.shade200,
-                        padding: EdgeInsets.symmetric(vertical: 14.h),
+                        padding: EdgeInsets.symmetric(vertical: 12.h),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12.r),
                         ),
@@ -176,10 +174,8 @@ class _UnassignedDevicesSheetState extends State<UnassignedDevicesSheet> {
                         _selected.isEmpty
                             ? 'Gán vào phòng'
                             : 'Gán ${_selected.length} thiết bị vào phòng',
-                        style: AppTextStyles.titleMedium(
-                          color: _selected.isEmpty
-                              ? Colors.grey.shade500
-                              : Colors.white,
+                        style: AppTextStyles.labelLarge2(
+                          color: _selected.isEmpty ? Colors.grey : Colors.white,
                         ),
                       ),
                     ),
@@ -221,13 +217,11 @@ class _UnassignedDeviceTile extends StatelessWidget {
           children: [
             // Status dot
             Container(
-              width: 8.w,
-              height: 8.w,
+              width: 10.w,
+              height: 10.w,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: isOnline
-                    ? const Color(0xFF34C759)
-                    : Colors.grey.shade400,
+                color: isOnline ? const Color(0xFF34C759) : Colors.grey,
               ),
             ),
             SizedBox(width: 12.w),
@@ -238,14 +232,12 @@ class _UnassignedDeviceTile extends StatelessWidget {
                 children: [
                   Text(
                     device.name,
-                    style: AppTextStyles.titleMedium(color: Colors.black),
+                    style: AppTextStyles.labelLarge2(color: Colors.black),
                   ),
                   SizedBox(height: 2.h),
                   Text(
                     device.serialNumber ?? '-',
-                    style: AppTextStyles.bodyMedium(
-                      color: Colors.grey.shade500,
-                    ),
+                    style: AppTextStyles.bodyMedium(color: Colors.grey),
                   ),
                 ],
               ),

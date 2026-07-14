@@ -22,7 +22,7 @@ class ActivateButton extends StatelessWidget {
       duration: const Duration(milliseconds: 200),
       child: SizedBox(
         width: double.infinity,
-        height: 52.h,
+        height: 50.h,
         child: ElevatedButton(
           onPressed: (isEnabled && !isLoading) ? onTap : null,
           style: ElevatedButton.styleFrom(

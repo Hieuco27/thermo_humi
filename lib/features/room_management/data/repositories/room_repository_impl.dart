@@ -3,7 +3,9 @@
 library;
 
 import 'package:thermo_humi/features/room_management/domain/repositories/room_repository.dart';
+import 'package:injectable/injectable.dart';
 
+@LazySingleton(as: RoomRepository)
 class RoomRepositoryImpl implements RoomRepository {
   /// Mock: Tạo phòng mới + gán thiết bị cùng lúc.
   /// Khi BE sẵn sàng: gọi 1 API endpoint duy nhất.

@@ -1,6 +1,7 @@
 import 'package:thermo_humi/features/auth/data/datasources/auth_remote_data_source.dart';
-import 'package:thermo_humi/features/auth/data/models/user_model.dart';
 import 'package:thermo_humi/features/auth/domain/entities/user_entity.dart';
+import 'package:dartz/dartz.dart';
+import 'package:thermo_humi/core/error/failure.dart';
 import 'package:thermo_humi/features/auth/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -34,17 +35,22 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<UserEntity> changePassword(UserEntity user, String password) async {
-    final userModel = await authDataSource.changePassword(
-      UserModel(
-        id: user.id,
-        fullName: user.fullName,
-        email: user.email,
-        phone: user.phone,
-        avatar: user.avatar,
-      ),
-      password,
-    );
-    return userModel;
+  Future<Either<Failure, void>> changePassword(
+    String oldPassword,
+    String newPassword,
+    String confirmPassword,
+  ) async {
+    try {
+      await authDataSource.changePassword(
+        oldPassword,
+        newPassword,
+        confirmPassword,
+      );
+      return const Right(null);
+    } catch (e) {
+      return Left(
+        ServerFailure(message: e.toString().replaceAll('Exception: ', '')),
+      );
+    }
   }
 }

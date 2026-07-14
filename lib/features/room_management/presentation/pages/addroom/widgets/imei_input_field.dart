@@ -4,6 +4,7 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
 
@@ -31,20 +32,28 @@ class ImeiInputField extends StatelessWidget {
       ],
       style: AppTextStyles.bodyMedium(color: Colors.black87),
       decoration: InputDecoration(
-        hintText: 'Nhập mã IMEI (15 chữ số)',
+        hintText: 'Nhập mã IMEI thiết bị',
         hintStyle: AppTextStyles.bodyMedium(color: Colors.grey.shade400),
         prefixIcon: Padding(
           padding: EdgeInsets.symmetric(horizontal: 12.w),
-          child: Icon(
-            Icons.barcode_reader,
-            color: Colors.grey.shade400,
-            size: 20.sp,
+          child: SvgPicture.asset(
+            'assets/icons/other/imei.svg',
+            width: 20.sp,
+            height: 20.sp,
+            colorFilter: ColorFilter.mode(
+              Colors.grey.shade400,
+              BlendMode.srcIn,
+            ),
           ),
         ),
         prefixIconConstraints: BoxConstraints(minWidth: 44.w),
         suffixIcon: controller.text.isNotEmpty
             ? IconButton(
-                icon: Icon(Icons.clear_rounded, size: 18.sp, color: Colors.grey.shade400),
+                icon: Icon(
+                  Icons.clear_rounded,
+                  size: 18.sp,
+                  color: Colors.grey.shade400,
+                ),
                 onPressed: () {
                   controller.clear();
                   onChanged('');

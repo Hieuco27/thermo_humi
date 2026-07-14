@@ -8,7 +8,7 @@ import 'package:thermo_humi/features/auth/presentation/bloc/login/login_bloc.dar
 import 'package:thermo_humi/features/auth/presentation/bloc/login/login_event.dart';
 import 'package:thermo_humi/features/auth/presentation/bloc/login/login_state.dart';
 import 'package:thermo_humi/features/auth/presentation/pages/auth_text_field.dart';
-import 'package:thermo_humi/features/auth/presentation/widgets/comon/primary_button.dart';
+import 'package:thermo_humi/features/auth/presentation/widgets/common/primary_button.dart';
 
 class SignInForm extends StatefulWidget {
   const SignInForm({super.key});

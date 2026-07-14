@@ -7,13 +7,13 @@ class RouteNames {
   // ── Auth ──────────────────────────────────────────────────────────────────
   static const String splash = '/';
   static const String login = '/login';
+  static const String changePassword = '/change-password';
 
   // ── Shell (Bottom Nav) ────────────────────────────────────────────────────
   static const String home = '/home';
   static const String areas = '/areas';
   static const String notifications = '/notifications';
   static const String report = '/report';
-  static const String account = '/account';
   static const String profile = '/profile';
 
   // ── Room ──────────────────────────────────────────────────────────────────

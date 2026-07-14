@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:thermo_humi/common/widgets/app_background.dart';
-import 'package:thermo_humi/core/theme/app_colors.dart';
-import 'package:thermo_humi/core/theme/text_styles.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:thermo_humi/features/profile/presentation/widgets/profile_avatar_section.dart';
 import 'package:thermo_humi/features/profile/presentation/widgets/profile_logout_button.dart';
 import 'package:thermo_humi/features/profile/presentation/widgets/profile_menu_list.dart';
 import 'package:thermo_humi/features/profile/presentation/cubit/profile_cubit.dart';
 import 'package:thermo_humi/features/profile/presentation/cubit/profile_state.dart';
+import 'package:thermo_humi/features/profile/presentation/widgets/profile_app_bar.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -19,23 +17,7 @@ class ProfilePage extends StatelessWidget {
     return AppBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        appBar: AppBar(
-          backgroundColor: AppColors.gradientEnd,
-          elevation: 0,
-          centerTitle: true,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.settings_outlined, color: Colors.white),
-              onPressed: () {},
-            ),
-          ],
-          title: Text(
-            'Tài khoản',
-            style: AppTextStyles.titleMediumAppBar().copyWith(
-              color: AppColors.background,
-            ),
-          ),
-        ),
+        appBar: const ProfileAppBar(),
         body: Column(
           children: [
             Expanded(

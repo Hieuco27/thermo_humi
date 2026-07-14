@@ -53,7 +53,7 @@ class DeviceActionSheet extends StatelessWidget {
               leading: Icon(
                 Icons.logout_rounded,
                 color: Colors.black87,
-                size: 22.sp,
+                size: 24.sp,
               ),
               title: Text(
                 'Chuyển khỏi phòng này',
@@ -70,7 +70,7 @@ class DeviceActionSheet extends StatelessWidget {
                 leading: Icon(
                   Icons.delete_outline_rounded,
                   color: Colors.red.shade600,
-                  size: 22.sp,
+                  size: 24.sp,
                 ),
                 title: Text(
                   'Xoá thiết bị khỏi hệ thống',

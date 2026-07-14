@@ -7,7 +7,7 @@ import 'package:thermo_humi/features/auth/presentation/bloc/register/register_bl
 import 'package:thermo_humi/features/auth/presentation/bloc/register/register_event.dart';
 import 'package:thermo_humi/features/auth/presentation/bloc/register/register_state.dart';
 import 'package:thermo_humi/features/auth/presentation/pages/auth_text_field.dart';
-import 'package:thermo_humi/features/auth/presentation/widgets/comon/primary_button.dart';
+import 'package:thermo_humi/features/auth/presentation/widgets/common/primary_button.dart';
 
 class SignUpForm extends StatefulWidget {
   const SignUpForm({super.key});

@@ -132,7 +132,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<UserModel> changePassword(UserModel user, String password) {
-    throw UnimplementedError();
+  Future<void> changePassword(
+    String oldPassword,
+    String newPassword,
+    String confirmPassword,
+  ) async {
+    final response = await _dio.post(
+      ApiEndpoints.change_password,
+      data: {'OldPassword': oldPassword, 'Password': newPassword},
+    );
+    if (response.data != null && response.data['success'] == false) {
+      throw Exception(response.data['message'] ?? 'Đổi mật khẩu thất bại');
+    }
   }
 }

@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:thermo_humi/core/theme/app_colors.dart';
-import 'package:thermo_humi/core/theme/text_styles.dart';
 import 'package:thermo_humi/features/device/domain/entities/device_entity.dart';
 import 'package:thermo_humi/features/room_management/presentation/bloc/room_manage_cubit.dart';
 import 'package:thermo_humi/features/room_management/presentation/bloc/room_manage_state.dart';
@@ -13,6 +11,10 @@ import 'package:thermo_humi/features/room_management/presentation/widgets/room_d
 import 'package:thermo_humi/features/room_management/presentation/widgets/room_detail/device_action_sheet.dart';
 import 'package:thermo_humi/features/room_management/presentation/widgets/room_detail/room_device_tile.dart';
 import 'package:thermo_humi/features/room_management/presentation/widgets/room_detail/unassigned_devices_sheet.dart';
+import 'package:thermo_humi/features/room_management/presentation/widgets/room_detail/room_detail_app_bar.dart';
+import 'package:thermo_humi/features/room_management/presentation/widgets/room_detail/summary_strip.dart';
+import 'package:thermo_humi/features/room_management/presentation/widgets/room_detail/empty_device_state.dart';
+import 'package:thermo_humi/features/room_management/presentation/widgets/room_detail/add_device_button.dart';
 
 class RoomDetailScreen extends StatelessWidget {
   final String roomId;
@@ -94,7 +96,7 @@ class _RoomDetailView extends StatelessWidget {
           },
           child: Scaffold(
             backgroundColor: Colors.white,
-            appBar: _DetailAppBar(
+            appBar: RoomDetailAppBar(
               roomName: room.name,
               deviceCount: deviceCount,
               isAdmin: state.isAdmin,
@@ -103,15 +105,15 @@ class _RoomDetailView extends StatelessWidget {
             ),
             body: Column(
               children: [
-                _SummaryStrip(
+                SummaryStrip(
                   totalDevices: deviceCount,
                   onlineCount: onlineCount,
                 ),
                 Expanded(
                   child: deviceCount == 0
-                      ? _EmptyDeviceState()
+                      ? const EmptyDeviceState()
                       : ListView.separated(
-                          padding: EdgeInsets.fromLTRB(16.w, 4.h, 16.w, 100.h),
+                          padding: EdgeInsets.all(8.w),
                           itemCount: deviceCount,
                           separatorBuilder: (_, __) => SizedBox(height: 12.h),
                           itemBuilder: (context, index) {
@@ -130,7 +132,7 @@ class _RoomDetailView extends StatelessWidget {
                 ),
               ],
             ),
-            bottomNavigationBar: _AddDeviceButton(
+            bottomNavigationBar: AddDeviceButton(
               onTap: () => _showAddDeviceOptionSheet(context, room.name),
             ),
           ),
@@ -285,212 +287,6 @@ class _RoomDetailView extends StatelessWidget {
               child: const Text('Xoá phòng'),
             ),
         ],
-      ),
-    );
-  }
-}
-
-class _DetailAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final String roomName;
-  final int deviceCount;
-  final bool isAdmin;
-  final VoidCallback onRename;
-  final VoidCallback onDelete;
-
-  const _DetailAppBar({
-    required this.roomName,
-    required this.deviceCount,
-    required this.isAdmin,
-    required this.onRename,
-    required this.onDelete,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final canDelete = deviceCount == 0;
-    return AppBar(
-      backgroundColor: AppColors.gradientEnd,
-      elevation: 0,
-      centerTitle: true,
-      leading: IconButton(
-        icon: Icon(
-          Icons.arrow_back_ios_new_rounded,
-          size: 20.sp,
-          color: Colors.white,
-        ),
-        onPressed: () {
-          final state = context.read<RoomManageCubit>().state;
-          if (state.hasChanges) {
-            final result = RoomDetailResult(
-              isDeleted: false,
-              newDeviceCount: deviceCount,
-              newOnlineCount:
-                  state.roomWithDevices?.devices
-                      .where((d) => d.isOnline)
-                      .length ??
-                  0,
-              newName: roomName,
-            );
-            context.pop(result);
-          } else {
-            context.pop();
-          }
-        },
-      ),
-      title: Text(
-        roomName,
-        style: AppTextStyles.titleMediumAppBar(color: Colors.white),
-      ),
-      actions: [
-        if (isAdmin)
-          PopupMenuButton<String>(
-            icon: Icon(
-              Icons.more_horiz_rounded,
-              size: 22.sp,
-              color: Colors.white,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            onSelected: (value) {
-              if (value == 'rename') onRename();
-              if (value == 'delete' && canDelete) onDelete();
-            },
-            itemBuilder: (_) => [
-              const PopupMenuItem(
-                value: 'rename',
-                child: Row(
-                  children: [
-                    Icon(Icons.edit_outlined, size: 18),
-                    SizedBox(width: 10),
-                    Text('Đổi tên phòng'),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 'delete',
-                enabled: canDelete,
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.delete_outline_rounded,
-                      size: 18,
-                      color: canDelete
-                          ? Colors.red.shade600
-                          : Colors.grey.shade400,
-                    ),
-                    const SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Xoá phòng',
-                          style: TextStyle(
-                            color: canDelete
-                                ? Colors.red.shade600
-                                : Colors.grey.shade400,
-                          ),
-                        ),
-                        if (!canDelete)
-                          Text(
-                            'Cần chuyển hết thiết bị ra trước',
-                            style: TextStyle(
-                              fontSize: 11.sp,
-                              color: Colors.grey.shade400,
-                            ),
-                          ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        SizedBox(width: 4.w),
-      ],
-    );
-  }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
-}
-
-class _SummaryStrip extends StatelessWidget {
-  final int totalDevices;
-  final int onlineCount;
-
-  const _SummaryStrip({required this.totalDevices, required this.onlineCount});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Text(
-          '$totalDevices thiết bị · $onlineCount online',
-          style: AppTextStyles.bodyMedium(color: Colors.grey.shade500),
-        ),
-      ),
-    );
-  }
-}
-
-class _EmptyDeviceState extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.device_hub_rounded,
-            size: 60.sp,
-            color: Colors.grey.shade300,
-          ),
-          SizedBox(height: 16.h),
-          Text(
-            'Phòng này chưa có thiết bị nào',
-            style: AppTextStyles.titleMedium(color: Colors.grey.shade500),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _AddDeviceButton extends StatelessWidget {
-  final VoidCallback onTap;
-
-  const _AddDeviceButton({required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Colors.grey.shade200)),
-      ),
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-      child: SafeArea(
-        child: TextButton.icon(
-          onPressed: onTap,
-          icon: Icon(Icons.add_rounded, color: Colors.black87, size: 20.sp),
-          label: Text(
-            'Thêm thiết bị vào phòng này',
-            style: AppTextStyles.titleMedium(color: Colors.black87),
-          ),
-          style: TextButton.styleFrom(
-            minimumSize: Size(double.infinity, 48.h),
-            backgroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.r),
-              side: const BorderSide(
-                color: Color(0xFFF39C12),
-              ), // Màu cam như design
-            ),
-          ),
-        ),
       ),
     );
   }

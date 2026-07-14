@@ -20,7 +20,7 @@ class RoomDeviceTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final isOnline = device.status == DeviceStatus.online;
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.r),
@@ -55,19 +55,17 @@ class RoomDeviceTile extends StatelessWidget {
                   children: [
                     // Status dot
                     Container(
-                      width: 8.w,
-                      height: 8.w,
+                      width: 10.w,
+                      height: 10.w,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: isOnline
-                            ? const Color(0xFF34C759)
-                            : Colors.grey.shade400,
+                        color: isOnline ? AppColors.appBarBg : Colors.grey,
                       ),
                     ),
                     SizedBox(width: 6.w),
                     Text(
                       device.name,
-                      style: AppTextStyles.titleMedium(color: Colors.black),
+                      style: AppTextStyles.labelLarge(color: Colors.black),
                     ),
                   ],
                 ),
@@ -108,18 +106,9 @@ class RoomDeviceTile extends StatelessWidget {
           IconButton(
             onPressed: onMoreTap,
             icon: Icon(
-              Icons.more_horiz_rounded,
-              size: 22.sp,
-              color: Colors.grey.shade500,
-            ),
-            style: IconButton.styleFrom(
-              padding: EdgeInsets.all(6.w),
-              minimumSize: Size.zero,
-              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.r),
-                side: BorderSide(color: Colors.grey.shade200),
-              ),
+              Icons.more_vert_rounded,
+              size: 28.sp,
+              color: Colors.grey,
             ),
           ),
         ],

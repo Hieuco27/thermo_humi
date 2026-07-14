@@ -17,6 +17,7 @@ import 'package:thermo_humi/features/room_management/presentation/pages/room_det
 import 'package:thermo_humi/common/widgets/nav_bar.dart';
 import 'package:thermo_humi/features/auth/presentation/pages/sign_in_page.dart';
 import 'package:thermo_humi/features/auth/presentation/pages/sign_up_page.dart';
+import 'package:thermo_humi/features/auth/presentation/pages/change_password.dart';
 import 'package:thermo_humi/features/history/presentation/pages/threshold_log_page.dart';
 import 'package:thermo_humi/features/member_management/presentation/pages/member_management_screen.dart';
 import 'package:thermo_humi/features/request_access/domain/entities/access_request.dart';
@@ -33,7 +34,7 @@ import 'package:thermo_humi/core/di/injection_container.dart';
 class AppRouter {
   AppRouter._();
   static final GoRouter router = GoRouter(
-    initialLocation: RouteNames.login,
+    initialLocation: RouteNames.home,
     redirect: sl<RouterGuard>().redirect,
     routes: [
       // ── Auth ──────────────────────────────────────────────────────────────
@@ -47,7 +48,6 @@ class AppRouter {
         name: 'register',
         builder: (_, __) => const SignUpPage(),
       ),
-
       // ── Access Request ────────────────────────────────────────────────────
       GoRoute(
         path: '/request-access',
@@ -180,6 +180,11 @@ class AppRouter {
                     path: 'device-management',
                     name: 'device-management',
                     builder: (_, __) => const DeviceManagementScreen(),
+                  ),
+                  GoRoute(
+                    path: 'change-password',
+                    name: 'change-password',
+                    builder: (_, __) => const ChangePasswordPage(),
                   ),
                 ],
               ),

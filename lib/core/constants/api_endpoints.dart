@@ -10,6 +10,7 @@ class ApiEndpoints {
   static const String register = '/auth/register';
   static const String logout = '/auth/logout';
   static const String refreshToken = '/auth/refresh-token';
+  static const String change_password = '/auth/change-password';
 
   // ── Dashboard ─────────────────────────────────────────────────────────────
   static const String dashboardSummary = '/api/v1/dashboard/summary';

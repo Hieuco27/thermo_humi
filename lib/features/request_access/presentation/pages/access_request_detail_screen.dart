@@ -149,7 +149,7 @@ class _DetailContentState extends State<_DetailContent> {
                               width: 50.w,
                               height: 50.w,
                               decoration: BoxDecoration(
-                                color: Colors.grey.shade300,
+                                color: Colors.grey.shade500,
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
@@ -172,7 +172,7 @@ class _DetailContentState extends State<_DetailContent> {
                                     children: [
                                       Text(
                                         'Số điện thoại:  ',
-                                        style: AppTextStyles.body13(
+                                        style: AppTextStyles.bodyMedium(
                                           color: Colors.black,
                                         ),
                                       ),
@@ -189,7 +189,7 @@ class _DetailContentState extends State<_DetailContent> {
                                     children: [
                                       Text(
                                         'Thời gian:  ',
-                                        style: AppTextStyles.body13(
+                                        style: AppTextStyles.bodyMedium(
                                           color: Colors.black,
                                         ),
                                       ),
