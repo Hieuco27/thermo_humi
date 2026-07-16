@@ -1,7 +1,8 @@
 /// AddRoomScreen — màn hình thêm phòng / thêm thiết bị
-/// Nhận [existingRoomId]:
-///  - null     → Chế độ tạo phòng mới + gán thiết bị đầu tiên
-///  - có giá trị → Chế độ chỉ thêm thiết bị vào phòng đó
+/// 3 mode:
+///  - forceNewRoom  (existingRoomId=null, isFlexible=false) → tạo phòng + thiết bị tùy chọn
+///  - lockedToRoom  (existingRoomId!=null, isFlexible=false) → chỉ thêm thiết bị vào phòng cố định
+///  - flexible      (existingRoomId=null, isFlexible=true)  → chọn phòng từ picker hoặc không gán
 library;
 
 import 'package:flutter/material.dart';
@@ -18,16 +19,28 @@ import 'package:thermo_humi/core/di/injection_container.dart';
 import 'package:thermo_humi/features/room_management/domain/repositories/room_repository.dart';
 import 'package:thermo_humi/features/room_management/presentation/bloc/add_room/add_room_cubit.dart';
 import 'package:thermo_humi/features/room_management/presentation/bloc/add_room/add_room_state.dart';
-import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/activate_button.dart';
-import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/device_recognized_banner.dart';
-import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/imei_input_field.dart';
-import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/qr_scan_area.dart';
+import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/add_room/activate_button.dart';
+import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/add_room/device_recognized_banner.dart';
+import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/add_room/imei_input_field.dart';
+import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/add_room/qr_scan_area.dart';
+import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/add_room/scan_option_sheet.dart';
 import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/qr_scanner_sheet.dart';
+import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/add_room/room_picker_sheet.dart';
+import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/room_selector_field.dart';
+import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/section_label.dart';
+import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/room_name_input.dart';
 
 class AddRoomScreen extends StatelessWidget {
   final String? existingRoomId;
 
-  const AddRoomScreen({super.key, this.existingRoomId});
+  /// true = mode flexible (điều hướng từ DeviceManagementScreen)
+  final bool isFlexible;
+
+  const AddRoomScreen({
+    super.key,
+    this.existingRoomId,
+    this.isFlexible = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +48,7 @@ class AddRoomScreen extends StatelessWidget {
       create: (_) => AddRoomCubit(
         repository: sl<RoomRepository>(),
         existingRoomId: existingRoomId,
+        isFlexible: isFlexible,
       ),
       child: const _AddRoomView(),
     );
@@ -87,55 +101,59 @@ class _AddRoomViewState extends State<_AddRoomView> {
       },
       builder: (context, state) {
         return Scaffold(
-          backgroundColor: const Color(0xFFF5F5F7),
+          backgroundColor: AppColors.background,
           appBar: _buildAppBar(context, state),
           body: Padding(
-            padding: EdgeInsets.fromLTRB(12.w, 12.h, 12.w, 12.h),
+            padding: EdgeInsets.all(1.w),
             child: LayoutBuilder(
               builder: (_, constraints) => SingleChildScrollView(
                 child: ConstrainedBox(
                   // Container luôn kéo dài ít nhất bằng toàn bộ chiều cao còn lại
                   constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12.r),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.3),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
                     padding: EdgeInsets.all(12.w),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Khối tạo phòng mới (ẩn khi existingRoomId != null)
+                        // ── forceNewRoom: ô nhập tên phòng ──
                         if (state.isNewRoomMode) ...[
-                          _SectionLabel(label: 'Thêm phòng mới'),
+                          const SectionLabel(label: 'Thêm phòng mới'),
                           SizedBox(height: 12.h),
-                          _RoomNameInput(
+                          RoomNameInput(
                             controller: _roomNameCtrl,
                             onChanged: context
                                 .read<AddRoomCubit>()
                                 .updateRoomName,
                           ),
+                          SizedBox(height: 20.h),
+                        ],
+
+                        // ── flexible: ô chọn phòng từ picker ──
+                        if (state.isFlexibleMode) ...[
+                          const SectionLabel(label: 'Chọn phòng'),
                           SizedBox(height: 6.h),
                           Text(
-                            'Ví dụ: Phòng khách, Phòng ngủ, Nhà bếp...',
-                            style: AppTextStyles.bodySmall(
-                              color: Colors.grey.shade400,
-                            ),
+                            'Tùy chọn — thiết bị có thể hoạt động mà không cần gán phòng',
+                            style: AppTextStyles.bodySmall(color: Colors.grey),
+                          ),
+                          SizedBox(height: 10.h),
+                          RoomSelectorField(
+                            selectedRoomName: state.selectedRoomName,
+                            onTap: () => _showRoomPicker(context),
                           ),
                           SizedBox(height: 10.h),
                           Divider(color: Colors.grey.shade200, height: 1),
                           SizedBox(height: 20.h),
                         ],
 
-                        // Khối thêm thiết bị mới (luôn hiển thị)
-                        _SectionLabel(label: 'Thêm thiết bị mới'),
+                        SectionLabel(label: 'Thêm thiết bị mới'),
+                        if (state.isNewRoomMode) ...[
+                          SizedBox(height: 4.h),
+                          Text(
+                            'Không bắt buộc — bạn có thể thêm thiết bị sau trong chi tiết phòng',
+                            style: AppTextStyles.bodySmall(color: Colors.grey),
+                          ),
+                        ],
                         SizedBox(height: 12.h),
 
                         // Vùng quét QR
@@ -179,7 +197,14 @@ class _AddRoomViewState extends State<_AddRoomView> {
   }
 
   AppBar _buildAppBar(BuildContext context, AddRoomState state) {
-    final title = state.isNewRoomMode ? 'Thêm phòng mới' : 'Thêm thiết bị';
+    final String title;
+    if (state.isFlexibleMode) {
+      title = 'Thêm thiết bị mới';
+    } else if (state.isNewRoomMode) {
+      title = 'Thêm phòng mới';
+    } else {
+      title = 'Thêm thiết bị';
+    }
     return AppBar(
       backgroundColor: AppColors.gradientEnd,
       elevation: 0,
@@ -207,14 +232,14 @@ class _AddRoomViewState extends State<_AddRoomView> {
       useRootNavigator: true,
       backgroundColor: Colors.transparent,
       // Dùng sheetCtx (context của sheet) để pop — tránh crash khi context cha detached
-      builder: (sheetCtx) => _ScanOptionSheet(
+      builder: (sheetCtx) => ScanOptionSheet(
         onCamera: () async {
-          Navigator.pop(sheetCtx); // ✅ dùng context của sheet
+          Navigator.pop(sheetCtx);
           await Future.delayed(const Duration(milliseconds: 250));
           if (context.mounted) _openCameraScanner(context, cubit);
         },
         onGallery: () async {
-          Navigator.pop(sheetCtx); // ✅ dùng context của sheet
+          Navigator.pop(sheetCtx);
           await Future.delayed(const Duration(milliseconds: 250));
           if (context.mounted) _pickFromGallery(context, cubit);
         },
@@ -307,180 +332,26 @@ class _AddRoomViewState extends State<_AddRoomView> {
       context.pop(result); // Trả kết quả về màn trước
     }
   }
-}
 
-// ── Bottom Bar ─────────────────────────────────────────────────────────────
-class _BottomBar extends StatelessWidget {
-  final AddRoomState state;
-  final VoidCallback onActivate;
+  // ── Room Picker (flexible mode) ───────────────────────────────────────────
+  Future<void> _showRoomPicker(BuildContext context) async {
+    final cubit = context.read<AddRoomCubit>();
 
-  const _BottomBar({required this.state, required this.onActivate});
+    // Lazy-load phòng lần đầu bấm mở picker
+    await cubit.loadAvailableRoomsIfNeeded();
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      padding: EdgeInsets.fromLTRB(
-        16.w,
-        12.h,
-        16.w,
-        MediaQuery.viewPaddingOf(
-          context,
-        ).bottom, // Chỉ lấy viền màn hình (notch), không bị đẩy bởi bàn phím
-      ),
-      child: ActivateButton(
-        isEnabled: state.canActivate,
-        isLoading: state.isSubmitting,
-        onTap: onActivate,
-      ),
-    );
-  }
-}
+    if (!context.mounted) return;
 
-// ── Section Label ──────────────────────────────────────────────────────────
-class _SectionLabel extends StatelessWidget {
-  final String label;
-  const _SectionLabel({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      label,
-      style: AppTextStyles.labelLarge().copyWith(fontWeight: FontWeight.w600),
-    );
-  }
-}
-
-// ── Room Name Input ────────────────────────────────────────────────────────
-class _RoomNameInput extends StatelessWidget {
-  final TextEditingController controller;
-  final ValueChanged<String> onChanged;
-
-  const _RoomNameInput({required this.controller, required this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      onChanged: onChanged,
-      textCapitalization: TextCapitalization.sentences,
-      style: AppTextStyles.label13(),
-      decoration: InputDecoration(
-        hintText: 'Tên phòng',
-        isDense: true,
-        constraints: BoxConstraints(minHeight: 44.h, maxHeight: 44.h),
-        prefixIconConstraints: BoxConstraints(minWidth: 40.w, minHeight: 20.w),
-        hintStyle: AppTextStyles.label13(color: Colors.grey.shade400),
-        prefixIcon: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8.w),
-          child: Icon(
-            Icons.meeting_room_outlined,
-            color: Colors.grey.shade400,
-            size: 20.sp,
-          ),
-        ),
-        suffixIcon: controller.text.isNotEmpty
-            ? GestureDetector(
-                onTap: () {
-                  controller.clear();
-                  onChanged('');
-                },
-
-                child: Icon(
-                  Icons.close_rounded,
-                  size: 14.sp,
-                  color: Colors.grey.shade600,
-                ),
-              )
-            : null,
-        filled: true,
-        fillColor: Colors.grey.shade50,
-        contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.r),
-          borderSide: BorderSide(color: Colors.grey.shade200),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.r),
-          borderSide: BorderSide(color: Colors.grey.shade200),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.r),
-          borderSide: const BorderSide(color: AppColors.primary, width: 1),
-        ),
-      ),
-    );
-  }
-}
-
-// ── Scan Option Sheet ──────────────────────────────────────────────────────
-class _ScanOptionSheet extends StatelessWidget {
-  final VoidCallback onCamera;
-  final VoidCallback onGallery;
-
-  const _ScanOptionSheet({required this.onCamera, required this.onGallery});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
-      ),
-      child: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(height: 12.h),
-            Container(
-              width: 40.w,
-              height: 4.h,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2.r),
-              ),
-            ),
-            SizedBox(height: 16.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Chọn phương thức quét QR',
-                  style: AppTextStyles.titleMedium(color: Colors.black87),
-                ),
-              ),
-            ),
-            SizedBox(height: 8.h),
-            ListTile(
-              leading: Icon(
-                Icons.qr_code_scanner_rounded,
-                color: AppColors.primary,
-                size: 22.sp,
-              ),
-              title: Text(
-                'Quét bằng camera',
-                style: AppTextStyles.bodyMedium(color: Colors.black87),
-              ),
-              contentPadding: EdgeInsets.symmetric(horizontal: 20.w),
-              onTap: onCamera,
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.photo_library_outlined,
-                color: AppColors.primary,
-                size: 22.sp,
-              ),
-              title: Text(
-                'Chọn ảnh từ thư viện',
-                style: AppTextStyles.bodyMedium(color: Colors.black87),
-              ),
-              contentPadding: EdgeInsets.symmetric(horizontal: 20.w),
-              onTap: onGallery,
-            ),
-            SizedBox(height: 16.h),
-          ],
-        ),
+    final state = cubit.state;
+    showModalBottomSheet(
+      context: context,
+      useRootNavigator: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => RoomPickerSheet(
+        rooms: state.availableRooms,
+        isLoading: state.isLoadingRooms,
+        selectedRoomId: state.selectedRoomId,
+        onSelected: (roomId, roomName) => cubit.selectRoom(roomId, roomName),
       ),
     );
   }

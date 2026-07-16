@@ -9,7 +9,7 @@ class AddRoomResult {
   final String roomName;
 
   /// Mã thiết bị vừa được gán
-  final String deviceCode;
+  final String? deviceCode;
 
   /// true = phòng mới vừa được tạo, false = chỉ gán thiết bị vào phòng cũ
   final bool isNewRoom;
@@ -17,7 +17,7 @@ class AddRoomResult {
   const AddRoomResult({
     required this.roomId,
     required this.roomName,
-    required this.deviceCode,
+    this.deviceCode,
     required this.isNewRoom,
   });
 }

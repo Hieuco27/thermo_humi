@@ -25,7 +25,10 @@ class DeviceManagementAppBar extends StatelessWidget implements PreferredSizeWid
         IconButton(
           icon: Icon(Icons.add, color: Colors.white, size: 24.sp),
           onPressed: () {
-            // Handle add action
+            context.pushNamed(
+              'add-room',
+              queryParameters: {'flexible': 'true'},
+            );
           },
         ),
       ],

@@ -161,9 +161,10 @@ class AppRouter {
                         path: 'add-room',
                         name: 'add-room',
                         builder: (_, state) => AddRoomScreen(
-                          // null = tạo phòng mới; có giá trị = chỉ thêm thiết bị
                           existingRoomId:
                               state.uri.queryParameters['existingRoomId'],
+                          isFlexible:
+                              state.uri.queryParameters['flexible'] == 'true',
                         ),
                       ),
                       GoRoute(

@@ -1,7 +1,6 @@
-/// RoomRepositoryImpl — mock implementation (Data layer)
-/// Thay bằng API thực khi BE sẵn sàng
 library;
 
+import 'package:thermo_humi/features/room/domain/entities/room_entity.dart';
 import 'package:thermo_humi/features/room_management/domain/repositories/room_repository.dart';
 import 'package:injectable/injectable.dart';
 
@@ -20,15 +19,6 @@ class RoomRepositoryImpl implements RoomRepository {
   }) async {
     // Simulate network delay
     await Future.delayed(const Duration(milliseconds: 800));
-
-    // Mock: trả về roomId giả
-    // TODO: thay bằng API call thực
-    // Ví dụ:
-    // final response = await dio.post('/rooms', data: {
-    //   'name': roomName,
-    //   'deviceCode': deviceCode,
-    // });
-    // return response.data['roomId'];
     return 'room_${DateTime.now().millisecondsSinceEpoch}';
   }
 
@@ -39,16 +29,72 @@ class RoomRepositoryImpl implements RoomRepository {
     required String deviceCode,
   }) async {
     await Future.delayed(const Duration(milliseconds: 600));
+  }
 
-    // TODO: thay bằng API call thực
-    // Ví dụ:
-    // await dio.post('/rooms/$roomId/devices', data: {
-    //   'deviceCode': deviceCode,
-    // });
+  @override
+  Future<String> createRoomOnly({required String roomName}) async {
+    // Simulate network delay
+    await Future.delayed(const Duration(milliseconds: 800));
+    return 'room_${DateTime.now().millisecondsSinceEpoch}';
+  }
 
-    // Mock error simulation (comment out khi dùng thực):
-    // if (deviceCode == 'ERR_TEST') {
-    //   throw Exception('Thiết bị đã được gán cho phòng khác');
-    // }
+  /// Mock: Lấy danh sách phòng cho RoomPickerSheet.
+  /// TODO: thay bằng API call thực, ví dụ:
+  ///   final response = await dio.get('/rooms');
+  ///   return (response.data['rooms'] as List).map(RoomEntity.fromJson).toList();
+  @override
+  Future<List<RoomEntity>> getAvailableRooms() async {
+    await Future.delayed(const Duration(milliseconds: 400));
+    final now = DateTime.now();
+    return [
+      RoomEntity(
+        id: 'room_001',
+        name: 'Phòng khách',
+        totalDevices: 2,
+        onlineDevices: 1,
+        alertCount: 0,
+        createdAt: now,
+      ),
+      RoomEntity(
+        id: 'room_002',
+        name: 'Phòng ngủ',
+        totalDevices: 1,
+        onlineDevices: 1,
+        alertCount: 0,
+        createdAt: now,
+      ),
+      RoomEntity(
+        id: 'room_003',
+        name: 'Nhà bếp',
+        totalDevices: 0,
+        onlineDevices: 0,
+        alertCount: 0,
+        createdAt: now,
+      ),
+      RoomEntity(
+        id: 'room_003',
+        name: 'Nhà bếp',
+        totalDevices: 0,
+        onlineDevices: 0,
+        alertCount: 0,
+        createdAt: now,
+      ),
+      RoomEntity(
+        id: 'room_003',
+        name: 'Nhà bếp',
+        totalDevices: 0,
+        onlineDevices: 0,
+        alertCount: 0,
+        createdAt: now,
+      ),
+    ];
+  }
+
+  /// Mock: Tạo thiết bị độc lập, không gán phòng.
+  /// TODO: thay bằng API call thực, ví dụ:
+  ///   await dio.post('/devices', data: {'deviceCode': deviceCode});
+  @override
+  Future<void> createUnassignedDevice({required String deviceCode}) async {
+    await Future.delayed(const Duration(milliseconds: 700));
   }
 }
