@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
-import 'package:thermo_humi/features/device/presentation/bloc/device_management/device_management_cubit.dart';
-import 'package:thermo_humi/features/device/presentation/bloc/device_management/device_management_state.dart';
+import 'package:thermo_humi/features/device_management/presentation/bloc/device_management/device_management_cubit.dart';
+import 'package:thermo_humi/features/device_management/presentation/bloc/device_management/device_management_state.dart';
 
 class DeviceFilterRow extends StatelessWidget {
   const DeviceFilterRow({super.key});

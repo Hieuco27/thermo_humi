@@ -112,7 +112,7 @@ class _AddRoomViewState extends State<_AddRoomView> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // ── Khối tạo phòng mới (ẩn khi existingRoomId != null) ──
+                        // Khối tạo phòng mới (ẩn khi existingRoomId != null)
                         if (state.isNewRoomMode) ...[
                           _SectionLabel(label: 'Thêm phòng mới'),
                           SizedBox(height: 12.h),
@@ -134,7 +134,7 @@ class _AddRoomViewState extends State<_AddRoomView> {
                           SizedBox(height: 20.h),
                         ],
 
-                        // ── Khối thêm thiết bị mới (luôn hiển thị) ──
+                        // Khối thêm thiết bị mới (luôn hiển thị)
                         _SectionLabel(label: 'Thêm thiết bị mới'),
                         SizedBox(height: 12.h),
 

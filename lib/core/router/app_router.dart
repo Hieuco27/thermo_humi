@@ -25,7 +25,7 @@ import 'package:thermo_humi/features/request_access/presentation/pages/access_re
 import 'package:thermo_humi/features/request_access/presentation/pages/access_request_detail_screen.dart';
 import 'package:thermo_humi/features/room_management/presentation/pages/room_management_screen.dart';
 import 'package:thermo_humi/features/room_management/presentation/pages/addroom/add_room_screen.dart';
-import 'package:thermo_humi/features/device/presentation/pages/device_management_screen.dart';
+import 'package:thermo_humi/features/device_management/presentation/pages/device_management_screen.dart';
 
 import 'package:thermo_humi/core/router/router_guard.dart';
 import 'package:thermo_humi/core/di/injection_container.dart';

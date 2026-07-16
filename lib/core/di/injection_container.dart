@@ -46,7 +46,7 @@ import 'package:thermo_humi/core/network/interceptors/auth_interceptor.dart';
 import 'package:thermo_humi/core/network/interceptors/error_interceptor.dart';
 import 'package:thermo_humi/core/storage/secure_storage.dart';
 
-import 'package:thermo_humi/features/device/presentation/bloc/device_management/device_management_cubit.dart';
+import 'package:thermo_humi/features/device_management/presentation/bloc/device_management/device_management_cubit.dart';
 import 'package:thermo_humi/features/device/presentation/bloc/device_detail/device_history_cubit.dart';
 import 'package:thermo_humi/features/device/domain/repositories/device_repository.dart';
 import 'package:thermo_humi/features/device/data/repositories/device_repository_impl.dart';

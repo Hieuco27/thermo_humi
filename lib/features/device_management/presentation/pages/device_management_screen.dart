@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:thermo_humi/features/device_management/presentation/widgets/device_filter_chips.dart';
+import 'package:thermo_humi/features/device_management/presentation/widgets/device_filter_row.dart';
+import 'package:thermo_humi/features/device_management/presentation/widgets/device_list_view.dart';
+import 'package:thermo_humi/features/device_management/presentation/widgets/device_search_bar.dart';
 import '../bloc/device_management/device_management_cubit.dart';
 import 'package:thermo_humi/core/di/injection_container.dart';
-import '../widgets/device_management/device_search_bar.dart';
-import '../widgets/device_management/device_filter_row.dart';
-import '../widgets/device_management/device_filter_chips.dart';
-import '../widgets/device_management/device_list_view.dart';
-import '../widgets/device_management/device_management_app_bar.dart';
+import '../widgets/device_management_app_bar.dart';
 
 class DeviceManagementScreen extends StatefulWidget {
   const DeviceManagementScreen({super.key});
