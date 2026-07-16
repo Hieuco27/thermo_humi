@@ -34,7 +34,7 @@ import 'package:thermo_humi/core/di/injection_container.dart';
 class AppRouter {
   AppRouter._();
   static final GoRouter router = GoRouter(
-    initialLocation: RouteNames.home,
+    initialLocation: RouteNames.login,
     redirect: sl<RouterGuard>().redirect,
     routes: [
       // ── Auth ──────────────────────────────────────────────────────────────
@@ -44,7 +44,7 @@ class AppRouter {
         builder: (_, __) => const SignInPage(),
       ),
       GoRoute(
-        path: '/register',
+        path: RouteNames.register,
         name: 'register',
         builder: (_, __) => const SignUpPage(),
       ),
@@ -157,7 +157,6 @@ class AppRouter {
                     name: 'room-management',
                     builder: (_, __) => const RoomManagementScreen(),
                     routes: [
-                      // ⚠️ Literal route phải khai báo TRƯỚC dynamic param :roomId
                       GoRoute(
                         path: 'add-room',
                         name: 'add-room',

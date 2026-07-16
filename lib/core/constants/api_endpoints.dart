@@ -2,6 +2,8 @@
 /// .NET backend convention: /api/v1/...
 library;
 
+import 'package:thermo_humi/core/config/app_config.dart';
+
 class ApiEndpoints {
   ApiEndpoints._();
 
@@ -22,6 +24,8 @@ class ApiEndpoints {
 
   // ── Devices ───────────────────────────────────────────────────────────────
   static const String devices = '/api/v1/devices';
+  static String get deviceOnlineQuery =>
+      '${AppConfig.devicesBaseUrl}/device-online/query';
   static String deviceById(String id) => '/api/v1/devices/$id';
   static String deviceReadings(String id) => '/api/v1/devices/$id/readings';
   static String deviceReadings24h(String id) =>

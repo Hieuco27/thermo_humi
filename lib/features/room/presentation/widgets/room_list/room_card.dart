@@ -25,20 +25,15 @@ class RoomCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color cardBg = const Color(0xFFFFFFFF);
-    final Color borderColor = const Color(0xFFE5E5EA);
-    final Color textPrimary = const Color(0xFF1C1C1E);
-    final Color textSec = const Color(0xFF6D6D71);
-
     final bool hasAlert = rwd.room.hasAlert;
 
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
       decoration: BoxDecoration(
-        color: cardBg,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: hasAlert ? AppColors.dashboardWarning : borderColor,
+          color: hasAlert ? AppColors.dashboardWarning : AppColors.border,
           width: hasAlert ? 1 : 0.5,
         ),
         boxShadow: [
@@ -56,8 +51,6 @@ class RoomCard extends StatelessWidget {
             room: rwd.room,
             devices: rwd.devices,
             isExpanded: isExpanded,
-            textPrimary: textPrimary,
-            textSec: textSec,
             hasAlert: hasAlert,
             onTap: onHeaderTap,
           ),
@@ -70,7 +63,6 @@ class RoomCard extends StatelessWidget {
                 : CrossFadeState.showSecond,
             firstChild: _DeviceListSection(
               devices: rwd.devices,
-              borderColor: borderColor,
               onViewAll: onViewAll,
             ),
             secondChild: const SizedBox.shrink(),
@@ -86,8 +78,6 @@ class _RoomCardHeader extends StatelessWidget {
   final RoomEntity room;
   final List<DeviceEntity> devices;
   final bool isExpanded;
-  final Color textPrimary;
-  final Color textSec;
   final bool hasAlert;
   final VoidCallback onTap;
 
@@ -95,8 +85,6 @@ class _RoomCardHeader extends StatelessWidget {
     required this.room,
     required this.devices,
     required this.isExpanded,
-    required this.textPrimary,
-    required this.textSec,
     required this.hasAlert,
     required this.onTap,
   });
@@ -158,7 +146,7 @@ class _RoomCardHeader extends StatelessWidget {
                       _RoomStat(
                         svgAsset: 'assets/icons/room/device.svg',
                         value: '${room.totalDevices}',
-                        color: textSec,
+                        color: AppColors.textFieldHint,
                       ),
                       SizedBox(width: 10.w),
                       _RoomStat(
@@ -187,7 +175,7 @@ class _RoomCardHeader extends StatelessWidget {
               duration: const Duration(milliseconds: 280),
               child: Icon(
                 Icons.keyboard_arrow_down_rounded,
-                color: textSec,
+                color: AppColors.textSecondary,
                 size: 22.sp,
               ),
             ),
@@ -232,14 +220,9 @@ class _RoomStat extends StatelessWidget {
 // ── Device list section ───────────────────────────────────────────────────────
 class _DeviceListSection extends StatelessWidget {
   final List<DeviceEntity> devices;
-  final Color borderColor;
   final VoidCallback onViewAll;
 
-  const _DeviceListSection({
-    required this.devices,
-    required this.borderColor,
-    required this.onViewAll,
-  });
+  const _DeviceListSection({required this.devices, required this.onViewAll});
 
   @override
   Widget build(BuildContext context) {
@@ -249,7 +232,7 @@ class _DeviceListSection extends StatelessWidget {
 
     return Column(
       children: [
-        Divider(height: 1, thickness: 0.5, color: borderColor),
+        Divider(height: 1, thickness: 0.5, color: AppColors.border),
         ...preview.map((d) => DeviceListItem(device: d)),
         if (hasMore)
           _ViewAllButton(remaining: devices.length - 3, onTap: onViewAll),
@@ -268,43 +251,45 @@ class _ViewAllButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       child: GestureDetector(
         onTap: () {
           HapticFeedback.selectionClick();
           onTap();
         },
         child: Container(
-          width: double.infinity,
           padding: EdgeInsets.symmetric(vertical: 10.h),
           decoration: BoxDecoration(
-            color: const Color(0xFF007AFF).withValues(alpha: 0.08),
+            color: AppColors.gradientEnd.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(10.r),
             border: Border.all(
-              color: const Color(0xFF007AFF).withValues(alpha: 0.25),
+              color: AppColors.gradientEnd.withValues(alpha: 0.25),
               width: 0.8,
             ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Xem tất cả', style: AppTextStyles.labelLarge()),
+              Text('Xem tất cả', style: AppTextStyles.titleSmall2()),
               if (remaining > 0) ...[
                 SizedBox(width: 6.w),
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 1.h),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF007AFF),
+                    color: AppColors.gradientEnd,
                     borderRadius: BorderRadius.circular(8.r),
                   ),
-                  child: Text('+$remaining', style: AppTextStyles.bodyMedium()),
+                  child: Text(
+                    '+$remaining',
+                    style: AppTextStyles.titleSmall2(),
+                  ),
                 ),
               ],
               SizedBox(width: 6.w),
               Icon(
                 Icons.arrow_forward_ios_rounded,
                 size: 12.sp,
-                color: const Color(0xFF007AFF),
+                color: AppColors.gradientEnd,
               ),
             ],
           ),

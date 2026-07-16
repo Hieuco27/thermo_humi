@@ -100,7 +100,6 @@ class AuthInterceptor extends Interceptor {
             _isRefreshing = false;
           }
         } else {
-          // TODO: Nếu đang refresh thì có thể queue các request khác lại.
           // Hiện tại nếu có nhiều request cùng lỗi 401 thì request sau sẽ văng lỗi luôn.
         }
       } else {

@@ -15,9 +15,10 @@ class RegisterSuccess extends RegisterState {}
 
 class RegisterError extends RegisterState {
   final String message;
+  final Map<String, String>? fieldErrors;
 
-  const RegisterError(this.message);
+  const RegisterError(this.message, {this.fieldErrors});
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [message, fieldErrors];
 }

@@ -1,6 +1,8 @@
 /// Error Interceptor — map HTTP status code → custom exception
 library;
 
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:thermo_humi/core/error/exceptions.dart';
@@ -31,14 +33,17 @@ class ErrorInterceptor extends Interceptor {
     final statusCode = response.statusCode ?? 0;
     final message = _extractMessage(response);
 
+    final validationErrors = _extractValidationErrors(response);
+
     final exception = switch (statusCode) {
       401 => UnauthorizedException(message: message),
       403 => ForbiddenException(message: message),
       404 => NotFoundException(message: message),
-      422 => ValidationException(
-          message: message,
-          errors: _extractValidationErrors(response),
-        ),
+      422 => ValidationException(message: message, errors: validationErrors),
+      400 when validationErrors.isNotEmpty => ValidationException(
+        message: message,
+        errors: validationErrors,
+      ),
       _ => ServerException(message: message, statusCode: statusCode),
     };
 
@@ -65,16 +70,60 @@ class ErrorInterceptor extends Interceptor {
 
   Map<String, List<String>> _extractValidationErrors(Response response) {
     try {
-      final data = response.data;
-      if (data is Map<String, dynamic> && data['errors'] != null) {
-        final errors = data['errors'] as Map<String, dynamic>;
-        return errors.map(
-          (key, value) => MapEntry(
-            key,
-            (value as List).map((e) => e.toString()).toList(),
-          ),
-        );
+      dynamic data = response.data;
+      if (data is String) {
+        try {
+          data = jsonDecode(data);
+        } catch (_) {}
       }
+
+      final errorsMap = <String, List<String>>{};
+
+      if (data is List) {
+        // Handle root array of IdentityError objects: [{"code": "...", "description": "..."}]
+        for (var item in data) {
+          if (item is Map &&
+              item['code'] != null &&
+              item['description'] != null) {
+            final key = item['code'].toString();
+            final desc = item['description'].toString();
+            errorsMap.putIfAbsent(key, () => []).add(desc);
+          }
+        }
+      } else if (data is Map) {
+        // Check if there is an "errors" field
+        final errorsField = data['errors'];
+
+        if (errorsField is Map) {
+          // Standard ProblemDetails: {"errors": {"Password": ["err1", "err2"]}}
+          errorsField.forEach((key, value) {
+            if (value is List) {
+              errorsMap[key.toString()] = value
+                  .map((e) => e.toString())
+                  .toList();
+            } else {
+              errorsMap[key.toString()] = [value.toString()];
+            }
+          });
+        } else if (errorsField is List) {
+          // Wrapper with list of objects: {"errors": [{"code": "...", "description": "..."}]}
+          for (var item in errorsField) {
+            if (item is Map &&
+                item['code'] != null &&
+                item['description'] != null) {
+              final key = item['code'].toString();
+              final desc = item['description'].toString();
+              errorsMap.putIfAbsent(key, () => []).add(desc);
+            } else if (item is Map && item.keys.length == 1) {
+              // Sometimes {"Password": "Error"} in a list
+              final key = item.keys.first.toString();
+              final desc = item.values.first.toString();
+              errorsMap.putIfAbsent(key, () => []).add(desc);
+            }
+          }
+        }
+      }
+      return errorsMap;
     } catch (_) {}
     return {};
   }

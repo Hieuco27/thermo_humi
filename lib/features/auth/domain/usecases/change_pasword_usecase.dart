@@ -11,11 +11,5 @@ class ChangePasswordUseCase {
     String oldPassword,
     String newPassword,
     String confirmPassword,
-  ) async {
-    return await repository.changePassword(
-      oldPassword,
-      newPassword,
-      confirmPassword,
-    );
-  }
+  ) => repository.changePassword(oldPassword, newPassword, confirmPassword);
 }

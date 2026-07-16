@@ -14,6 +14,7 @@ class LoginSuccess extends LoginState {
 
 class LoginError extends LoginState {
   final String message;
+  final Map<String, String>? fieldErrors;
 
-  LoginError(this.message);
+  LoginError(this.message, {this.fieldErrors});
 }

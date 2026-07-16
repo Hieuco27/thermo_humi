@@ -36,55 +36,66 @@ class _SignUpFormState extends State<SignUpForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        AuthTextField(
-          hintText: 'Họ và tên',
-          prefixIcon: Icons.person_outline,
-          controller: _nameController,
-          keyboardType: TextInputType.name,
-        ),
-        SizedBox(height: 10.h),
-        AuthTextField(
-          hintText: 'Số điện thoại',
-          prefixIcon: Icons.phone_outlined,
-          controller: _phoneController,
-          keyboardType: TextInputType.phone,
-        ),
-        SizedBox(height: 10.h),
-        AuthTextField(
-          hintText: 'Mật khẩu',
-          prefixIcon: Icons.lock_outline,
-          isPassword: true,
-          controller: _passwordController,
-        ),
-        SizedBox(height: 10.h),
-        AuthTextField(
-          hintText: 'Xác nhận mật khẩu',
-          prefixIcon: Icons.lock_outline,
-          isPassword: true,
-          controller: _confirmPasswordController,
-        ),
-        SizedBox(height: 20.h),
-        BlocConsumer<RegisterBloc, RegisterState>(
-          listener: (context, state) {
-            if (state is RegisterSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Đăng ký thành công!')),
-              );
-              // Navigate back to login
-              context.pop();
-            } else if (state is RegisterError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
-          },
-          builder: (context, state) {
-            return PrimaryButton(
+    return BlocConsumer<RegisterBloc, RegisterState>(
+      listener: (context, state) {
+        if (state is RegisterSuccess) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Đăng ký thành công!')));
+          // Navigate back to login
+          context.pop();
+        } else if (state is RegisterError) {
+          if (state.fieldErrors == null || state.fieldErrors!.isEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+            );
+          }
+        }
+      },
+      builder: (context, state) {
+        return Column(
+          children: [
+            AuthTextField(
+              hintText: 'Họ và tên',
+              prefixIcon: Icons.person_outline,
+              controller: _nameController,
+              keyboardType: TextInputType.name,
+              errorText: (state is RegisterError)
+                  ? (state.fieldErrors?['name'])
+                  : null,
+            ),
+            SizedBox(height: 10.h),
+            AuthTextField(
+              hintText: 'Số điện thoại',
+              prefixIcon: Icons.phone_outlined,
+              controller: _phoneController,
+              keyboardType: TextInputType.phone,
+              errorText: (state is RegisterError)
+                  ? (state.fieldErrors?['phone'])
+                  : null,
+            ),
+            SizedBox(height: 10.h),
+            AuthTextField(
+              hintText: 'Mật khẩu',
+              prefixIcon: Icons.lock_outline,
+              isPassword: true,
+              controller: _passwordController,
+              errorText: (state is RegisterError)
+                  ? (state.fieldErrors?['password'])
+                  : null,
+            ),
+            SizedBox(height: 10.h),
+            AuthTextField(
+              hintText: 'Xác nhận mật khẩu',
+              prefixIcon: Icons.lock_outline,
+              isPassword: true,
+              controller: _confirmPasswordController,
+              errorText: (state is RegisterError)
+                  ? (state.fieldErrors?['confirmPassword'])
+                  : null,
+            ),
+            SizedBox(height: 20.h),
+            PrimaryButton(
               text: 'Đăng ký',
               isLoading: state is RegisterLoading,
               backgroundColor: AppColors.gradientStart,
@@ -98,10 +109,10 @@ class _SignUpFormState extends State<SignUpForm> {
                   ),
                 );
               },
-            );
-          },
-        ),
-      ],
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -31,13 +31,30 @@ class _SignInFormState extends State<SignInForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
+    return BlocConsumer<LoginBloc, LoginState>(
+      listener: (context, state) {
+        if (state is LoginSuccess) {
+          context.go('/home');
+        } else if (state is LoginError) {
+          if (state.fieldErrors == null || state.fieldErrors!.isEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
+      },
+      builder: (context, state) {
+        return Column(
+          children: [
         AuthTextField(
           hintText: 'Gmail hoặc Số điện thoại',
           prefixIcon: Icons.person_outline,
           controller: _emailController,
           keyboardType: TextInputType.emailAddress,
+          errorText: (state is LoginError) ? (state.fieldErrors?['email']) : null,
         ),
         SizedBox(height: 16.h),
         AuthTextField(
@@ -45,6 +62,7 @@ class _SignInFormState extends State<SignInForm> {
           prefixIcon: Icons.lock_outline,
           isPassword: true,
           controller: _passwordController,
+          errorText: (state is LoginError) ? (state.fieldErrors?['password']) : null,
         ),
         SizedBox(height: 8.h),
         Row(
@@ -93,21 +111,7 @@ class _SignInFormState extends State<SignInForm> {
           ],
         ),
         SizedBox(height: 32.h),
-        BlocConsumer<LoginBloc, LoginState>(
-          listener: (context, state) {
-            if (state is LoginSuccess) {
-              context.go('/home');
-            } else if (state is LoginError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
-          },
-          builder: (context, state) {
-            return PrimaryButton(
+        PrimaryButton(
               text: 'Đăng nhập',
               isLoading: state is LoginLoading,
               backgroundColor: AppColors.gradientStart,
@@ -120,10 +124,10 @@ class _SignInFormState extends State<SignInForm> {
                   ),
                 );
               },
-            );
-          },
-        ),
-      ],
+            ),
+          ],
+        );
+      },
     );
   }
 }

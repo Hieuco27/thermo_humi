@@ -10,6 +10,7 @@ class AuthTextField extends StatefulWidget {
   final bool isPassword;
   final TextEditingController controller;
   final TextInputType keyboardType;
+  final String? errorText;
 
   const AuthTextField({
     super.key,
@@ -19,6 +20,7 @@ class AuthTextField extends StatefulWidget {
     this.isPassword = false,
     required this.controller,
     this.keyboardType = TextInputType.text,
+    this.errorText,
   });
 
   @override
@@ -49,6 +51,9 @@ class _AuthTextFieldState extends State<AuthTextField> {
           style: AppTextStyles.bodyMedium(),
           decoration: InputDecoration(
             hintText: widget.hintText,
+            errorText: widget.errorText,
+            errorMaxLines: 2,
+            errorStyle: AppTextStyles.labelSmall().copyWith(color: Colors.red),
             hintStyle: AppTextStyles.bodyMedium().copyWith(
               color: AppColors.textFieldHint,
             ),

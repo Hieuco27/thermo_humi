@@ -25,13 +25,12 @@ class AuthRepositoryImpl implements AuthRepository {
     String password,
     String fullname,
   ) async {
-    final userModel = await authDataSource.signUp(userName, password, fullname);
-    return userModel;
+    return await authDataSource.signUp(userName, password, fullname);
   }
 
   @override
   Future<void> signOut() async {
-    await authDataSource.signOut();
+    return await authDataSource.signOut();
   }
 
   @override

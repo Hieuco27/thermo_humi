@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart' as intl;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -9,8 +8,9 @@ import 'package:thermo_humi/core/theme/text_styles.dart';
 import 'package:thermo_humi/features/request_access/domain/entities/access_request.dart';
 import 'package:thermo_humi/features/request_access/presentation/cubit/access_request_detail_cubit.dart';
 import 'package:thermo_humi/features/request_access/presentation/cubit/access_request_state.dart';
-import 'package:thermo_humi/features/request_access/presentation/widgets/role_selector.dart';
-import 'package:thermo_humi/features/request_access/presentation/widgets/status_chip.dart';
+import '../widgets/access_request_detail/requester_info_card.dart';
+import '../widgets/access_request_detail/requested_device_card.dart';
+import '../widgets/access_request_detail/action_button.dart';
 
 class AccessRequestDetailScreen extends StatelessWidget {
   final String id;
@@ -117,217 +117,21 @@ class _DetailContentState extends State<_DetailContent> {
                   child: Column(
                     children: [
                       // Section 1: Thông tin người yêu cầu
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Thông tin người yêu cầu :',
-                          style: AppTextStyles.bodyMedium(color: Colors.black),
-                        ),
-                      ),
-                      SizedBox(height: 12.h),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12.w,
-                          vertical: 8.h,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12.r),
-                          border: Border.all(color: Colors.grey.shade300),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.3),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            // Avatar
-                            Container(
-                              width: 50.w,
-                              height: 50.w,
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade500,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.person,
-                                color: Colors.white,
-                                size: 30.w,
-                              ),
-                            ),
-                            SizedBox(width: 20.w),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    request.requesterName,
-                                    style: AppTextStyles.titleMediumBlack(),
-                                  ),
-                                  SizedBox(height: 8.h),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        'Số điện thoại:  ',
-                                        style: AppTextStyles.bodyMedium(
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                      Text(
-                                        request.requesterPhone ?? '-',
-                                        style: AppTextStyles.bodyMedium(
-                                          color: Colors.grey.shade500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 4.h),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        'Thời gian:  ',
-                                        style: AppTextStyles.bodyMedium(
-                                          color: Colors.black,
-                                        ),
-                                      ),
-
-                                      Text(
-                                        '12:08  27-02-2026',
-                                        style: AppTextStyles.bodyMedium(
-                                          color: Colors.grey.shade500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
+                      RequesterInfoCard(request: request),
                       SizedBox(height: 24.h),
-
                       // Section 2: Thiết bị yêu cầu
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Thiết bị yêu cầu :',
-                          style: AppTextStyles.bodyMedium(color: Colors.black),
-                        ),
-                      ),
-                      SizedBox(height: 12.h),
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 12.w,
-                          vertical: 8.h,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12.r),
-                          border: Border.all(color: Colors.grey.shade300),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.3),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            // Device Image
-                            Container(
-                              width: 50.w,
-                              height: 50.w,
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade200,
-                                borderRadius: BorderRadius.circular(8.r),
-                              ),
-                              child: Icon(
-                                request.type == AccessRequestType.room
-                                    ? Icons.door_front_door
-                                    : Icons.ad_units,
-                                color: Colors.grey.shade500,
-                                size: 30.w,
-                              ),
-                            ),
-                            SizedBox(width: 20.w),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    request.resourceName,
-                                    style: AppTextStyles.titleMediumBlack(),
-                                  ),
-                                  SizedBox(height: 8.h),
-                                  RichText(
-                                    text: TextSpan(
-                                      text: 'Quyền hạn:  ',
-                                      style: AppTextStyles.body13(
-                                        color: Colors.black,
-                                      ),
-                                      children: [
-                                        TextSpan(
-                                          text:
-                                              request.roleRequested.displayName,
-                                          style: AppTextStyles.bodyMedium(
-                                            color: Colors.grey.shade500,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  if (request.macAddress != null) ...[
-                                    SizedBox(height: 8.h),
-                                    Text(
-                                      request.macAddress!,
-                                      style: AppTextStyles.bodyMedium(
-                                        color: Colors.grey.shade500,
-                                      ),
-                                    ),
-                                  ],
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      RequestedDeviceCard(request: request),
                     ],
                   ),
                 ),
               ),
 
               // Bottom Button
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 32.h),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 52.h,
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(
-                        0xFF98F59B,
-                      ), // Light green matching the image
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(100.r),
-                      ),
-                    ),
-                    child: Text(
-                      'Đã được xác nhận',
-                      style: AppTextStyles.titleMedium(
-                        color: const Color(0xFF7CB37C),
-                      ).copyWith(fontSize: 16.sp), // Grayish green text
-                    ),
-                  ),
-                ),
+              ActionButton(
+                label: 'Đã được xác nhận',
+                onPressed: () {},
+                backgroundColor: const Color(0xFF98F59B),
+                textColor: const Color(0xFF7CB37C),
               ),
             ],
           ),

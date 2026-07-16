@@ -104,7 +104,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   ) async {
     final response = await _dio.post(
       ApiEndpoints.register,
-      data: {'UserName': userName, 'Password': password, 'FullName': fullname},
+      data: {
+        'Phone': userName,
+        'Password': password,
+        'Fullname': fullname,
+      },
     );
     if (response.data['success'] != true) {
       throw Exception(response.data['message'] ?? 'Đăng ký thất bại');
@@ -127,8 +131,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<void> signOut() {
-    throw UnimplementedError();
+  Future<void> signOut() async {
+    await _secureStorage.delete(AppConstants.kAccessToken);
+    await _secureStorage.delete(AppConstants.kRefreshToken);
+    await _secureStorage.delete(AppConstants.kUserData);
   }
 
   @override

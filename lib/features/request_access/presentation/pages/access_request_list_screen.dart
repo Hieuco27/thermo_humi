@@ -10,7 +10,7 @@ import 'package:thermo_humi/core/theme/text_styles.dart';
 import 'package:thermo_humi/features/request_access/presentation/cubit/access_request_state.dart';
 import 'package:thermo_humi/features/request_access/presentation/cubit/device_access_request_list_cubit.dart';
 import 'package:thermo_humi/features/request_access/presentation/cubit/room_access_request_list_cubit.dart';
-import 'package:thermo_humi/features/request_access/presentation/widgets/access_request_tile.dart';
+import 'package:thermo_humi/features/request_access/presentation/widgets/access_request_list/access_request_tile.dart';
 
 class AccessRequestListScreen extends StatelessWidget {
   const AccessRequestListScreen({super.key});

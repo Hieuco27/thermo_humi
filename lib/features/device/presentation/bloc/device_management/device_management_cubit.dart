@@ -133,7 +133,6 @@ class DeviceManagementCubit extends Cubit<DeviceManagementState> {
   @override
   Future<void> close() {
     _debounce?.cancel();
-    // Todo: Cancel stream subscriptions (e.g. from a global event bus) when available
     return super.close();
   }
 }

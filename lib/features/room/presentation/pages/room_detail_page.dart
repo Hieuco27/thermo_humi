@@ -4,12 +4,13 @@ library;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:thermo_humi/core/di/injection_container.dart';
 import 'package:thermo_humi/common/widgets/animated_list_item.dart';
 import 'package:thermo_humi/common/widgets/app_background.dart';
 import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/features/device/domain/entities/device_entity.dart';
-import 'package:thermo_humi/features/room/presentation/bloc/room_detail_cubit.dart';
-import 'package:thermo_humi/features/room/presentation/bloc/room_detail_state.dart';
+import 'package:thermo_humi/features/room/presentation/bloc/room_detail/room_detail_cubit.dart';
+import 'package:thermo_humi/features/room/presentation/bloc/room_detail/room_detail_state.dart';
 import 'package:thermo_humi/features/room/presentation/widgets/device_list_item.dart';
 import 'package:thermo_humi/features/room/presentation/widgets/room_detail/device_summary_strip.dart';
 import 'package:thermo_humi/features/room/presentation/widgets/room_detail/device_filter_bar.dart';
@@ -25,7 +26,7 @@ class RoomDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => RoomDetailCubit()..loadRoomData(roomId),
+      create: (_) => sl<RoomDetailCubit>()..loadRoomData(roomId),
       child: _RoomDeviceListView(roomId: roomId),
     );
   }

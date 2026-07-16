@@ -31,11 +31,12 @@ class RouterGuard {
 
     final isOnSplash = state.matchedLocation == RouteNames.splash;
     final isOnLogin = state.matchedLocation == RouteNames.login;
+    final isOnRegister = state.matchedLocation == RouteNames.register;
 
     // Tạm thời tắt redirect để có thể chuyển qua lại giữa các tab khi chưa đăng nhập
-    // if (!isAuthenticated && !isOnLogin && !isOnSplash) {
-    //   return RouteNames.login;
-    // }
+    if (!isAuthenticated && !isOnLogin && !isOnSplash && !isOnRegister) {
+      return RouteNames.login;
+    }
 
     // Đã đăng nhập mà vào login → về home
     if (isAuthenticated && isOnLogin) {

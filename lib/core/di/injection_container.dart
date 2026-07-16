@@ -53,6 +53,15 @@ import 'package:thermo_humi/features/device/data/repositories/device_repository_
 import 'package:thermo_humi/features/room_management/data/repositories/room_repository_impl.dart';
 import 'package:thermo_humi/features/room_management/domain/repositories/room_repository.dart';
 
+// --- Room Feature imports ---
+import 'package:thermo_humi/features/room/data/datasources/room_remote_datasource.dart';
+import 'package:thermo_humi/features/room/data/datasources/room_remote_datasource_impl.dart';
+import 'package:thermo_humi/features/room/data/repositories/room_repository_impl.dart' as room_repo;
+import 'package:thermo_humi/features/room/domain/repositories/room_repository.dart' as room_domain;
+import 'package:thermo_humi/features/room/domain/usecases/get_rooms_with_devices_usecase.dart';
+import 'package:thermo_humi/features/room/presentation/bloc/room_list/room_list_cubit.dart';
+import 'package:thermo_humi/features/room/presentation/bloc/room_detail/room_detail_cubit.dart';
+
 final sl = GetIt.instance;
 
 void init() {
@@ -150,4 +159,23 @@ void init() {
     () => RoomRepositoryImpl(),
     // Nếu RoomRepositoryImpl cần DataSource, sẽ viết là: RoomRepositoryImpl(dataSource: sl())
   );
+
+  // --- Room Feature (device-online/query) ---
+
+  // 1. DataSource
+  sl.registerLazySingleton<RoomRemoteDataSource>(
+    () => RoomRemoteDataSourceImpl(sl<Dio>()),
+  );
+
+  // 2. Repository
+  sl.registerLazySingleton<room_domain.RoomRepository>(
+    () => room_repo.RoomRepositoryImpl(sl()),
+  );
+
+  // 3. UseCase
+  sl.registerLazySingleton(() => GetRoomsWithDevicesUseCase(sl()));
+
+  // 4. Cubit (registerFactory → mỗi lần tạo instance mới)
+  sl.registerFactory(() => RoomListCubit(sl()));
+  sl.registerFactory(() => RoomDetailCubit(sl()));
 }
