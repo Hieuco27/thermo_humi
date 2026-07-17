@@ -54,6 +54,11 @@ import 'package:thermo_humi/features/room_management/data/repositories/room_repo
 import 'package:thermo_humi/features/room_management/domain/repositories/room_repository.dart';
 
 // --- Room Feature imports ---
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:thermo_humi/features/room/data/models/hive/room_hive_model.dart';
+import 'package:thermo_humi/features/room/data/models/hive/device_hive_model.dart';
+import 'package:thermo_humi/features/room/data/datasources/room_local_datasource.dart';
+import 'package:thermo_humi/features/room/data/datasources/room_local_datasource_impl.dart';
 import 'package:thermo_humi/features/room/data/datasources/room_remote_datasource.dart';
 import 'package:thermo_humi/features/room/data/datasources/room_remote_datasource_impl.dart';
 import 'package:thermo_humi/features/room/data/repositories/room_repository_impl.dart' as room_repo;
@@ -64,7 +69,13 @@ import 'package:thermo_humi/features/room/presentation/bloc/room_detail/room_det
 
 final sl = GetIt.instance;
 
-void init() {
+Future<void> init() async {
+  // --- Hive Initialization ---
+  await Hive.initFlutter();
+  Hive.registerAdapter(RoomHiveModelAdapter());
+  Hive.registerAdapter(DeviceHiveModelAdapter());
+  await Hive.openBox<RoomHiveModel>(RoomLocalDataSourceImpl.boxName);
+
   // --- Core ---
   sl.registerLazySingleton(() => const FlutterSecureStorage());
   sl.registerLazySingleton(() => SecureStorage(sl()));
@@ -166,10 +177,13 @@ void init() {
   sl.registerLazySingleton<RoomRemoteDataSource>(
     () => RoomRemoteDataSourceImpl(sl<Dio>()),
   );
+  sl.registerLazySingleton<RoomLocalDataSource>(
+    () => RoomLocalDataSourceImpl(),
+  );
 
   // 2. Repository
   sl.registerLazySingleton<room_domain.RoomRepository>(
-    () => room_repo.RoomRepositoryImpl(sl()),
+    () => room_repo.RoomRepositoryImpl(sl(), sl()),
   );
 
   // 3. UseCase

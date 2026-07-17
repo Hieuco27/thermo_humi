@@ -118,10 +118,7 @@ class _HomeView extends StatelessWidget {
                               Text(
                                 state.errorMessage ?? 'Đã xảy ra lỗi',
                                 textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 13.sp,
-                                  color: Colors.white60,
-                                ),
+                                style: AppTextStyles.body13().copyWith(),
                               ),
                               SizedBox(height: 16.h),
                               ElevatedButton.icon(
@@ -148,7 +145,7 @@ class _HomeView extends StatelessWidget {
                           ),
                         ),
                       )
-                    // ── Danh sách khu vực ──
+                    // Danh sách khu vực
                     else
                       ListView.separated(
                         shrinkWrap: true,

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
 
-/// Hàng tiêu đề cố định của bảng báo cáo (Thời gian / Nhiệt độ / Độ ẩm / Tình trạng).
 class ReportTableHeader extends StatelessWidget {
   const ReportTableHeader({super.key});
 

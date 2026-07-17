@@ -56,9 +56,10 @@ class _ReportView extends StatelessWidget {
         ),
         body: BlocBuilder<DeviceReportCubit, DeviceReportState>(
           builder: (context, state) {
-            // Loading filters
+            // Loading filters (chỉ hiện full màn hình khi load lần đầu tiên)
             if (state.status == DeviceReportStatus.initial ||
-                state.status == DeviceReportStatus.loadingFilters) {
+                (state.status == DeviceReportStatus.loadingFilters &&
+                    state.rooms.isEmpty)) {
               return const Center(
                 child: CircularProgressIndicator(color: Colors.black),
               );
@@ -102,18 +103,29 @@ class _ReportDataTable extends StatelessWidget {
       );
     }
 
-    // Chưa chọn thiết bị
-    if (state.selectedDevice == null) {
-      return Center(
-        child: Text(
-          'Vui lòng chọn thiết bị để xem báo cáo',
-          style: AppTextStyles.bodyMedium(color: Colors.grey),
-        ),
-      );
-    }
-
-    // Chưa bấm "Xem báo cáo" hoặc không có dữ liệu
+    // Nếu chưa có dữ liệu báo cáo nào (hoặc dữ liệu rỗng)
     if (state.reportData.isEmpty) {
+      // Chưa chọn thiết bị
+      if (state.selectedDevice == null) {
+        return Center(
+          child: Text(
+            'Vui lòng chọn thiết bị để xem báo cáo',
+            style: AppTextStyles.bodyMedium(color: Colors.grey),
+          ),
+        );
+      }
+
+      // Chưa bấm xem báo cáo (hoặc vừa đổi bộ lọc)
+      if (state.status == DeviceReportStatus.filtersLoaded) {
+        return Center(
+          child: Text(
+            'Bấm "Xem báo cáo" để tải dữ liệu',
+            style: AppTextStyles.bodyMedium(color: Colors.grey),
+          ),
+        );
+      }
+
+      // Đã bấm "Xem báo cáo" nhưng API trả về mảng rỗng
       return Center(
         child: Text(
           'Không có dữ liệu',
@@ -123,6 +135,8 @@ class _ReportDataTable extends StatelessWidget {
       );
     }
 
+    // Nếu đã có dữ liệu cũ, BẤT CHẤP việc vừa đổi phòng hay chưa chọn thiết bị,
+    // Vẫn hiển thị bảng dữ liệu cũ
     return Column(
       children: [
         const ReportTableHeader(),

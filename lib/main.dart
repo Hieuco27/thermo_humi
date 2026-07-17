@@ -13,7 +13,7 @@ void main() async {
     debugPrint("Failed to load .env file: $e");
   }
 
-  di.init();
+  await di.init();
 
   runApp(const MyApp());
 }

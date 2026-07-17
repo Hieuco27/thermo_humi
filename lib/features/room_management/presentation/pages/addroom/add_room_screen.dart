@@ -23,17 +23,16 @@ import 'package:thermo_humi/features/room_management/presentation/pages/addroom/
 import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/add_room/device_recognized_banner.dart';
 import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/add_room/imei_input_field.dart';
 import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/add_room/qr_scan_area.dart';
+import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/add_room/qr_scanner_sheet.dart';
+import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/add_room/room_name_input.dart';
 import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/add_room/scan_option_sheet.dart';
-import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/qr_scanner_sheet.dart';
 import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/add_room/room_picker_sheet.dart';
 import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/room_selector_field.dart';
 import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/section_label.dart';
-import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/room_name_input.dart';
 
 class AddRoomScreen extends StatelessWidget {
   final String? existingRoomId;
 
-  /// true = mode flexible (điều hướng từ DeviceManagementScreen)
   final bool isFlexible;
 
   const AddRoomScreen({

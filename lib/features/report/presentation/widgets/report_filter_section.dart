@@ -105,15 +105,18 @@ class ReportFilterSection extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 12.w),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(8.r),
+        borderRadius: BorderRadius.circular(12.r),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<T>(
           value: value,
           isExpanded: true,
+          dropdownColor: Colors.white,
+          borderRadius: BorderRadius.circular(16.r),
+          elevation: 0,
           hint: Text(
             hint,
-            style: AppTextStyles.titleSmall2(color: Colors.grey),
+            style: AppTextStyles.body13().copyWith(color: Colors.grey),
           ),
           icon: const Icon(
             Icons.keyboard_arrow_down,
