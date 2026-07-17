@@ -9,9 +9,7 @@ void main() async {
 
   try {
     await dotenv.load(fileName: "assets/env/.env");
-  } catch (e) {
-    debugPrint("Failed to load .env file: $e");
-  }
+  } catch (e) {}
 
   await di.init();
 

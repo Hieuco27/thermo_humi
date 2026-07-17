@@ -15,7 +15,7 @@ class AuthInterceptor extends Interceptor {
   bool _isRefreshing = false;
   final Dio _dioForRefresh = Dio(
     BaseOptions(
-      baseUrl: 'http://192.168.1.19:8999',
+      baseUrl: 'http://103.249.158.28:8999',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',

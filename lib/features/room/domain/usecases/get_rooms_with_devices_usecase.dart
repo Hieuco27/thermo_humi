@@ -14,4 +14,6 @@ class GetRoomsWithDevicesUseCase {
   Future<Either<String, List<RoomWithDevices>>> execute() {
     return _repository.getRoomsWithDevices();
   }
+
+  Stream<List<RoomWithDevices>> get stream => _repository.roomsWithDevicesStream;
 }

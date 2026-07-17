@@ -29,4 +29,3 @@ abstract class RoomRepository {
   /// Dùng ở mode flexible khi selectedRoomId == null.
   Future<void> createUnassignedDevice({required String deviceCode});
 }
-

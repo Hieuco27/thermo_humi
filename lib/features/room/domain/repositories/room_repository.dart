@@ -14,4 +14,7 @@ abstract class RoomRepository {
 
   /// Lấy danh sách phòng (chỉ entity, không có devices).
   Future<Either<String, List<RoomEntity>>> getRooms();
+
+  /// Stream báo hiệu khi có thay đổi từ dữ liệu realtime
+  Stream<List<RoomWithDevices>> get roomsWithDevicesStream;
 }

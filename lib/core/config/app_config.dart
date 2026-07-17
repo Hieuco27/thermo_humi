@@ -10,7 +10,7 @@ class AppConfig {
       dotenv.env['BASE_URL'] ?? 'http://192.168.1.19:8999';
 
   static String get devicesBaseUrl =>
-      dotenv.env['DEVICES_BASE_URL'] ?? 'http://192.168.1.19:9005';
+      dotenv.env['DEVICES_BASE_URL'] ?? 'http://192.168.1.20:9005';
 
   static String get realtimeType =>
       dotenv.env['REALTIME_TYPE'] ?? 'POLLING'; // MQTT | WS | POLLING

@@ -46,10 +46,7 @@ class _ThresholdSearchBarState extends State<ThresholdSearchBar> {
         decoration: InputDecoration(
           icon: Icon(Icons.search, color: Colors.grey, size: 20.w),
           hintText: 'Tìm theo thiết bị hoặc người thực hiện',
-          hintStyle: AppTextStyles.titleSmall2().copyWith(
-            color: Colors.grey,
-            fontStyle: FontStyle.italic,
-          ),
+          hintStyle: AppTextStyles.titleSmall2().copyWith(color: Colors.grey),
           border: InputBorder.none,
           isDense: true,
           contentPadding: EdgeInsets.symmetric(vertical: 12.h),

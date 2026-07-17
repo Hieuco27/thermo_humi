@@ -82,23 +82,10 @@ class _ReportDatePickerState extends State<ReportDatePicker> {
           // Nút chọn Tháng / Năm
           GestureDetector(
             onTap: () async {
-              final date = await showDatePicker(
+              final date = await showDialog<DateTime>(
                 context: context,
-                initialDate: widget.selectedDate,
-                firstDate: DateTime(2020),
-                lastDate: DateTime.now().add(const Duration(days: 365)),
-                builder: (context, child) {
-                  return Theme(
-                    data: Theme.of(context).copyWith(
-                      colorScheme: ColorScheme.light(
-                        primary: AppColors.gradientEnd,
-                        onPrimary: Colors.white,
-                        onSurface: Colors.black,
-                      ),
-                    ),
-                    child: child!,
-                  );
-                },
+                builder: (context) =>
+                    _MonthYearPickerDialog(initialDate: widget.selectedDate),
               );
               if (date != null) {
                 widget.onDateSelected(date);
@@ -195,6 +182,172 @@ class _ReportDatePickerState extends State<ReportDatePicker> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _MonthYearPickerDialog extends StatefulWidget {
+  final DateTime initialDate;
+
+  const _MonthYearPickerDialog({required this.initialDate});
+
+  @override
+  State<_MonthYearPickerDialog> createState() => _MonthYearPickerDialogState();
+}
+
+class _MonthYearPickerDialogState extends State<_MonthYearPickerDialog> {
+  late int _selectedYear;
+  late int _selectedMonth;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedYear = widget.initialDate.year;
+    _selectedMonth = widget.initialDate.month;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+      insetPadding: EdgeInsets.symmetric(horizontal: 24.w),
+      child: Padding(
+        padding: EdgeInsets.all(24.w),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Thg $_selectedMonth $_selectedYear',
+              style: AppTextStyles.titleMedium(color: Colors.black),
+            ),
+            SizedBox(height: 8.h),
+            Row(
+              children: [
+                Text(
+                  '$_selectedYear',
+                  style: AppTextStyles.titleLarge(
+                    color: Colors.black,
+                  ).copyWith(fontSize: 28.sp),
+                ),
+                const Spacer(),
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _selectedYear++;
+                    });
+                  },
+                  icon: const Icon(
+                    Icons.keyboard_arrow_up,
+                    color: Colors.black,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _selectedYear--;
+                    });
+                  },
+                  icon: const Icon(
+                    Icons.keyboard_arrow_down,
+                    color: Colors.black,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 16.h),
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4,
+                childAspectRatio: 1.2,
+                crossAxisSpacing: 8.w,
+                mainAxisSpacing: 16.h,
+              ),
+              itemCount: 12,
+              itemBuilder: (context, index) {
+                final month = index + 1;
+                final isSelected = month == _selectedMonth;
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedMonth = month;
+                    });
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? AppColors.gradientEnd
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(12.r),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Thg $month',
+                      style:
+                          AppTextStyles.bodyMedium(
+                            color: isSelected
+                                ? Colors.white
+                                : Colors.grey.shade600,
+                          ).copyWith(
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.normal,
+                          ),
+                    ),
+                  ),
+                );
+              },
+            ),
+            SizedBox(height: 24.h),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(
+                    'Hủy',
+                    style: AppTextStyles.titleSmall2(
+                      color: AppColors.gradientEnd,
+                    ),
+                  ),
+                ),
+                SizedBox(width: 8.w),
+                TextButton(
+                  onPressed: () {
+                    // Nếu chọn trúng tháng/năm hiện tại ngoài đời thực -> nhảy về hôm nay
+                    // Nếu chọn tháng khác -> giữ nguyên ngày đang chọn
+                    final now = DateTime.now();
+                    int targetDay = widget.initialDate.day;
+
+                    if (_selectedYear == now.year &&
+                        _selectedMonth == now.month) {
+                      targetDay = now.day;
+                    }
+
+                    int maxDays = DateUtils.getDaysInMonth(
+                      _selectedYear,
+                      _selectedMonth,
+                    );
+                    if (targetDay > maxDays) {
+                      targetDay = maxDays;
+                    }
+                    Navigator.of(
+                      context,
+                    ).pop(DateTime(_selectedYear, _selectedMonth, targetDay));
+                  },
+                  child: Text(
+                    'Chọn',
+                    style: AppTextStyles.titleSmall2(color: Colors.black),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -17,6 +17,8 @@ class DeviceOnlineModel {
   final double humidityMin;
   final double humidityMax;
   final DateTime? lastUpdate;
+  final double? currentTemperature;
+  final double? currentHumidity;
 
   const DeviceOnlineModel({
     required this.deviceId,
@@ -30,6 +32,8 @@ class DeviceOnlineModel {
     required this.humidityMin,
     required this.humidityMax,
     this.lastUpdate,
+    this.currentTemperature,
+    this.currentHumidity,
   });
 
   /// Parse từ JSON (API response)
@@ -50,13 +54,25 @@ class DeviceOnlineModel {
       lastUpdate: json['lastUpdate'] != null
           ? DateTime.tryParse(json['lastUpdate'] as String)
           : null,
+      currentTemperature: _parseSensorValue(json['sensors'], 'temperature'),
+      currentHumidity: _parseSensorValue(json['sensors'], 'humidity'),
     );
+  }
+
+  static double? _parseSensorValue(dynamic sensorsList, String key) {
+    if (sensorsList is List && sensorsList.isNotEmpty) {
+      final sensor = sensorsList.first;
+      if (sensor is Map<String, dynamic> && sensor[key] != null) {
+        return double.tryParse(sensor[key].toString());
+      }
+    }
+    return null;
   }
 
   /// Chuyển DTO → Domain Entity để các layer trên dùng
   DeviceEntity toEntity() {
     return DeviceEntity(
-      id: deviceId.toString(),
+      id: imei.isNotEmpty ? imei : deviceId.toString(),
       name: name,
       roomId: locationId,
       serialNumber: imei,
@@ -70,6 +86,8 @@ class DeviceOnlineModel {
         humidHigh: humidityMax,
       ),
       lastUpdatedAt: lastUpdate,
+      currentTemperature: currentTemperature,
+      currentHumidity: currentHumidity,
     );
   }
 }

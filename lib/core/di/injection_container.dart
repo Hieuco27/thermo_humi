@@ -67,6 +67,9 @@ import 'package:thermo_humi/features/room/domain/usecases/get_rooms_with_devices
 import 'package:thermo_humi/features/room/presentation/bloc/room_list/room_list_cubit.dart';
 import 'package:thermo_humi/features/room/presentation/bloc/room_detail/room_detail_cubit.dart';
 
+// --- Realtime ---
+import 'package:thermo_humi/core/realtime/device_realtime_service.dart';
+
 final sl = GetIt.instance;
 
 Future<void> init() async {
@@ -79,6 +82,9 @@ Future<void> init() async {
   // --- Core ---
   sl.registerLazySingleton(() => const FlutterSecureStorage());
   sl.registerLazySingleton(() => SecureStorage(sl()));
+  
+  // Realtime Service
+  sl.registerLazySingleton(() => DeviceRealtimeService(sl()));
   sl.registerLazySingleton(() => RouterGuard(sl()));
 
   sl.registerLazySingleton(() => AuthInterceptor(sl()));
@@ -168,7 +174,6 @@ Future<void> init() async {
   // 2. Đăng ký Repository (chỉ đăng ký interface RoomRepository)
   sl.registerLazySingleton<RoomRepository>(
     () => RoomRepositoryImpl(),
-    // Nếu RoomRepositoryImpl cần DataSource, sẽ viết là: RoomRepositoryImpl(dataSource: sl())
   );
 
   // --- Room Feature (device-online/query) ---
@@ -183,13 +188,13 @@ Future<void> init() async {
 
   // 2. Repository
   sl.registerLazySingleton<room_domain.RoomRepository>(
-    () => room_repo.RoomRepositoryImpl(sl(), sl()),
+    () => room_repo.RoomRepositoryImpl(sl(), sl(), sl()),
   );
 
   // 3. UseCase
   sl.registerLazySingleton(() => GetRoomsWithDevicesUseCase(sl()));
 
   // 4. Cubit (registerFactory → mỗi lần tạo instance mới)
-  sl.registerFactory(() => RoomListCubit(sl()));
-  sl.registerFactory(() => RoomDetailCubit(sl()));
+  sl.registerFactory(() => RoomListCubit(sl(), sl()));
+  sl.registerFactory(() => RoomDetailCubit(sl(), sl()));
 }

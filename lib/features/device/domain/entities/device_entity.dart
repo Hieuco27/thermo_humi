@@ -75,7 +75,17 @@ class DeviceEntity extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, name, roomId, roomName, status];
+  List<Object?> get props => [
+        id,
+        name,
+        roomId,
+        roomName,
+        status,
+        connectivity,
+        currentTemperature,
+        currentHumidity,
+        lastUpdatedAt,
+      ];
 }
 
 enum DeviceStatus { online, offline, unknown }

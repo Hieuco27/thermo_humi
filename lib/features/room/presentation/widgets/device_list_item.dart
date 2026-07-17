@@ -186,7 +186,7 @@ class _DeviceListItemState extends State<DeviceListItem> {
                         children: [
                           Icon(
                             Icons.access_time_rounded,
-                            size: 10.sp,
+                            size: 15.sp,
                             color: const Color(0xFF8E8E93),
                           ),
                           SizedBox(width: 3.w),
