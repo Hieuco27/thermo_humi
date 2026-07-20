@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:developer';
-import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:signalr_netcore/signalr_client.dart';
 import 'package:thermo_humi/core/config/app_config.dart';
@@ -32,9 +31,11 @@ class DeviceRealtimeService {
   DeviceRealtimeService(this._secureStorage) {
     Logger.root.level = Level.ALL;
     Logger.root.onRecord.listen((LogRecord rec) {
-      print('[SignalR Internal] ${rec.level.name}: ${rec.time}: ${rec.message}');
+      print(
+        '[SignalR Internal] ${rec.level.name}: ${rec.time}: ${rec.message}',
+      );
     });
-    
+
     _updateState(RealtimeConnectionState.disconnected);
   }
 

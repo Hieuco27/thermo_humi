@@ -28,10 +28,11 @@ class RoomNameInput extends StatelessWidget {
         hintStyle: AppTextStyles.label13(color: Colors.grey.shade400),
         prefixIcon: Padding(
           padding: EdgeInsets.symmetric(horizontal: 8.w),
-          child: Icon(
-            Icons.meeting_room_outlined,
-            color: Colors.grey.shade400,
-            size: 20.sp,
+          child: Image.asset(
+            "assets/icons/room/room.png",
+            width: 20.sp,
+            height: 20.sp,
+            color: Colors.black87,
           ),
         ),
         suffixIcon: controller.text.isNotEmpty

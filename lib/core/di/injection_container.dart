@@ -67,6 +67,14 @@ import 'package:thermo_humi/features/room/domain/usecases/get_rooms_with_devices
 import 'package:thermo_humi/features/room/presentation/bloc/room_list/room_list_cubit.dart';
 import 'package:thermo_humi/features/room/presentation/bloc/room_detail/room_detail_cubit.dart';
 
+// --- Phone Alert ---
+// TODO: Khi BE hoàn thiện, bỏ comment 3 dòng dưới và xoá dòng mock
+// import 'package:thermo_humi/features/room/data/datasources/phone_alert_remote_datasource.dart';
+// import 'package:thermo_humi/features/room/data/datasources/phone_alert_remote_datasource_impl.dart';
+// import 'package:thermo_humi/features/room/data/repositories/phone_alert_repository_impl.dart';
+import 'package:thermo_humi/features/room/data/repositories/mock_phone_alert_repository.dart';
+import 'package:thermo_humi/features/room/domain/repositories/phone_alert_repository.dart';
+
 // --- Realtime ---
 import 'package:thermo_humi/core/realtime/device_realtime_service.dart';
 
@@ -197,4 +205,18 @@ Future<void> init() async {
   // 4. Cubit (registerFactory → mỗi lần tạo instance mới)
   sl.registerFactory(() => RoomListCubit(sl(), sl()));
   sl.registerFactory(() => RoomDetailCubit(sl(), sl()));
+
+  // --- Phone Alert Feature ---
+  // TODO: Khi BE hoàn thiện:
+  //   1. Bỏ comment 2 dòng đăng ký DataSource + Impl bên dưới
+  //   2. Xoá dòng Mock
+  // sl.registerLazySingleton<PhoneAlertRemoteDataSource>(
+  //   () => PhoneAlertRemoteDataSourceImpl(sl<Dio>()),
+  // );
+  // sl.registerLazySingleton<PhoneAlertRepository>(
+  //   () => PhoneAlertRepositoryImpl(sl()),
+  // );
+  sl.registerLazySingleton<PhoneAlertRepository>(
+    () => MockPhoneAlertRepository(), // ← Xoá dòng này khi BE xong
+  );
 }

@@ -104,7 +104,7 @@ class DeviceBottomSheet extends StatelessWidget {
 
                   _MenuItem(
                     iconPath: 'assets/icons/navbar/report.svg',
-                    iconColor: const Color(0xFF34C759),
+                    iconColor: AppColors.appBarBg,
                     label: 'Xem báo cáo',
                     onTap: () {
                       Navigator.push(

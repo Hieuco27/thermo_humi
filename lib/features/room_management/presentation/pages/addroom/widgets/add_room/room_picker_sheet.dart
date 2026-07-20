@@ -49,10 +49,9 @@ class RoomPickerSheet extends StatelessWidget {
               ),
             ),
             SizedBox(height: 16.h),
-
             // ── Tiêu đề ──
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              padding: EdgeInsets.symmetric(horizontal: 12.w),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -71,12 +70,12 @@ class RoomPickerSheet extends StatelessWidget {
             // ── Danh sách phòng hoặc loading ──
             if (isLoading)
               Padding(
-                padding: EdgeInsets.symmetric(vertical: 24.h),
+                padding: EdgeInsets.symmetric(vertical: 12.h),
                 child: const Center(child: CircularProgressIndicator()),
               )
             else if (rooms.isEmpty)
               Padding(
-                padding: EdgeInsets.symmetric(vertical: 24.h),
+                padding: EdgeInsets.symmetric(vertical: 12.h),
                 child: Text(
                   'Chưa có phòng nào. Hãy tạo phòng trong Quản lý phòng.',
                   style: AppTextStyles.bodySmall(color: Colors.grey.shade400),
@@ -105,11 +104,7 @@ class RoomPickerSheet extends StatelessWidget {
   Widget _buildUnassignedTile(BuildContext context) {
     final isSelected = selectedRoomId == null;
     return ListTile(
-      leading: Icon(
-        Icons.cancel_outlined,
-        color: Colors.grey.shade400,
-        size: 22.sp,
-      ),
+      leading: Icon(Icons.cancel, color: Colors.grey.shade400, size: 22.sp),
       title: Text(
         'Chưa gán phòng',
         style: AppTextStyles.label13(
@@ -137,10 +132,10 @@ class RoomPickerSheet extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         ListTile(
-          leading: Icon(
-            Icons.meeting_room_outlined,
-            color: isSelected ? AppColors.primary : Colors.grey,
-            size: 22.sp,
+          leading: Image.asset(
+            "assets/icons/room/room.png",
+            width: 22.sp,
+            height: 22.sp,
           ),
           title: Text(
             room.name,
@@ -156,7 +151,7 @@ class RoomPickerSheet extends StatelessWidget {
           trailing: isSelected
               ? Icon(Icons.check_rounded, color: AppColors.primary, size: 20.sp)
               : null,
-          contentPadding: EdgeInsets.symmetric(horizontal: 14.w),
+          contentPadding: EdgeInsets.symmetric(horizontal: 12.w),
           onTap: () {
             Navigator.pop(context);
             onSelected(room.id, room.name);

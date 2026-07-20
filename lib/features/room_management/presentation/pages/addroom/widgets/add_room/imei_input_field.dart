@@ -40,10 +40,7 @@ class ImeiInputField extends StatelessWidget {
             'assets/icons/other/imei.svg',
             width: 20.sp,
             height: 20.sp,
-            colorFilter: ColorFilter.mode(
-              Colors.grey.shade400,
-              BlendMode.srcIn,
-            ),
+            colorFilter: ColorFilter.mode(Colors.black87, BlendMode.srcIn),
           ),
         ),
         prefixIconConstraints: BoxConstraints(minWidth: 44.w),
@@ -52,7 +49,7 @@ class ImeiInputField extends StatelessWidget {
                 icon: Icon(
                   Icons.clear_rounded,
                   size: 18.sp,
-                  color: Colors.grey.shade400,
+                  color: Colors.grey,
                 ),
                 onPressed: () {
                   controller.clear();
@@ -75,7 +72,7 @@ class ImeiInputField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.r),
-          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.r),

@@ -45,19 +45,9 @@ class RoomManagementCard extends StatelessWidget {
           children: [
             // Room icon
             SizedBox(
-              width: 44.w,
-              height: 44.w,
-              child: Center(
-                child: SvgPicture.asset(
-                  'assets/icons/other/area.svg',
-                  width: 30.sp,
-                  height: 30.sp,
-                  colorFilter: ColorFilter.mode(
-                    AppColors.primary,
-                    BlendMode.srcIn,
-                  ),
-                ),
-              ),
+              width: 32.w,
+              height: 32.w,
+              child: Center(child: Image.asset('assets/icons/room/room.png')),
             ),
             SizedBox(width: 12.w),
 
@@ -74,9 +64,7 @@ class RoomManagementCard extends StatelessWidget {
                   if (!hasDevices)
                     Text(
                       'Chưa có thiết bị',
-                      style: AppTextStyles.bodyMedium(
-                        color: Colors.grey.shade500,
-                      ),
+                      style: AppTextStyles.bodyMedium(color: Colors.grey),
                     )
                   else
                     Row(

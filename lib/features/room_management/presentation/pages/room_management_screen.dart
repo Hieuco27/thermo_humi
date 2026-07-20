@@ -81,11 +81,11 @@ class _RoomManagementScreenState extends State<RoomManagementScreen> {
                         decoration: InputDecoration(
                           hintText: 'Tìm kiếm',
                           hintStyle: AppTextStyles.bodyMedium(
-                            color: Colors.grey.shade400,
+                            color: Colors.grey,
                           ),
                           prefixIcon: Icon(
                             Icons.search_rounded,
-                            color: Colors.grey.shade400,
+                            color: Colors.grey,
                             size: 22.sp,
                           ),
                           suffixIcon: _searchCtrl.text.isNotEmpty
@@ -93,7 +93,7 @@ class _RoomManagementScreenState extends State<RoomManagementScreen> {
                                   icon: Icon(
                                     Icons.clear_rounded,
                                     size: 22.sp,
-                                    color: Colors.grey.shade400,
+                                    color: Colors.grey,
                                   ),
                                   onPressed: () => _searchCtrl.clear(),
                                 )

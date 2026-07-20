@@ -72,6 +72,7 @@ dependencies:
   hive_flutter: ^1.1.0
   path_provider: ^2.1.5
   signalr_netcore: ^1.4.4
+  pin_code_fields: ^9.4.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

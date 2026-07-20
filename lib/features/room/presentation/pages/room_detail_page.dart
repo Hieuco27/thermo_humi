@@ -17,6 +17,7 @@ import 'package:thermo_humi/features/room/presentation/widgets/room_detail/devic
 import 'package:thermo_humi/features/sharing/presentation/pages/share_page.dart';
 import 'package:thermo_humi/features/room/presentation/widgets/device_empty_state.dart';
 import 'package:thermo_humi/features/room/presentation/widgets/room_detail/room_detail_app_bar.dart';
+import 'package:thermo_humi/features/room/presentation/widgets/room_detail/phone_otp_bottom_sheet.dart';
 
 class RoomDetailPage extends StatelessWidget {
   final String roomId;
@@ -131,7 +132,10 @@ class _RoomDeviceListViewState extends State<_RoomDeviceListView>
               backgroundColor: AppColors.gradientEnd,
               textColor: Colors.white,
               onSearch: () {},
-              onMoreOptions: () {},
+              onMoreOptions: () => showPhoneOtpBottomSheet(
+                context,
+                roomId: room.id,
+              ),
             ),
             body: FadeTransition(
               opacity: _fadeAnim,

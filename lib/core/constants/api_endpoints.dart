@@ -59,4 +59,8 @@ class ApiEndpoints {
   // ── Profile ───────────────────────────────────────────────────────────────
   static const String profile = '/api/v1/profile';
   static const String changePassword = '/api/v1/profile/change-password';
+
+  // ── Phone Alert (SMS cảnh báo) ────────────────────────────────────────────
+  static const String phoneAlertSendOtp = '/api/v1/phone-alert/send-otp';
+  static const String phoneAlertVerifyOtp = '/api/v1/phone-alert/verify-otp';
 }

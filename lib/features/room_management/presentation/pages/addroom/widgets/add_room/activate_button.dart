@@ -18,7 +18,7 @@ class ActivateButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedOpacity(
-      opacity: isEnabled ? 1.0 : 0.45,
+      opacity: isEnabled ? 1.0 : 0.5,
       duration: const Duration(milliseconds: 200),
       child: SizedBox(
         width: double.infinity,

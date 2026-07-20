@@ -16,7 +16,7 @@ class HomeAppBar extends StatelessWidget implements PreferredSizeWidget {
       centerTitle: true,
       leading: IconButton(
         icon: SvgPicture.asset(
-          'assets/icons/appbar/add.svg',
+          'assets/icons/home/qr.svg',
           colorFilter: const ColorFilter.mode(
             AppColors.background,
             BlendMode.srcIn,

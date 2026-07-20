@@ -35,10 +35,10 @@ class RoomSelectorField extends StatelessWidget {
         child: Row(
           children: [
             // Icon phòng bên trái
-            Icon(
-              Icons.meeting_room_outlined,
-              color: isUnassigned ? Colors.grey : AppColors.primary,
-              size: 20.sp,
+            Image.asset(
+              'assets/icons/room/room.png',
+              width: 20.sp,
+              height: 20.sp,
             ),
             SizedBox(width: 8.w),
             // Text phòng đã chọn hoặc placeholder

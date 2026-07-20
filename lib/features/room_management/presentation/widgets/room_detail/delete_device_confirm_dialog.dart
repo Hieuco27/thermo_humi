@@ -18,7 +18,11 @@ class DeleteDeviceConfirmDialog extends StatelessWidget {
     return AlertDialog(
       title: Row(
         children: [
-          Icon(Icons.warning_amber_rounded, color: Colors.red.shade600, size: 22.sp),
+          Icon(
+            Icons.warning_amber_rounded,
+            color: Colors.red.shade600,
+            size: 22.sp,
+          ),
           SizedBox(width: 8.w),
           Text(
             'Xoá $deviceName?',
@@ -27,24 +31,30 @@ class DeleteDeviceConfirmDialog extends StatelessWidget {
         ],
       ),
       content: Text(
-        'Thiết bị "$deviceName" sẽ bị XOÁ VĨNH VIỄN khỏi hệ thống.\n\n'
-        'Toàn bộ dữ liệu lịch sử của thiết bị này sẽ KHÔNG thể khôi phục lại.\n\n'
+        'Thiết bị "$deviceName" sẽ bị XOÁ VĨNH VIỄN khỏi hệ thống.\n'
+        'Toàn bộ dữ liệu lịch sử của thiết bị này sẽ KHÔNG thể khôi phục lại.\n'
         'Bạn có chắc chắn muốn tiếp tục?',
-        style: AppTextStyles.bodyMedium(color: Colors.grey.shade700),
+        style: AppTextStyles.label13(color: Colors.black54),
       ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
       actions: [
         TextButton(
           onPressed: () => context.pop(),
-          child: Text('Huỷ', style: AppTextStyles.titleMedium(color: Colors.grey.shade600)),
+          child: Text(
+            'Huỷ',
+            style: AppTextStyles.labelLarge2(color: Colors.grey),
+          ),
         ),
         TextButton(
           onPressed: () {
             context.pop();
             onConfirm();
           },
-          style: TextButton.styleFrom(foregroundColor: Colors.red.shade600),
-          child: Text('Xoá', style: AppTextStyles.titleMedium(color: Colors.red.shade600)),
+          style: TextButton.styleFrom(foregroundColor: Colors.red),
+          child: Text(
+            'Xoá',
+            style: AppTextStyles.labelLarge2(color: Colors.red),
+          ),
         ),
       ],
     );
