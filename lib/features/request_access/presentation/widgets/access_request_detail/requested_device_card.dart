@@ -16,7 +16,7 @@ class RequestedDeviceCard extends StatelessWidget {
           alignment: Alignment.centerLeft,
           child: Text(
             'Thiết bị yêu cầu :',
-            style: AppTextStyles.bodyMedium(color: Colors.black),
+            style: AppTextStyles.bodyMedium(color: Colors.black87),
           ),
         ),
         SizedBox(height: 12.h),
@@ -60,13 +60,13 @@ class RequestedDeviceCard extends StatelessWidget {
                   children: [
                     Text(
                       request.resourceName,
-                      style: AppTextStyles.titleMediumBlack(),
+                      style: AppTextStyles.titleMediumLogin(),
                     ),
-                    SizedBox(height: 8.h),
+                    SizedBox(height: 2.h),
                     RichText(
                       text: TextSpan(
                         text: 'Quyền hạn:  ',
-                        style: AppTextStyles.body13(color: Colors.black),
+                        style: AppTextStyles.bodyMedium(color: Colors.black),
                         children: [
                           TextSpan(
                             text: request.roleRequested.displayName,
@@ -76,7 +76,7 @@ class RequestedDeviceCard extends StatelessWidget {
                       ),
                     ),
                     if (request.macAddress != null) ...[
-                      SizedBox(height: 8.h),
+                      SizedBox(height: 2.h),
                       Text(
                         request.macAddress!,
                         style: AppTextStyles.bodyMedium(color: Colors.grey),

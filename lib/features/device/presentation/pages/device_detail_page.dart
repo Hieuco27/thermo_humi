@@ -11,6 +11,7 @@ import 'package:thermo_humi/features/device/presentation/widgets/device/device_g
 import 'package:thermo_humi/features/device/presentation/widgets/chart/history_tab_chart.dart';
 import 'package:thermo_humi/features/device/presentation/widgets/device/device_footer.dart';
 import 'package:thermo_humi/core/theme/app_colors.dart';
+import 'package:thermo_humi/features/sharing/presentation/pages/share_page.dart';
 
 class DeviceDetailPage extends StatelessWidget {
   final String deviceId;
@@ -59,20 +60,44 @@ class _DeviceDetailView extends StatelessWidget {
             ),
             onPressed: () => Navigator.pop(context),
           ),
-          title: Column(
+          title: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Chi tiết thiết bị',
-                style: AppTextStyles.titleMediumAppBar(
-                  color: AppColors.background,
-                ),
-              ),
-              Text(
-                '($deviceName)',
-                style: AppTextStyles.bodySmall(color: AppColors.background),
+                deviceName,
+                style: AppTextStyles.titleMediumAppBar(color: Colors.white),
               ),
             ],
           ),
+          actions: [
+            IconButton(
+              icon: Icon(
+                Icons.settings_outlined,
+                color: Colors.white,
+                size: 22.sp,
+              ),
+              onPressed: () {
+                // TODO: Navigate to ThresholdSettingsScreen
+              },
+            ),
+            IconButton(
+              icon: Icon(
+                Icons.share_outlined,
+                color: Colors.white,
+                size: 22.sp,
+              ),
+              onPressed: () {
+                // Navigate to SharePage
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => SharePage(initialDeviceIds: [deviceId]),
+                  ),
+                );
+              },
+            ),
+            SizedBox(width: 4.w),
+          ],
         ),
         body: BlocBuilder<DeviceHistoryCubit, DeviceHistoryState>(
           builder: (context, state) {

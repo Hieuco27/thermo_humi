@@ -5,8 +5,7 @@ import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
 
 class RoomMgmtAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final VoidCallback onAddRoom;
-  const RoomMgmtAppBar({super.key, required this.onAddRoom});
+  const RoomMgmtAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,13 +25,6 @@ class RoomMgmtAppBar extends StatelessWidget implements PreferredSizeWidget {
         'Quản lý phòng',
         style: AppTextStyles.titleMediumAppBar(color: Colors.white),
       ),
-      actions: [
-        IconButton(
-          onPressed: onAddRoom,
-          icon: Icon(Icons.add_rounded, color: Colors.white, size: 24.sp),
-        ),
-        SizedBox(width: 4.w),
-      ],
     );
   }
 

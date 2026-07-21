@@ -17,12 +17,12 @@ class StatusChip extends StatelessWidget {
     switch (status) {
       case AccessRequestStatus.pending:
         backgroundColor = Colors.orange.shade50;
-        textColor = Colors.orange.shade800;
+        textColor = Colors.orange;
         text = 'Chờ xác nhận';
         break;
       case AccessRequestStatus.accepted:
         backgroundColor = Colors.green.shade50;
-        textColor = Colors.green.shade700;
+        textColor = Colors.green;
         text = 'Đã chấp nhận';
         break;
       case AccessRequestStatus.declined:
@@ -32,7 +32,7 @@ class StatusChip extends StatelessWidget {
         break;
       case AccessRequestStatus.expired:
         backgroundColor = Colors.grey.shade200;
-        textColor = Colors.grey.shade600;
+        textColor = Colors.grey;
         text = 'Đã hết hạn';
         break;
     }
@@ -43,12 +43,7 @@ class StatusChip extends StatelessWidget {
         color: backgroundColor,
         borderRadius: BorderRadius.circular(12.r),
       ),
-      child: Text(
-        text,
-        style: AppTextStyles.labelMedium(
-          color: textColor,
-        ).copyWith(fontWeight: FontWeight.w600),
-      ),
+      child: Text(text, style: AppTextStyles.bodySmall(color: textColor)),
     );
   }
 }

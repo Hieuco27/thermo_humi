@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
 import 'package:thermo_humi/features/room/presentation/models/room_with_devices.dart';
@@ -22,7 +21,7 @@ class RoomManagementCard extends StatelessWidget {
     final Color statusColor = !hasDevices
         ? Colors.transparent
         : allOnline
-        ? const Color(0xFF34C759)
+        ? AppColors.appBarBg
         : Colors.red.shade400;
 
     return GestureDetector(
@@ -56,10 +55,7 @@ class RoomManagementCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    room.name,
-                    style: AppTextStyles.titleMedium(color: Colors.black),
-                  ),
+                  Text(room.name, style: AppTextStyles.titleMediumLogin()),
                   SizedBox(height: 4.h),
                   if (!hasDevices)
                     Text(
@@ -94,11 +90,7 @@ class RoomManagementCard extends StatelessWidget {
             ),
 
             // Chevron
-            Icon(
-              Icons.chevron_right_rounded,
-              color: Colors.grey.shade400,
-              size: 24.sp,
-            ),
+            Icon(Icons.chevron_right_rounded, color: Colors.grey, size: 24.sp),
           ],
         ),
       ),

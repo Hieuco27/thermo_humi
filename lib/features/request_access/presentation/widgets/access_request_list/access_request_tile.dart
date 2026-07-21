@@ -30,7 +30,7 @@ class AccessRequestTile extends StatelessWidget {
           color: isPending ? const Color(0xFFFFF7E6) : Colors.white,
           borderRadius: BorderRadius.circular(12.r),
           border: Border.all(
-            color: isPending ? Colors.orange.shade200 : Colors.grey.shade200,
+            color: isPending ? Colors.orange.shade200 : Colors.grey.shade400,
           ),
           boxShadow: isPending
               ? []
@@ -59,10 +59,8 @@ class AccessRequestTile extends StatelessWidget {
                 child: Text(
                   request.requesterInitials,
                   style: AppTextStyles.titleMedium(
-                    color: isPending
-                        ? Colors.orange.shade800
-                        : AppColors.primary,
-                  ).copyWith(fontWeight: FontWeight.w600),
+                    color: isPending ? Colors.orange : AppColors.primary,
+                  ).copyWith(fontWeight: FontWeight.w500),
                 ),
               ),
             ),

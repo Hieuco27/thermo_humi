@@ -58,7 +58,7 @@ class _RoomManagementScreenState extends State<RoomManagementScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: RoomMgmtAppBar(onAddRoom: _onAddRoom),
+      appBar: const RoomMgmtAppBar(),
       body: LayoutBuilder(
         builder: (context, constraints) {
           final keyboardHeight = MediaQueryData.fromView(
@@ -120,9 +120,7 @@ class _RoomManagementScreenState extends State<RoomManagementScreen> {
                       alignment: Alignment.centerLeft,
                       child: Text(
                         '${_allRooms.length} phòng · $_totalDevices thiết bị',
-                        style: AppTextStyles.bodyMedium(
-                          color: Colors.grey.shade500,
-                        ),
+                        style: AppTextStyles.bodyMedium(color: Colors.grey),
                       ),
                     ),
                   ),

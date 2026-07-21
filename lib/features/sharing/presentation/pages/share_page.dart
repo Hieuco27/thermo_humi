@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
 import 'package:thermo_humi/features/sharing/presentation/bloc/share_cubit.dart';
@@ -29,7 +30,7 @@ class _SharePageContent extends StatelessWidget {
   Widget _buildToggleTab(
     BuildContext context, {
     required String title,
-    required IconData icon,
+    required String iconPath,
     required bool isSelected,
     required VoidCallback onTap,
   }) {
@@ -48,10 +49,14 @@ class _SharePageContent extends StatelessWidget {
           ),
           child: Column(
             children: [
-              Icon(
-                icon,
-                color: isSelected ? AppColors.primary : AppColors.textSecondary,
-                size: 24.w,
+              SvgPicture.asset(
+                iconPath,
+                colorFilter: ColorFilter.mode(
+                  isSelected ? AppColors.primary : AppColors.textSecondary,
+                  BlendMode.srcIn,
+                ),
+                width: 24.w,
+                height: 24.w,
               ),
               SizedBox(height: 8.h),
               Text(
@@ -102,7 +107,7 @@ class _SharePageContent extends StatelessWidget {
             centerTitle: true,
           ),
           body: SingleChildScrollView(
-            padding: EdgeInsets.fromLTRB(20.w, 16.h, 20.w, 32.h),
+            padding: EdgeInsets.fromLTRB(12.w, 16.h, 12.w, 12.h),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -129,7 +134,7 @@ class _SharePageContent extends StatelessWidget {
                       _buildToggleTab(
                         context,
                         title: 'Thiết bị',
-                        icon: Icons.memory,
+                        iconPath: 'assets/icons/room/device.svg',
                         isSelected: state.scope == ShareScope.single,
                         onTap: () => context.read<ShareCubit>().toggleScope(
                           ShareScope.single,
@@ -139,7 +144,7 @@ class _SharePageContent extends StatelessWidget {
                       _buildToggleTab(
                         context,
                         title: 'Cả phòng',
-                        icon: Icons.meeting_room_outlined,
+                        iconPath: 'assets/icons/room/room.svg',
                         isSelected: state.scope == ShareScope.room,
                         onTap: () => context.read<ShareCubit>().toggleScope(
                           ShareScope.room,
@@ -157,30 +162,35 @@ class _SharePageContent extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 12.h),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16.w,
-                        vertical: 12.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFAFAFA),
-                        borderRadius: BorderRadius.circular(12.r),
-                        border: Border.all(color: Colors.grey.shade200),
-                      ),
-                      child: Row(
-                        children: [
-                          Text(
-                            '${state.selectedDeviceIds.length} thiết bị đã chọn',
-                            style: AppTextStyles.body13(color: Colors.black87),
+                    Wrap(
+                      spacing: 8.w,
+                      runSpacing: 8.h,
+                      children: state.selectedDeviceIds.map((id) {
+                        // TODO: Thay thế id bằng tên thiết bị thật nếu bạn có Data
+                        final mockName =
+                            'Thiết bị ${id.length > 4 ? id.substring(0, 4) : id}';
+                        return Chip(
+                          label: Text(mockName),
+                          labelStyle: AppTextStyles.label13(
+                            color: AppColors.primary,
                           ),
-                          const Spacer(),
-                          Icon(
-                            Icons.keyboard_arrow_down,
-                            color: AppColors.textSecondary,
-                            size: 24.w,
+                          backgroundColor: AppColors.primary.withValues(
+                            alpha: 0.1,
                           ),
-                        ],
-                      ),
+                          side: BorderSide.none,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                          deleteIcon: Icon(
+                            Icons.close_rounded,
+                            size: 16.sp,
+                            color: AppColors.primary,
+                          ),
+                          onDeleted: () {
+                            // TODO: Handle logic xóa thiết bị khỏi list chọn
+                          },
+                        );
+                      }).toList(),
                     ),
                     SizedBox(height: 24.h),
                   ],
@@ -198,7 +208,7 @@ class _SharePageContent extends StatelessWidget {
                       _buildToggleTab(
                         context,
                         title: 'SĐT/email',
-                        icon: Icons.contact_mail_outlined,
+                        iconPath: 'assets/icons/room/phone.svg',
                         isSelected: state.method == ShareMethod.emailPhone,
                         onTap: () => context.read<ShareCubit>().toggleMethod(
                           ShareMethod.emailPhone,
@@ -208,7 +218,7 @@ class _SharePageContent extends StatelessWidget {
                       _buildToggleTab(
                         context,
                         title: 'Mã QR',
-                        icon: Icons.qr_code_2,
+                        iconPath: 'assets/icons/home/qr.svg',
                         isSelected: state.method == ShareMethod.qrCode,
                         onTap: () => context.read<ShareCubit>().toggleMethod(
                           ShareMethod.qrCode,

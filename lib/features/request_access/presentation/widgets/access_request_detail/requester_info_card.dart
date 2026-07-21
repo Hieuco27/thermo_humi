@@ -16,15 +16,12 @@ class RequesterInfoCard extends StatelessWidget {
           alignment: Alignment.centerLeft,
           child: Text(
             'Thông tin người yêu cầu :',
-            style: AppTextStyles.bodyMedium(color: Colors.black),
+            style: AppTextStyles.bodyMedium(color: Colors.black87),
           ),
         ),
         SizedBox(height: 12.h),
         Container(
-          padding: EdgeInsets.symmetric(
-            horizontal: 12.w,
-            vertical: 8.h,
-          ),
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12.r),
@@ -44,32 +41,26 @@ class RequesterInfoCard extends StatelessWidget {
                 width: 50.w,
                 height: 50.w,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade500,
+                  color: Colors.grey.shade400,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  Icons.person,
-                  color: Colors.white,
-                  size: 30.w,
-                ),
+                child: Icon(Icons.person, color: Colors.white, size: 30.w),
               ),
-              SizedBox(width: 20.w),
+              SizedBox(width: 12.w),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       request.requesterName,
-                      style: AppTextStyles.titleMediumBlack(),
+                      style: AppTextStyles.titleMediumLogin(),
                     ),
-                    SizedBox(height: 8.h),
+                    SizedBox(height: 2.h),
                     Row(
                       children: [
                         Text(
                           'Số điện thoại:  ',
-                          style: AppTextStyles.bodyMedium(
-                            color: Colors.black,
-                          ),
+                          style: AppTextStyles.bodyMedium(color: Colors.black),
                         ),
                         Text(
                           request.requesterPhone ?? '-',
@@ -84,9 +75,7 @@ class RequesterInfoCard extends StatelessWidget {
                       children: [
                         Text(
                           'Thời gian:  ',
-                          style: AppTextStyles.bodyMedium(
-                            color: Colors.black,
-                          ),
+                          style: AppTextStyles.bodyMedium(color: Colors.black),
                         ),
                         Text(
                           '12:08  27-02-2026',

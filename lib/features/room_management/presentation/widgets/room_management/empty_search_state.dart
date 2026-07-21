@@ -14,15 +14,11 @@ class EmptySearchState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.search_off_rounded,
-              size: 48.sp,
-              color: Colors.grey.shade300,
-            ),
+            Icon(Icons.search_off_rounded, size: 48.sp, color: Colors.grey),
             SizedBox(height: 12.h),
             Text(
               'Không tìm thấy phòng "$query"',
-              style: AppTextStyles.bodyMedium(color: Colors.grey.shade500),
+              style: AppTextStyles.bodyMedium(color: Colors.grey),
               textAlign: TextAlign.center,
             ),
           ],

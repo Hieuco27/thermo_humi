@@ -91,8 +91,7 @@ class _AccessRequestTabBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 8.w, vertical: 16.h),
-      height: 45.h,
-      padding: EdgeInsets.all(4.r),
+      height: 40.h,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(100.r),
