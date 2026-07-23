@@ -4,8 +4,11 @@ import 'package:go_router/go_router.dart';
 import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
 
-class DeviceManagementAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const DeviceManagementAppBar({super.key});
+class DeviceManagementAppBar extends StatelessWidget
+    implements PreferredSizeWidget {
+  final VoidCallback? onAddPressed;
+
+  const DeviceManagementAppBar({super.key, this.onAddPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -24,12 +27,11 @@ class DeviceManagementAppBar extends StatelessWidget implements PreferredSizeWid
       actions: [
         IconButton(
           icon: Icon(Icons.add, color: Colors.white, size: 24.sp),
-          onPressed: () {
-            context.pushNamed(
-              'add-room',
-              queryParameters: {'flexible': 'true'},
-            );
-          },
+          onPressed:
+              onAddPressed ??
+              () {
+                context.pushNamed('add-device');
+              },
         ),
       ],
     );

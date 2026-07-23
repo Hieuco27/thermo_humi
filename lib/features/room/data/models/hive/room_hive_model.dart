@@ -1,6 +1,5 @@
 import 'package:hive/hive.dart';
 import 'package:thermo_humi/features/room/domain/entities/room_entity.dart';
-import 'package:thermo_humi/features/room/presentation/models/room_with_devices.dart';
 import 'package:thermo_humi/features/room/data/models/hive/device_hive_model.dart';
 
 class RoomHiveModel extends HiveObject {
@@ -20,29 +19,28 @@ class RoomHiveModel extends HiveObject {
     required this.devices,
   });
 
-  factory RoomHiveModel.fromEntity(RoomWithDevices entity) {
+  factory RoomHiveModel.fromEntity(RoomEntity entity) {
     return RoomHiveModel(
-      id: entity.room.id,
-      name: entity.room.name,
-      description: entity.room.description,
-      totalDevices: entity.room.totalDevices,
-      createdAt: entity.room.createdAt,
-      devices: entity.devices.map((d) => DeviceHiveModel.fromEntity(d)).toList(),
+      id: entity.id,
+      name: entity.name,
+      description: entity.description,
+      totalDevices: entity.totalDevices,
+      createdAt: entity.createdAt,
+      devices: entity.devices
+          .map((d) => DeviceHiveModel.fromEntity(d))
+          .toList(),
     );
   }
 
-  RoomWithDevices toEntity() {
-    return RoomWithDevices(
-      room: RoomEntity(
-        id: id,
-        name: name,
-        description: description,
-        totalDevices: totalDevices,
-        onlineDevices: 0, // Default for offline cache
-        alertCount: 0, // Default for offline cache
-        createdAt: createdAt,
-      ),
-      devices: devices.map((d) => d.toEntity()).toList(),
+  RoomEntity toEntity() {
+    return RoomEntity(
+      id: id,
+      name: name,
+      description: description,
+      totalDevices: totalDevices,
+      onlineDevices: 0, // Default for offline cache
+      alertCount: 0, // Default for offline cache
+      createdAt: createdAt,
     );
   }
 }

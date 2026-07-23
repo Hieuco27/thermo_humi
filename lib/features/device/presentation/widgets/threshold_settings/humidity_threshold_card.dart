@@ -3,8 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
-import '../../bloc/threshold_settings/threshold_settings_bloc.dart';
-import '../../bloc/threshold_settings/threshold_settings_event.dart';
+import '../../bloc/threshold_settings/threshold_settings_cubit.dart';
 import '../../bloc/threshold_settings/threshold_settings_state.dart';
 import 'edit_threshold_dialog.dart';
 import 'border_slider.dart';
@@ -36,7 +35,7 @@ class _HumidityThresholdCardState extends State<HumidityThresholdCard> {
           ),
         ],
       ),
-      child: BlocBuilder<ThresholdSettingsBloc, ThresholdSettingsState>(
+      child: BlocBuilder<ThresholdSettingsCubit, ThresholdSettingsState>(
         buildWhen: (previous, current) =>
             previous.humMin != current.humMin ||
             previous.humMax != current.humMax,
@@ -96,9 +95,9 @@ class _HumidityThresholdCardState extends State<HumidityThresholdCard> {
                             });
                           },
                           onChangeEnd: (values) {
-                            context.read<ThresholdSettingsBloc>().add(
-                              HumRangeChanged(values.start, values.end),
-                            );
+                            context
+                                .read<ThresholdSettingsCubit>()
+                                .updateHumRange(values.start, values.end);
                             _localRange = null;
                           },
                         ),
@@ -201,8 +200,9 @@ class _HumidityThresholdCardState extends State<HumidityThresholdCard> {
           suffixText: '%',
           primaryColor: const Color(0xFF1976D2),
           onSave: (newMin, newMax) {
-            context.read<ThresholdSettingsBloc>().add(
-              HumRangeChanged(newMin, newMax),
+            context.read<ThresholdSettingsCubit>().updateHumRange(
+              newMin,
+              newMax,
             );
           },
         );

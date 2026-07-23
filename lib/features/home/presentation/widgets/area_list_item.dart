@@ -4,18 +4,17 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
-import 'package:thermo_humi/features/room/presentation/models/room_with_devices.dart';
+import 'package:thermo_humi/features/room/domain/entities/room_entity.dart';
 
 class AreaListItem extends StatelessWidget {
-  final RoomWithDevices rwd;
+  final RoomEntity room;
 
-  const AreaListItem({super.key, required this.rwd});
+  const AreaListItem({super.key, required this.room});
 
   @override
   Widget build(BuildContext context) {
-    final room = rwd.room;
-    final onlineCount = rwd.devices.where((d) => d.isOnline).length;
-    final alertCount = rwd.devices.where((d) => d.hasAlert).length;
+    final onlineCount = room.onlineDevices;
+    final alertCount = room.alertCount;
     final hasAlert = alertCount > 0;
 
     return InkWell(
@@ -56,7 +55,7 @@ class AreaListItem extends StatelessWidget {
                 Opacity(
                   opacity: 0.6,
                   child: SvgPicture.asset(
-                    'assets/icons/home/device.svg',
+                    'assets/icons/room/device.svg',
                     width: 20.sp,
                     height: 20.sp,
                     colorFilter: ColorFilter.mode(

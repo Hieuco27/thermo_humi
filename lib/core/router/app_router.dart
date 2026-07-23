@@ -1,6 +1,3 @@
-/// GoRouter configuration — Shell route với bottom navigation
-library;
-
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
 import 'package:thermo_humi/core/router/route_names.dart';
@@ -9,6 +6,7 @@ import 'package:thermo_humi/features/notification/presentation/pages/notificatio
 import 'package:thermo_humi/features/profile/presentation/pages/profile_page.dart';
 import 'package:thermo_humi/features/profile/presentation/cubit/profile_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:thermo_humi/features/device_management/presentation/pages/add_device_screen.dart';
 import 'package:thermo_humi/features/report/presentation/pages/report_page.dart';
 import 'package:thermo_humi/features/room/presentation/pages/room_list_page.dart';
 import 'package:thermo_humi/features/room/presentation/pages/room_detail_page.dart';
@@ -37,7 +35,7 @@ class AppRouter {
     initialLocation: RouteNames.login,
     redirect: sl<RouterGuard>().redirect,
     routes: [
-      // ── Auth ──────────────────────────────────────────────────────────────
+      // Auth
       GoRoute(
         path: RouteNames.login,
         name: 'login',
@@ -48,7 +46,7 @@ class AppRouter {
         name: 'register',
         builder: (_, __) => const SignUpPage(),
       ),
-      // ── Access Request ────────────────────────────────────────────────────
+      // Access Request
       GoRoute(
         path: '/request-access',
         name: 'request-access-list',
@@ -69,7 +67,7 @@ class AppRouter {
         ],
       ),
 
-      // ── Shell Route (Bottom Nav)
+      // Shell Route (Bottom Nav)
       StatefulShellRoute.indexedStack(
         builder: (_, __, navigationShell) =>
             AppShell(navigationShell: navigationShell),
@@ -180,6 +178,13 @@ class AppRouter {
                     path: 'device-management',
                     name: 'device-management',
                     builder: (_, __) => const DeviceManagementScreen(),
+                    routes: [
+                      GoRoute(
+                        path: 'add-device',
+                        name: 'add-device',
+                        builder: (_, __) => const AddDeviceScreen(),
+                      ),
+                    ],
                   ),
                   GoRoute(
                     path: 'change-password',

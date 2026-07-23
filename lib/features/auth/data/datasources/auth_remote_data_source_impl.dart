@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:thermo_humi/core/config/app_config.dart';
 import 'package:thermo_humi/core/constants/api_endpoints.dart';
 import 'package:thermo_humi/core/constants/app_constants.dart';
 import 'package:thermo_humi/core/storage/secure_storage.dart';
@@ -20,7 +21,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     bool rememberMe,
   ) async {
     final response = await _dio.post(
-      ApiEndpoints.login,
+      '${AppConfig.authBaseUrl}${ApiEndpoints.login}',
       data: {'Phone': phone, 'Password': password},
     );
 
@@ -68,9 +69,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
             phone = claims['phone'].toString();
           }
         }
-      } catch (e) {
-        // Ignored, fallback to userName
-      }
+      } catch (e) {}
       await _secureStorage.write(AppConstants.kAccessToken, accessToken);
       if (refreshToken.isNotEmpty) {
         await _secureStorage.write(AppConstants.kRefreshToken, refreshToken);
@@ -103,12 +102,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     String fullname,
   ) async {
     final response = await _dio.post(
-      ApiEndpoints.register,
-      data: {
-        'Phone': userName,
-        'Password': password,
-        'Fullname': fullname,
-      },
+      '${AppConfig.authBaseUrl}${ApiEndpoints.register}',
+      data: {'Phone': userName, 'Password': password, 'Fullname': fullname},
     );
     if (response.data['success'] != true) {
       throw Exception(response.data['message'] ?? 'Đăng ký thất bại');
@@ -144,7 +139,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     String confirmPassword,
   ) async {
     final response = await _dio.post(
-      ApiEndpoints.change_password,
+      '${AppConfig.authBaseUrl}${ApiEndpoints.change_password}',
       data: {'OldPassword': oldPassword, 'Password': newPassword},
     );
     if (response.data != null && response.data['success'] == false) {

@@ -47,11 +47,16 @@ import 'package:thermo_humi/core/network/interceptors/error_interceptor.dart';
 import 'package:thermo_humi/core/storage/secure_storage.dart';
 
 import 'package:thermo_humi/features/device_management/presentation/bloc/device_management/device_management_cubit.dart';
+import 'package:thermo_humi/features/device_management/presentation/bloc/add_device/add_device_cubit.dart';
 import 'package:thermo_humi/features/device/presentation/bloc/device_detail/device_history_cubit.dart';
 import 'package:thermo_humi/features/device/domain/repositories/device_repository.dart';
 import 'package:thermo_humi/features/device/data/repositories/device_repository_impl.dart';
+import 'package:thermo_humi/features/device/data/datasources/device_remote_data_source.dart';
+import 'package:thermo_humi/features/device/data/datasources/device_remote_data_source_impl.dart';
 import 'package:thermo_humi/features/room_management/data/repositories/room_repository_impl.dart';
 import 'package:thermo_humi/features/room_management/domain/repositories/room_repository.dart';
+import 'package:thermo_humi/features/room_management/domain/usecases/get_rooms_usecase.dart';
+import 'package:thermo_humi/features/room_management/presentation/bloc/room_list/room_management_list_cubit.dart';
 
 // --- Room Feature imports ---
 import 'package:hive_flutter/hive_flutter.dart';
@@ -59,24 +64,22 @@ import 'package:thermo_humi/features/room/data/models/hive/room_hive_model.dart'
 import 'package:thermo_humi/features/room/data/models/hive/device_hive_model.dart';
 import 'package:thermo_humi/features/room/data/datasources/room_local_datasource.dart';
 import 'package:thermo_humi/features/room/data/datasources/room_local_datasource_impl.dart';
-import 'package:thermo_humi/features/room/data/datasources/room_remote_datasource.dart';
-import 'package:thermo_humi/features/room/data/datasources/room_remote_datasource_impl.dart';
-import 'package:thermo_humi/features/room/data/repositories/room_repository_impl.dart' as room_repo;
-import 'package:thermo_humi/features/room/domain/repositories/room_repository.dart' as room_domain;
-import 'package:thermo_humi/features/room/domain/usecases/get_rooms_with_devices_usecase.dart';
+import 'package:thermo_humi/features/room/data/datasources/room/room_remote_datasource.dart';
+import 'package:thermo_humi/features/room/data/datasources/room/room_remote_datasource_impl.dart';
+import 'package:thermo_humi/features/room/data/repositories/room_repository_impl.dart'
+    as room_repo;
+import 'package:thermo_humi/features/room/domain/repositories/room_repository.dart'
+    as room_domain;
+import 'package:thermo_humi/features/room/domain/usecases/get_room_usecase.dart';
 import 'package:thermo_humi/features/room/presentation/bloc/room_list/room_list_cubit.dart';
 import 'package:thermo_humi/features/room/presentation/bloc/room_detail/room_detail_cubit.dart';
 
 // --- Phone Alert ---
-// TODO: Khi BE hoàn thiện, bỏ comment 3 dòng dưới và xoá dòng mock
 // import 'package:thermo_humi/features/room/data/datasources/phone_alert_remote_datasource.dart';
 // import 'package:thermo_humi/features/room/data/datasources/phone_alert_remote_datasource_impl.dart';
 // import 'package:thermo_humi/features/room/data/repositories/phone_alert_repository_impl.dart';
 import 'package:thermo_humi/features/room/data/repositories/mock_phone_alert_repository.dart';
 import 'package:thermo_humi/features/room/domain/repositories/phone_alert_repository.dart';
-
-// --- Realtime ---
-import 'package:thermo_humi/core/realtime/device_realtime_service.dart';
 
 final sl = GetIt.instance;
 
@@ -90,9 +93,8 @@ Future<void> init() async {
   // --- Core ---
   sl.registerLazySingleton(() => const FlutterSecureStorage());
   sl.registerLazySingleton(() => SecureStorage(sl()));
-  
+
   // Realtime Service
-  sl.registerLazySingleton(() => DeviceRealtimeService(sl()));
   sl.registerLazySingleton(() => RouterGuard(sl()));
 
   sl.registerLazySingleton(() => AuthInterceptor(sl()));
@@ -158,9 +160,18 @@ Future<void> init() async {
   sl.registerFactory(() => MemberCubit(repository: sl()));
 
   // --- Device Management Feature ---
-  sl.registerLazySingleton<DeviceRepository>(() => DeviceRepositoryImpl());
+  // 1. DataSource
+  sl.registerLazySingleton<DeviceRemoteDataSource>(
+    () => DeviceRemoteDataSourceImpl(sl<Dio>()),
+  );
+
+  // 2. Repository
+  sl.registerLazySingleton<DeviceRepository>(
+    () => DeviceRepositoryImpl(sl<DeviceRemoteDataSource>()),
+  );
 
   sl.registerFactory(() => DeviceManagementCubit(repository: sl()));
+  sl.registerFactory(() => AddDeviceCubit(repository: sl()));
   sl.registerFactory(() => DeviceHistoryCubit(repository: sl()));
 
   // --- Request Access Feature ---
@@ -180,9 +191,13 @@ Future<void> init() async {
   // sl.registerLazySingleton<RoomRemoteDataSource>(() => RoomRemoteDataSourceImpl(dio: sl()));
 
   // 2. Đăng ký Repository (chỉ đăng ký interface RoomRepository)
-  sl.registerLazySingleton<RoomRepository>(
-    () => RoomRepositoryImpl(),
-  );
+  sl.registerLazySingleton<RoomRepository>(() => RoomRepositoryImpl(sl()));
+
+  // 3. UseCase
+  sl.registerLazySingleton(() => GetRoomsManagementUseCase(sl()));
+
+  // 4. Cubit
+  sl.registerFactory(() => RoomManagementListCubit(sl()));
 
   // --- Room Feature (device-online/query) ---
 
@@ -196,18 +211,17 @@ Future<void> init() async {
 
   // 2. Repository
   sl.registerLazySingleton<room_domain.RoomRepository>(
-    () => room_repo.RoomRepositoryImpl(sl(), sl(), sl()),
+    () => room_repo.RoomRepositoryImpl(sl()),
   );
 
   // 3. UseCase
-  sl.registerLazySingleton(() => GetRoomsWithDevicesUseCase(sl()));
+  sl.registerLazySingleton(() => GetRoomsUseCase(sl()));
 
   // 4. Cubit (registerFactory → mỗi lần tạo instance mới)
-  sl.registerFactory(() => RoomListCubit(sl(), sl()));
-  sl.registerFactory(() => RoomDetailCubit(sl(), sl()));
+  sl.registerFactory(() => RoomListCubit(sl()));
+  sl.registerFactory(() => RoomDetailCubit(sl()));
 
   // --- Phone Alert Feature ---
-  // TODO: Khi BE hoàn thiện:
   //   1. Bỏ comment 2 dòng đăng ký DataSource + Impl bên dưới
   //   2. Xoá dòng Mock
   // sl.registerLazySingleton<PhoneAlertRemoteDataSource>(

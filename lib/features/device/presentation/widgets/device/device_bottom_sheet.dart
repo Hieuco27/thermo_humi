@@ -93,10 +93,7 @@ class DeviceBottomSheet extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => DeviceDetailPage(
-                            deviceId: device.id,
-                            deviceName: device.name,
-                          ),
+                          builder: (_) => DeviceDetailPage(device: device),
                         ),
                       );
                     },

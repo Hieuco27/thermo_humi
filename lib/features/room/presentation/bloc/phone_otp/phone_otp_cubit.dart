@@ -15,10 +15,8 @@ class PhoneOtpCubit extends Cubit<PhoneOtpState> {
   }) : _repository = repository,
        super(const PhoneOtpState());
 
-  // ─────────────────────────────────────────────────────────────
   // BƯỚC 1: Gửi OTP
   // Chỉ nơi DUY NHẤT chuyển step → enterOtp
-  // ─────────────────────────────────────────────────────────────
 
   Future<void> sendOtp({required String phone, required String note}) async {
     if (state.isSendingOtp) return;

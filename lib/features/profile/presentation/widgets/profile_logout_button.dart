@@ -5,7 +5,6 @@ import 'package:thermo_humi/core/router/route_names.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
 import 'package:thermo_humi/core/di/injection_container.dart';
 import 'package:thermo_humi/features/auth/domain/repositories/auth_repository.dart';
-import 'package:thermo_humi/core/realtime/device_realtime_service.dart';
 
 class ProfileLogoutButton extends StatelessWidget {
   const ProfileLogoutButton({super.key});
@@ -52,7 +51,6 @@ class ProfileLogoutButton extends StatelessWidget {
                     TextButton(
                       onPressed: () async {
                         Navigator.pop(context);
-                        await sl<DeviceRealtimeService>().stop();
                         await sl<AuthRepository>().signOut();
                         if (context.mounted) {
                           context.go(RouteNames.login);

@@ -51,14 +51,14 @@ class ThresholdSettingsState extends Equatable {
 
   @override
   List<Object?> get props => [
-        status,
-        tempMin,
-        tempMax,
-        humMin,
-        humMax,
-        isSmsEnabled,
-        isPushEnabled,
-        isEmailEnabled,
-        errorMessage,
-      ];
+    status,
+    tempMin,
+    tempMax,
+    humMin,
+    humMax,
+    isSmsEnabled,
+    isPushEnabled,
+    isEmailEnabled,
+    errorMessage,
+  ];
 }

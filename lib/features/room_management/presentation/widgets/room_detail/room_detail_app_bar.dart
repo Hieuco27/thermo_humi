@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
 import 'package:thermo_humi/features/room_management/presentation/bloc/room_manage_cubit.dart';
-import 'package:thermo_humi/features/room_management/presentation/models/room_detail_result.dart';
 
 class RoomDetailAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String roomName;
@@ -39,17 +38,7 @@ class RoomDetailAppBar extends StatelessWidget implements PreferredSizeWidget {
         onPressed: () {
           final state = context.read<RoomManageCubit>().state;
           if (state.hasChanges) {
-            final result = RoomDetailResult(
-              isDeleted: false,
-              newDeviceCount: deviceCount,
-              newOnlineCount:
-                  state.roomWithDevices?.devices
-                      .where((d) => d.isOnline)
-                      .length ??
-                  0,
-              newName: roomName,
-            );
-            context.pop(result);
+            context.pop();
           } else {
             context.pop();
           }

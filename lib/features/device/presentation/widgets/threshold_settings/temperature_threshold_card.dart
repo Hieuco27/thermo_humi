@@ -3,8 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
-import '../../bloc/threshold_settings/threshold_settings_bloc.dart';
-import '../../bloc/threshold_settings/threshold_settings_event.dart';
+import '../../bloc/threshold_settings/threshold_settings_cubit.dart';
 import '../../bloc/threshold_settings/threshold_settings_state.dart';
 import 'edit_threshold_dialog.dart';
 import 'border_slider.dart';
@@ -36,7 +35,7 @@ class _TemperatureThresholdCardState extends State<TemperatureThresholdCard> {
           ),
         ],
       ),
-      child: BlocBuilder<ThresholdSettingsBloc, ThresholdSettingsState>(
+      child: BlocBuilder<ThresholdSettingsCubit, ThresholdSettingsState>(
         buildWhen: (previous, current) =>
             previous.tempMin != current.tempMin ||
             previous.tempMax != current.tempMax,
@@ -92,9 +91,9 @@ class _TemperatureThresholdCardState extends State<TemperatureThresholdCard> {
                             });
                           },
                           onChangeEnd: (values) {
-                            context.read<ThresholdSettingsBloc>().add(
-                              TempRangeChanged(values.start, values.end),
-                            );
+                            context
+                                .read<ThresholdSettingsCubit>()
+                                .updateTempRange(values.start, values.end);
                             _localRange = null;
                           },
                         ),
@@ -197,8 +196,9 @@ class _TemperatureThresholdCardState extends State<TemperatureThresholdCard> {
           suffixText: '°C',
           primaryColor: const Color(0xFFE53935),
           onSave: (newMin, newMax) {
-            context.read<ThresholdSettingsBloc>().add(
-              TempRangeChanged(newMin, newMax),
+            context.read<ThresholdSettingsCubit>().updateTempRange(
+              newMin,
+              newMax,
             );
           },
         );

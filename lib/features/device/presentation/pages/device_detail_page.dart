@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:thermo_humi/common/widgets/app_background.dart';
+import 'package:thermo_humi/core/di/injection_container.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
 import 'package:thermo_humi/features/device/data/repositories/device_repository_impl.dart';
 import 'package:thermo_humi/features/device/presentation/bloc/device_detail/device_history_cubit.dart';
@@ -11,35 +12,30 @@ import 'package:thermo_humi/features/device/presentation/widgets/device/device_g
 import 'package:thermo_humi/features/device/presentation/widgets/chart/history_tab_chart.dart';
 import 'package:thermo_humi/features/device/presentation/widgets/device/device_footer.dart';
 import 'package:thermo_humi/core/theme/app_colors.dart';
+import 'package:thermo_humi/features/device/domain/entities/device_entity.dart';
 import 'package:thermo_humi/features/sharing/presentation/pages/share_page.dart';
 
 class DeviceDetailPage extends StatelessWidget {
-  final String deviceId;
-  final String deviceName;
+  final DeviceEntity device;
 
-  const DeviceDetailPage({
-    super.key,
-    required this.deviceId,
-    required this.deviceName,
-  });
+  const DeviceDetailPage({super.key, required this.device});
 
   @override
   Widget build(BuildContext context) {
     // Provide Cubit
     return BlocProvider(
       create: (context) => DeviceHistoryCubit(
-        repository: DeviceRepositoryImpl(), // Mock Repo
-      )..fetchHistory(deviceId),
-      child: _DeviceDetailView(deviceName: deviceName, deviceId: deviceId),
+        repository: DeviceRepositoryImpl(sl()), // Mock Repo
+      )..fetchHistory(device.id),
+      child: _DeviceDetailView(device: device),
     );
   }
 }
 
 class _DeviceDetailView extends StatelessWidget {
-  final String deviceName;
-  final String deviceId;
+  final DeviceEntity device;
 
-  const _DeviceDetailView({required this.deviceName, required this.deviceId});
+  const _DeviceDetailView({required this.device});
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +60,7 @@ class _DeviceDetailView extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                deviceName,
+                device.name,
                 style: AppTextStyles.titleMediumAppBar(color: Colors.white),
               ),
             ],
@@ -91,7 +87,7 @@ class _DeviceDetailView extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => SharePage(initialDeviceIds: [deviceId]),
+                    builder: (_) => SharePage(initialDeviceIds: [device.id]),
                   ),
                 );
               },
@@ -108,7 +104,6 @@ class _DeviceDetailView extends StatelessWidget {
               return Center(child: Text('Error: ${state.message}'));
             } else if (state is DeviceHistoryLoaded) {
               final data = state.data;
-              final latestPoint = data.points.last;
 
               return SingleChildScrollView(
                 padding: EdgeInsets.all(10.w),
@@ -136,21 +131,17 @@ class _DeviceDetailView extends StatelessWidget {
                           Expanded(
                             child: DeviceGauge(
                               title: 'Nhiệt độ:',
-                              value: latestPoint.temperature,
+                              value: device.currentTemperature ?? 0.0,
                               unit: '°C',
-                              hasAlert:
-                                  latestPoint.temperature >
-                                  data.threshold.tempHigh,
+                              hasAlert: device.isTemperatureAlert,
                             ),
                           ),
                           Expanded(
                             child: DeviceGauge(
                               title: 'Độ ẩm:',
-                              value: latestPoint.humidity,
+                              value: device.currentHumidity ?? 0.0,
                               unit: '%',
-                              hasAlert:
-                                  latestPoint.humidity >
-                                  data.threshold.humidHigh,
+                              hasAlert: device.isHumidityAlert,
                             ),
                           ),
                         ],
@@ -189,8 +180,9 @@ class _DeviceDetailView extends StatelessWidget {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) =>
-                                          ReportPage(initialDeviceId: deviceId),
+                                      builder: (_) => ReportPage(
+                                        initialDeviceId: device.id,
+                                      ),
                                     ),
                                   );
                                 },

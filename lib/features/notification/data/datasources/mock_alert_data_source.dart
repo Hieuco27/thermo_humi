@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:injectable/injectable.dart';
 import 'package:thermo_humi/features/notification/domain/entities/alert_model.dart';
-import 'package:thermo_humi/common/mock/mock_room_data.dart';
 import 'package:thermo_humi/features/device/domain/entities/device_entity.dart';
 import 'package:thermo_humi/features/room/domain/entities/room_entity.dart';
 
@@ -13,8 +12,8 @@ class MockAlertDataSource {
   Timer? _mockSocketTimer;
 
   // Cache danh sách phòng & thiết bị để dùng
-  late final List<RoomEntity> _rooms;
-  late final List<DeviceEntity> _devices;
+  final List<RoomEntity> _rooms = [];
+  final List<DeviceEntity> _devices = [];
 
   MockAlertDataSource() {
     _initMockDataFromRooms();
@@ -49,11 +48,7 @@ class MockAlertDataSource {
     _socketStreamController.close();
   }
 
-  void _initMockDataFromRooms() {
-    final mockRoomsWithDevices = buildMockRooms();
-    _rooms = mockRoomsWithDevices.map((e) => e.room).toList();
-    _devices = mockRoomsWithDevices.expand((e) => e.devices).toList();
-  }
+  void _initMockDataFromRooms() {}
 
   void _generateInitialMockData() {
     if (_devices.isEmpty) return;

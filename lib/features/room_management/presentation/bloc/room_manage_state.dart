@@ -1,12 +1,12 @@
 import 'package:equatable/equatable.dart';
-import 'package:thermo_humi/features/room/presentation/models/room_with_devices.dart';
+import 'package:thermo_humi/features/room/domain/entities/room_entity.dart';
 import 'package:thermo_humi/features/room/presentation/widgets/room_detail/device_filter_bar.dart';
 
 enum RoomManageStatus { initial, loading, success, failure, deleting, deleted }
 
 class RoomManageState extends Equatable {
   final RoomManageStatus status;
-  final RoomWithDevices? roomWithDevices;
+  final RoomEntity? room;
   final DeviceFilterType activeFilter;
   final bool isSelectionMode;
   final Set<String> selectedDeviceIds;
@@ -16,18 +16,19 @@ class RoomManageState extends Equatable {
 
   const RoomManageState({
     this.status = RoomManageStatus.initial,
-    this.roomWithDevices,
+    this.room,
     this.activeFilter = DeviceFilterType.all,
     this.isSelectionMode = false,
     this.selectedDeviceIds = const {},
     this.errorMessage,
     this.hasChanges = false,
-    this.isAdmin = true, // Mặc định là true theo giả định để test full chức năng
+    this.isAdmin =
+        true, // Mặc định là true theo giả định để test full chức năng
   });
 
   RoomManageState copyWith({
     RoomManageStatus? status,
-    RoomWithDevices? roomWithDevices,
+    RoomEntity? room,
     DeviceFilterType? activeFilter,
     bool? isSelectionMode,
     Set<String>? selectedDeviceIds,
@@ -37,7 +38,7 @@ class RoomManageState extends Equatable {
   }) {
     return RoomManageState(
       status: status ?? this.status,
-      roomWithDevices: roomWithDevices ?? this.roomWithDevices,
+      room: room ?? this.room,
       activeFilter: activeFilter ?? this.activeFilter,
       isSelectionMode: isSelectionMode ?? this.isSelectionMode,
       selectedDeviceIds: selectedDeviceIds ?? this.selectedDeviceIds,
@@ -49,13 +50,13 @@ class RoomManageState extends Equatable {
 
   @override
   List<Object?> get props => [
-        status,
-        roomWithDevices,
-        activeFilter,
-        isSelectionMode,
-        selectedDeviceIds,
-        errorMessage,
-        hasChanges,
-        isAdmin,
-      ];
+    status,
+    room,
+    activeFilter,
+    isSelectionMode,
+    selectedDeviceIds,
+    errorMessage,
+    hasChanges,
+    isAdmin,
+  ];
 }

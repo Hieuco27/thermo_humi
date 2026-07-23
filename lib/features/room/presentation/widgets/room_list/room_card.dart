@@ -6,18 +6,18 @@ import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
 import 'package:thermo_humi/features/device/domain/entities/device_entity.dart';
 import 'package:thermo_humi/features/room/domain/entities/room_entity.dart';
-import 'package:thermo_humi/features/room/presentation/models/room_with_devices.dart';
+
 import 'package:thermo_humi/features/room/presentation/widgets/device_list_item.dart';
 
 class RoomCard extends StatelessWidget {
-  final RoomWithDevices rwd;
+  final RoomEntity room;
   final bool isExpanded;
   final VoidCallback onHeaderTap;
   final VoidCallback onViewAll;
 
   const RoomCard({
     super.key,
-    required this.rwd,
+    required this.room,
     required this.isExpanded,
     required this.onHeaderTap,
     required this.onViewAll,
@@ -25,10 +25,10 @@ class RoomCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool hasAlert = rwd.room.hasAlert;
+    final bool hasAlert = room.hasAlert;
 
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 6.h),
+      margin: EdgeInsets.symmetric(horizontal: 8.w, vertical: 6.h),
       decoration: BoxDecoration(
         color: AppColors.background,
         borderRadius: BorderRadius.circular(16.r),
@@ -48,8 +48,8 @@ class RoomCard extends StatelessWidget {
         children: [
           // ── Header ──
           _RoomCardHeader(
-            room: rwd.room,
-            devices: rwd.devices,
+            room: room,
+            devices: room.devices,
             isExpanded: isExpanded,
             hasAlert: hasAlert,
             onTap: onHeaderTap,
@@ -62,7 +62,7 @@ class RoomCard extends StatelessWidget {
                 ? CrossFadeState.showFirst
                 : CrossFadeState.showSecond,
             firstChild: _DeviceListSection(
-              devices: rwd.devices,
+              devices: room.devices,
               onViewAll: onViewAll,
             ),
             secondChild: const SizedBox.shrink(),
@@ -105,12 +105,6 @@ class _RoomCardHeader extends StatelessWidget {
             SizedBox(
               width: 42.r,
               height: 42.r,
-              // decoration: BoxDecoration(
-              //   color: hasAlert
-              //       ? const Color(0xFFFF9800).withValues(alpha: 0.12)
-              //       : const Color(0xFF007AFF).withValues(alpha: 0.1),
-              //   borderRadius: BorderRadius.circular(12.r),
-              // ),
               child: SvgPicture.asset(
                 'assets/icons/room/room.svg',
                 width: 22.sp,
@@ -145,12 +139,12 @@ class _RoomCardHeader extends StatelessWidget {
                     children: [
                       _RoomStat(
                         svgAsset: 'assets/icons/room/device.svg',
-                        value: '${room.totalDevices}',
+                        value: '${room.totalDevices} thiết bị',
                         color: AppColors.textFieldHint,
                       ),
                       SizedBox(width: 10.w),
                       _RoomStat(
-                        svgAsset: 'assets/icons/room/4g.svg',
+                        svgAsset: 'assets/icons/home/online.svg',
                         value: '$onlineCount online',
                         color: AppColors.appBarBg,
                         iconSize: 12,

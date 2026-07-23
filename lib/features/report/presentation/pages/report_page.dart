@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:thermo_humi/common/widgets/app_background.dart';
+import 'package:thermo_humi/core/di/injection_container.dart';
 import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
-import 'package:thermo_humi/features/device/data/repositories/device_repository_impl.dart';
 import 'package:thermo_humi/features/report/presentation/bloc/report/device_report_cubit.dart';
 import 'package:thermo_humi/features/report/presentation/bloc/report/device_report_state.dart';
 import 'package:thermo_humi/features/report/presentation/widgets/report_data_row.dart';
@@ -20,7 +20,7 @@ class ReportPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) =>
-          DeviceReportCubit(repository: DeviceRepositoryImpl())
+          DeviceReportCubit(repository: sl(), getRoomsUseCase: sl())
             ..loadFilters(initialDeviceId: initialDeviceId),
       child: const _ReportView(),
     );

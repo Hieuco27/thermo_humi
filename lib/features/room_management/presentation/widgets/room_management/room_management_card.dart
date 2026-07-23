@@ -2,17 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
-import 'package:thermo_humi/features/room/presentation/models/room_with_devices.dart';
+import 'package:thermo_humi/features/room/domain/entities/room_entity.dart';
 
 class RoomManagementCard extends StatelessWidget {
-  final RoomWithDevices rwd;
+  final RoomEntity room;
   final VoidCallback onTap;
 
-  const RoomManagementCard({super.key, required this.rwd, required this.onTap});
+  const RoomManagementCard({
+    super.key,
+    required this.room,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final room = rwd.room;
     final hasDevices = room.totalDevices > 0;
     final allOnline = hasDevices && room.onlineDevices == room.totalDevices;
     final hasOffline = hasDevices && room.offlineDevices > 0;

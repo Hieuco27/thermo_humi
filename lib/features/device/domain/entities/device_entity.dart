@@ -1,6 +1,3 @@
-/// Device Entity — thiết bị cảm biến
-library;
-
 import 'package:equatable/equatable.dart';
 
 class DeviceEntity extends Equatable {
@@ -31,6 +28,8 @@ class DeviceEntity extends Equatable {
   });
 
   bool get isOnline => status == DeviceStatus.online;
+  bool get isOffline =>
+      status == DeviceStatus.offline || connectivity == ConnectivityStatus.none;
 
   bool get isTemperatureAlert {
     if (threshold == null || currentTemperature == null) return false;
@@ -76,25 +75,25 @@ class DeviceEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        name,
-        roomId,
-        roomName,
-        status,
-        connectivity,
-        currentTemperature,
-        currentHumidity,
-        lastUpdatedAt,
-      ];
+    id,
+    name,
+    roomId,
+    roomName,
+    status,
+    connectivity,
+    currentTemperature,
+    currentHumidity,
+    lastUpdatedAt,
+  ];
 }
 
 enum DeviceStatus { online, offline, unknown }
 
 enum ConnectivityStatus {
-  strong,  // 4G tốt
-  medium,  // 4G trung bình
-  weak,    // 4G yếu
-  none,    // Không kết nối
+  strong, // 4G tốt
+  medium, // 4G trung bình
+  weak, // 4G yếu
+  none, // Không kết nối
 }
 
 class ThresholdEntity extends Equatable {

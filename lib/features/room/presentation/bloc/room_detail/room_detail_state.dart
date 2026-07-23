@@ -1,12 +1,12 @@
 import 'package:equatable/equatable.dart';
-import 'package:thermo_humi/features/room/presentation/models/room_with_devices.dart';
+import 'package:thermo_humi/features/room/domain/entities/room_entity.dart';
 import 'package:thermo_humi/features/room/presentation/widgets/room_detail/device_filter_bar.dart';
 
 enum RoomDetailStatus { initial, loading, success, failure }
 
 class RoomDetailState extends Equatable {
   final RoomDetailStatus status;
-  final RoomWithDevices? roomWithDevices;
+  final RoomEntity? room;
   final DeviceFilterType activeFilter;
   final bool isSelectionMode;
   final Set<String> selectedDeviceIds;
@@ -14,7 +14,7 @@ class RoomDetailState extends Equatable {
 
   const RoomDetailState({
     this.status = RoomDetailStatus.initial,
-    this.roomWithDevices,
+    this.room,
     this.activeFilter = DeviceFilterType.all,
     this.isSelectionMode = false,
     this.selectedDeviceIds = const {},
@@ -23,7 +23,7 @@ class RoomDetailState extends Equatable {
 
   RoomDetailState copyWith({
     RoomDetailStatus? status,
-    RoomWithDevices? roomWithDevices,
+    RoomEntity? room,
     DeviceFilterType? activeFilter,
     bool? isSelectionMode,
     Set<String>? selectedDeviceIds,
@@ -31,7 +31,7 @@ class RoomDetailState extends Equatable {
   }) {
     return RoomDetailState(
       status: status ?? this.status,
-      roomWithDevices: roomWithDevices ?? this.roomWithDevices,
+      room: room ?? this.room,
       activeFilter: activeFilter ?? this.activeFilter,
       isSelectionMode: isSelectionMode ?? this.isSelectionMode,
       selectedDeviceIds: selectedDeviceIds ?? this.selectedDeviceIds,
@@ -41,11 +41,11 @@ class RoomDetailState extends Equatable {
 
   @override
   List<Object?> get props => [
-        status,
-        roomWithDevices,
-        activeFilter,
-        isSelectionMode,
-        selectedDeviceIds,
-        errorMessage,
-      ];
+    status,
+    room,
+    activeFilter,
+    isSelectionMode,
+    selectedDeviceIds,
+    errorMessage,
+  ];
 }

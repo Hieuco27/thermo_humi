@@ -1,11 +1,11 @@
 import 'package:equatable/equatable.dart';
-import 'package:thermo_humi/features/room/presentation/models/room_with_devices.dart';
+import 'package:thermo_humi/features/room/domain/entities/room_entity.dart';
 
 enum RoomListStatus { initial, loading, success, failure }
 
 class RoomListState extends Equatable {
   final RoomListStatus status;
-  final List<RoomWithDevices> rooms;
+  final List<RoomEntity> rooms;
   final String? errorMessage;
 
   const RoomListState({
@@ -16,7 +16,7 @@ class RoomListState extends Equatable {
 
   RoomListState copyWith({
     RoomListStatus? status,
-    List<RoomWithDevices>? rooms,
+    List<RoomEntity>? rooms,
     String? errorMessage,
   }) {
     return RoomListState(
@@ -26,7 +26,6 @@ class RoomListState extends Equatable {
     );
   }
 
-  /// Tiện ích UI — kiểm tra trạng thái
   bool get isLoading => status == RoomListStatus.loading;
   bool get isSuccess => status == RoomListStatus.success;
   bool get isFailure => status == RoomListStatus.failure;

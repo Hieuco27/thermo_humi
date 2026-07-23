@@ -1,98 +1,20 @@
-library;
-
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:thermo_humi/features/room/data/datasources/room_remote_datasource.dart';
-import 'package:thermo_humi/features/room/data/models/device_online_model.dart';
+import 'package:thermo_humi/features/room/data/datasources/room/room_remote_datasource.dart';
 import 'package:thermo_humi/features/room/domain/entities/room_entity.dart';
 import 'package:thermo_humi/features/room/domain/repositories/room_repository.dart';
-import 'package:thermo_humi/features/room/presentation/models/room_with_devices.dart';
-
-import 'dart:async';
-import 'package:thermo_humi/core/realtime/device_realtime_service.dart';
-import 'package:thermo_humi/features/room/data/datasources/room_local_datasource.dart';
 
 class RoomRepositoryImpl implements RoomRepository {
   final RoomRemoteDataSource _remoteDataSource;
-  final RoomLocalDataSource _localDataSource;
-  final DeviceRealtimeService _realtimeService;
 
-  final _roomsStreamController = StreamController<List<RoomWithDevices>>.broadcast();
-  List<RoomWithDevices> _inMemoryRooms = [];
-
-  RoomRepositoryImpl(this._remoteDataSource, this._localDataSource, this._realtimeService) {
-    _realtimeService.deviceUpdatesStream.listen(_onDeviceUpdateReceived);
-  }
+  RoomRepositoryImpl(this._remoteDataSource);
 
   @override
-  Stream<List<RoomWithDevices>> get roomsWithDevicesStream => _roomsStreamController.stream;
-
-  Future<void> _onDeviceUpdateReceived(DeviceOnlineModel event) async {
+  Future<Either<String, List<RoomEntity>>> getRooms(String userId) async {
     try {
-      if (_inMemoryRooms.isEmpty) {
-        _inMemoryRooms = await _localDataSource.getRoomsWithDevices();
-      }
-      
-      bool isUpdated = false;
-      final cachedRooms = List<RoomWithDevices>.from(_inMemoryRooms);
-
-      for (int i = 0; i < cachedRooms.length; i++) {
-        final roomData = cachedRooms[i];
-        final devices = List.of(roomData.devices);
-
-        for (int j = 0; j < devices.length; j++) {
-          if (devices[j].id == event.imei) {
-            // Found device, update it
-            final updatedDevice = devices[j].copyWith(
-              currentTemperature: event.currentTemperature,
-              currentHumidity: event.currentHumidity,
-              lastUpdatedAt: event.lastUpdate ?? DateTime.now(),
-            );
-            devices[j] = updatedDevice;
-            isUpdated = true;
-          }
-        }
-
-        if (isUpdated) {
-          cachedRooms[i] = RoomWithDevices(room: roomData.room, devices: devices);
-        }
-      }
-
-      if (isUpdated) {
-        _inMemoryRooms = cachedRooms;
-        _roomsStreamController.add(cachedRooms);
-      }
-    } catch (e) {
-      // Ignore errors when updating cache
-    }
-  }
-
-  @override
-  Future<Either<String, List<RoomWithDevices>>> getRoomsWithDevices() async {
-    try {
-      final response = await _remoteDataSource.getDeviceOnline();
-      final result = response.toRoomWithDevicesList();
-      
-      // Lưu lại vào Hive Cache khi có mạng
-      await _localDataSource.saveRoomsWithDevices(result);
-      
-      _inMemoryRooms = result;
-      _roomsStreamController.add(result);
-      return Right(result);
+      final rooms = await _remoteDataSource.getRooms(userId);
+      return Right(rooms);
     } on DioException catch (e) {
-      // Nếu rớt mạng, cố gắng lấy từ Cache
-      try {
-        final cachedData = await _localDataSource.getRoomsWithDevices();
-        if (cachedData.isNotEmpty) {
-          if (_inMemoryRooms.isEmpty) {
-            _inMemoryRooms = cachedData;
-          }
-          return Right(_inMemoryRooms);
-        }
-      } catch (_) {
-        // Nếu không có cache, bỏ qua để hiển thị lỗi gốc
-      }
-
       String? message;
       final data = e.response?.data;
       if (data is Map) {
@@ -104,28 +26,6 @@ class RoomRepositoryImpl implements RoomRepository {
     }
   }
 
-  @override
-  Future<Either<String, List<RoomEntity>>> getRooms() async {
-    try {
-      final response = await _remoteDataSource.getDeviceOnline();
-      final rooms = response.data.map((loc) => loc.toRoomEntity()).toList();
-      return Right(rooms);
-    } on DioException catch (e) {
-      // Nếu rớt mạng, thử lấy từ Cache và chỉ trả về danh sách phòng
-      try {
-        final cachedData = await _localDataSource.getRoomsWithDevices();
-        if (cachedData.isNotEmpty) {
-          return Right(cachedData.map((e) => e.room).toList());
-        }
-      } catch (_) {}
-
-      return Left(_mapDioError(e));
-    } catch (e) {
-      return Left(e.toString());
-    }
-  }
-
-  /// Chuyển DioException → thông báo lỗi thân thiện với người dùng
   String _mapDioError(DioException e) {
     switch (e.type) {
       case DioExceptionType.connectionTimeout:

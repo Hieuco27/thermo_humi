@@ -40,15 +40,15 @@ class _HomeView extends StatelessWidget {
             final rooms = state.rooms;
             final int totalDevices = rooms.fold(
               0,
-              (sum, r) => sum + r.room.totalDevices,
+              (sum, r) => sum + r.totalDevices,
             );
             final int totalOnline = rooms.fold(
               0,
-              (sum, r) => sum + r.room.onlineDevices,
+              (sum, r) => sum + r.onlineDevices,
             );
             final int totalAlerts = rooms.fold(
               0,
-              (sum, r) => sum + r.room.alertCount,
+              (sum, r) => sum + r.alertCount,
             );
 
             return RefreshIndicator(
@@ -153,7 +153,7 @@ class _HomeView extends StatelessWidget {
                         itemCount: rooms.length,
                         separatorBuilder: (_, __) => SizedBox(height: 12.h),
                         itemBuilder: (context, index) {
-                          return AreaListItem(rwd: rooms[index]);
+                          return AreaListItem(room: rooms[index]);
                         },
                       ),
 

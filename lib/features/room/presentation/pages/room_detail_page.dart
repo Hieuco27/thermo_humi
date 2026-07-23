@@ -72,7 +72,7 @@ class _RoomDeviceListViewState extends State<_RoomDeviceListView>
       case DeviceFilterType.online:
         return allDevices.where((d) => d.isOnline).toList();
       case DeviceFilterType.offline:
-        return allDevices.where((d) => !d.isOnline).toList();
+        return allDevices.where((d) => d.isOffline).toList();
       case DeviceFilterType.alert:
         return allDevices.where((d) => d.hasAlert).toList();
       case DeviceFilterType.all:
@@ -107,16 +107,17 @@ class _RoomDeviceListViewState extends State<_RoomDeviceListView>
     return BlocBuilder<RoomDetailCubit, RoomDetailState>(
       builder: (context, state) {
         if (state.status == RoomDetailStatus.initial ||
-            state.status == RoomDetailStatus.loading &&
-                state.roomWithDevices == null) {
+            (state.status == RoomDetailStatus.loading && state.room == null)) {
           return const Scaffold(
             backgroundColor: Colors.white,
             body: Center(child: CircularProgressIndicator()),
           );
         }
 
-        final room = state.roomWithDevices!.room;
-        final allDevices = state.roomWithDevices!.devices;
+        final room = state.room;
+        final allDevices = room?.devices ?? [];
+        final String roomName = room?.name ?? 'Chi tiết phòng';
+
         final filteredDevices = _getFilteredDevices(
           allDevices,
           state.activeFilter,
@@ -128,14 +129,12 @@ class _RoomDeviceListViewState extends State<_RoomDeviceListView>
           child: Scaffold(
             backgroundColor: Colors.transparent,
             appBar: RoomDetailAppBar(
-              roomName: room.name,
+              roomName: roomName,
               backgroundColor: AppColors.gradientEnd,
               textColor: Colors.white,
               onSearch: () {},
-              onMoreOptions: () => showPhoneOtpBottomSheet(
-                context,
-                roomId: room.id,
-              ),
+              onMoreOptions: () =>
+                  showPhoneOtpBottomSheet(context, roomId: widget.roomId),
             ),
             body: FadeTransition(
               opacity: _fadeAnim,
@@ -153,11 +152,11 @@ class _RoomDeviceListViewState extends State<_RoomDeviceListView>
                     activeFilter: state.activeFilter,
                     totalCount: allDevices.length,
                     onlineCount: onlineCount,
-                    offlineCount: allDevices.length - onlineCount,
+                    offlineCount: allDevices.where((d) => d.isOffline).length,
                     alertCount: alertCount,
                     isSelectionMode: state.isSelectionMode,
                     onFilterChanged: (f) =>
-                        context.read<RoomDetailCubit>().changeFilter(f),
+                        context.read<RoomDetailCubit>().setFilter(f),
                     onSelectModeToggle: () =>
                         context.read<RoomDetailCubit>().toggleSelectionMode(),
                     onCancelSelection: () =>
@@ -180,7 +179,7 @@ class _RoomDeviceListViewState extends State<_RoomDeviceListView>
                         MaterialPageRoute(
                           builder: (_) => SharePage(
                             initialDeviceIds: selectedDeviceIds,
-                            roomId: room.id,
+                            roomId: widget.roomId,
                           ),
                         ),
                       );

@@ -1,19 +1,18 @@
-/// App config từ .env — base URL, API version, realtime type
-library;
-
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class AppConfig {
   AppConfig._();
 
   static String get baseUrl =>
-      dotenv.env['BASE_URL'] ?? 'http://192.168.1.19:8999';
+      dotenv.env['BASE_URL'] ?? 'http://103.249.158.28:8999';
 
-  static String get devicesBaseUrl =>
-      dotenv.env['DEVICES_BASE_URL'] ?? 'http://192.168.1.20:9005';
+  static String get authBaseUrl =>
+      dotenv.env['AUTH_BASE_URL'] ?? 'http://103.249.158.28:8999';
 
-  static String get realtimeType =>
-      dotenv.env['REALTIME_TYPE'] ?? 'POLLING'; // MQTT | WS | POLLING
+  static String get dashboardBaseUrl =>
+      dotenv.env['DASHBOARD_BASE_URL'] ?? 'http://103.249.158.28:8888';
+
+  static String get realtimeType => dotenv.env['REALTIME_TYPE'] ?? 'POLLING';
 
   static String get mqttBroker => dotenv.env['MQTT_BROKER'] ?? '';
 

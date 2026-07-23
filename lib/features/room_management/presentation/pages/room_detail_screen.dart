@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:thermo_humi/features/device/domain/entities/device_entity.dart';
 import 'package:thermo_humi/features/room_management/presentation/bloc/room_manage_cubit.dart';
 import 'package:thermo_humi/features/room_management/presentation/bloc/room_manage_state.dart';
-import 'package:thermo_humi/features/room_management/presentation/models/room_detail_result.dart';
+
 import 'package:thermo_humi/features/room_management/presentation/widgets/room_detail/add_device_option_sheet.dart';
 import 'package:thermo_humi/features/room_management/presentation/widgets/room_detail/delete_device_confirm_dialog.dart';
 import 'package:thermo_humi/features/room_management/presentation/widgets/room_detail/device_action_sheet.dart';
@@ -15,6 +15,8 @@ import 'package:thermo_humi/features/room_management/presentation/widgets/room_d
 import 'package:thermo_humi/features/room_management/presentation/widgets/room_detail/summary_strip.dart';
 import 'package:thermo_humi/features/room_management/presentation/widgets/room_detail/empty_device_state.dart';
 import 'package:thermo_humi/features/room_management/presentation/widgets/room_detail/add_device_button.dart';
+import 'package:thermo_humi/core/di/injection_container.dart';
+import 'package:thermo_humi/features/room/domain/usecases/get_room_usecase.dart';
 
 class RoomDetailScreen extends StatelessWidget {
   final String roomId;
@@ -24,7 +26,11 @@ class RoomDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => RoomManageCubit()..loadRoomData(roomId),
+      create: (_) =>
+          RoomManageCubit(
+            getRoomsUseCase: sl<GetRoomsUseCase>(),
+            deviceRepository: sl(),
+          )..loadRoomData(roomId),
       child: const _RoomDetailView(),
     );
   }
@@ -41,13 +47,7 @@ class _RoomDetailView extends StatelessWidget {
           previous.errorMessage != current.errorMessage,
       listener: (context, state) {
         if (state.status == RoomManageStatus.deleted) {
-          final result = RoomDetailResult(
-            isDeleted: true,
-            newDeviceCount: 0,
-            newOnlineCount: 0,
-            newName: '',
-          );
-          context.pop(result);
+          context.pop(true);
         }
         if (state.errorMessage != null) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -65,16 +65,15 @@ class _RoomDetailView extends StatelessWidget {
       },
       builder: (context, state) {
         if (state.status == RoomManageStatus.initial ||
-            (state.status == RoomManageStatus.loading &&
-                state.roomWithDevices == null)) {
+            (state.status == RoomManageStatus.loading && state.room == null)) {
           return const Scaffold(
             backgroundColor: Colors.white,
             body: Center(child: CircularProgressIndicator()),
           );
         }
 
-        final room = state.roomWithDevices!.room;
-        final devices = state.roomWithDevices!.devices;
+        final room = state.room!;
+        final devices = room.devices;
         final onlineCount = devices.where((d) => d.isOnline).length;
         final deviceCount = devices.length;
 
@@ -83,13 +82,7 @@ class _RoomDetailView extends StatelessWidget {
           onPopInvokedWithResult: (didPop, _) {
             if (didPop) return;
             if (state.hasChanges) {
-              final result = RoomDetailResult(
-                isDeleted: false,
-                newDeviceCount: deviceCount,
-                newOnlineCount: onlineCount,
-                newName: room.name,
-              );
-              context.pop(result);
+              context.pop(true);
             } else {
               context.pop();
             }
@@ -172,12 +165,7 @@ class _RoomDetailView extends StatelessWidget {
   }
 
   void _showAddDeviceOptionSheet(BuildContext context, String roomName) {
-    final roomId = context
-        .read<RoomManageCubit>()
-        .state
-        .roomWithDevices
-        ?.room
-        .id;
+    final roomId = context.read<RoomManageCubit>().state.room!.id;
     showModalBottomSheet(
       context: context,
       useRootNavigator: true,
@@ -186,13 +174,11 @@ class _RoomDetailView extends StatelessWidget {
         roomName: roomName,
         onAddNew: () {
           Navigator.pop(context); // Đóng sheet trước
-          if (roomId != null) {
-            // Navigate tới AddRoomScreen chế độ "chỉ thêm thiết bị"
-            context.pushNamed(
-              'add-room',
-              queryParameters: {'existingRoomId': roomId},
-            );
-          }
+          // Navigate tới AddRoomScreen chế độ "chỉ thêm thiết bị"
+          context.pushNamed(
+            'add-room',
+            queryParameters: {'existingRoomId': roomId},
+          );
         },
         onSelectUnassigned: () =>
             _showUnassignedDevicesSheet(context, roomName),
@@ -205,7 +191,19 @@ class _RoomDetailView extends StatelessWidget {
     String roomName,
   ) async {
     final cubit = context.read<RoomManageCubit>();
-    final unassigned = await cubit.getUnassignedDevices();
+    
+    // Show loading
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    final devices = await cubit.fetchUnassignedDevices();
+    
+    if (context.mounted) {
+      Navigator.pop(context); // close loading
+    }
 
     if (!context.mounted) return;
 
@@ -214,22 +212,23 @@ class _RoomDetailView extends StatelessWidget {
       useRootNavigator: true,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (_) =>
-          UnassignedDevicesSheet(devices: unassigned, roomName: roomName),
+      builder: (_) => UnassignedDevicesSheet(
+        devices: devices,
+        roomName: roomName,
+      ),
     );
 
     if (result != null && result.isNotEmpty && context.mounted) {
-      await cubit.assignExistingDevices(result);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Đã gán ${result.length} thiết bị vào phòng $roomName',
-            ),
-            backgroundColor: Colors.green.shade600,
+      // TODO: Call API to assign devices to this room.
+      // await cubit.assignDevicesToRoom(result, roomId);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Đã chọn ${result.length} thiết bị. Tính năng gán đang được hoàn thiện.',
           ),
-        );
-      }
+          backgroundColor: Colors.blue.shade600,
+        ),
+      );
     }
   }
 

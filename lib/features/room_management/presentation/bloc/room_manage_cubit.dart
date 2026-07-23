@@ -1,44 +1,98 @@
+import 'dart:convert';
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:thermo_humi/common/mock/mock_room_data.dart';
+import 'package:thermo_humi/core/constants/app_constants.dart';
+import 'package:thermo_humi/core/storage/secure_storage.dart';
+import 'package:thermo_humi/core/di/injection_container.dart';
 import 'package:thermo_humi/features/device/domain/entities/device_entity.dart';
 import 'package:thermo_humi/features/room/domain/entities/room_entity.dart';
+import 'package:thermo_humi/features/room/domain/usecases/get_room_usecase.dart';
 import 'package:thermo_humi/features/room_management/presentation/bloc/room_manage_state.dart';
-import 'package:thermo_humi/features/room/presentation/models/room_with_devices.dart';
 import 'package:thermo_humi/features/room/presentation/widgets/room_detail/device_filter_bar.dart';
+import 'package:thermo_humi/features/device/domain/repositories/device_repository.dart';
 
 class RoomManageCubit extends Cubit<RoomManageState> {
-  RoomManageCubit() : super(const RoomManageState());
+  final GetRoomsUseCase _getRoomsUseCase;
+  final DeviceRepository _deviceRepository;
+
+  RoomManageCubit({
+    required GetRoomsUseCase getRoomsUseCase,
+    required DeviceRepository deviceRepository,
+  }) : _getRoomsUseCase = getRoomsUseCase,
+       _deviceRepository = deviceRepository,
+       super(const RoomManageState());
 
   // ── Load ──────────────────────────────────────────────────────────────────
   Future<void> loadRoomData(String roomId) async {
     emit(state.copyWith(status: RoomManageStatus.loading));
-    await Future.delayed(const Duration(milliseconds: 300));
 
-    final allRooms = buildMockRooms();
-    final roomWithDevices = allRooms.firstWhere(
-      (r) => r.room.id == roomId,
-      orElse: () => RoomWithDevices(
-        room: RoomEntity(
-          id: roomId,
-          name: 'Phòng không xác định',
-          totalDevices: 0,
-          onlineDevices: 0,
-          alertCount: 0,
-          createdAt: DateTime.now(),
+    final userId = await _getUserId();
+    if (userId == null) {
+      emit(
+        state.copyWith(
+          status: RoomManageStatus.success, // Keep UI running
+          errorMessage: 'User ID not found',
         ),
-        devices: [],
-      ),
-    );
+      );
+      return;
+    }
 
-    emit(
-      state.copyWith(
-        status: RoomManageStatus.success,
-        roomWithDevices: roomWithDevices,
-        hasChanges: false,
+    final result = await _getRoomsUseCase.execute(userId);
+
+    result.fold(
+      (error) => emit(
+        state.copyWith(
+          status: RoomManageStatus.success, // Keep UI from crashing
+          errorMessage: error,
+        ),
       ),
+      (rooms) {
+        final roomWithDevices = rooms.firstWhere(
+          (r) => r.id == roomId,
+          orElse: () => RoomEntity(
+            id: roomId,
+            name: 'Phòng không xác định',
+            totalDevices: 0,
+            onlineDevices: 0,
+            alertCount: 0,
+            createdAt: DateTime.now(),
+          ),
+        );
+
+        emit(
+          state.copyWith(
+            status: RoomManageStatus.success,
+            room: roomWithDevices,
+            hasChanges: false,
+          ),
+        );
+      },
     );
+  }
+
+  Future<List<DeviceEntity>> fetchUnassignedDevices() async {
+    final userId = await _getUserId();
+    if (userId == null) return [];
+
+    final result = await _deviceRepository.getUnassignedDevices(userId);
+    return result.fold(
+      (error) => [], // Trả về mảng rỗng nếu lỗi (có thể xử lý log lỗi)
+      (devices) => devices,
+    );
+  }
+
+  // Lấy userId từ storage
+  Future<String?> _getUserId() async {
+    try {
+      final storage = sl<SecureStorage>();
+      final userDataStr = await storage.read(AppConstants.kUserData);
+      if (userDataStr != null) {
+        final Map<String, dynamic> userJson = jsonDecode(userDataStr);
+        return userJson['id']?.toString();
+      }
+    } catch (_) {}
+    return null;
   }
 
   // Filter
@@ -69,7 +123,7 @@ class RoomManageCubit extends Cubit<RoomManageState> {
 
   // Chuyển khỏi phòng này
   Future<bool> unassignDevice(String deviceId) async {
-    final currentRwd = state.roomWithDevices;
+    final currentRwd = state.room;
     if (currentRwd == null) return false;
 
     // Optimistic update
@@ -78,18 +132,18 @@ class RoomManageCubit extends Cubit<RoomManageState> {
         .toList();
     final onlineCount = newDevices.where((d) => d.isOnline).length;
     final newRoom = RoomEntity(
-      id: currentRwd.room.id,
-      name: currentRwd.room.name,
-      description: currentRwd.room.description,
+      id: currentRwd.id,
+      name: currentRwd.name,
+      description: currentRwd.description,
       totalDevices: newDevices.length,
       onlineDevices: onlineCount,
-      alertCount: currentRwd.room.alertCount,
-      createdAt: currentRwd.room.createdAt,
+      alertCount: currentRwd.alertCount,
+      createdAt: currentRwd.createdAt,
     );
 
     emit(
       state.copyWith(
-        roomWithDevices: RoomWithDevices(room: newRoom, devices: newDevices),
+        room: newRoom.copyWith(devices: newDevices),
         hasChanges: true,
       ),
     );
@@ -102,7 +156,7 @@ class RoomManageCubit extends Cubit<RoomManageState> {
       // Rollback on failure
       emit(
         state.copyWith(
-          roomWithDevices: currentRwd,
+          room: currentRwd,
           errorMessage: 'Không thể chuyển thiết bị. Vui lòng thử lại.',
         ),
       );
@@ -112,7 +166,7 @@ class RoomManageCubit extends Cubit<RoomManageState> {
 
   //  Delete Device (Xoá khỏi hệ thống)
   Future<bool> deleteDeviceCompletely(String deviceId) async {
-    final currentRwd = state.roomWithDevices;
+    final currentRwd = state.room;
     if (currentRwd == null) return false;
 
     // Optimistic update
@@ -121,18 +175,18 @@ class RoomManageCubit extends Cubit<RoomManageState> {
         .toList();
     final onlineCount = newDevices.where((d) => d.isOnline).length;
     final newRoom = RoomEntity(
-      id: currentRwd.room.id,
-      name: currentRwd.room.name,
-      description: currentRwd.room.description,
+      id: currentRwd.id,
+      name: currentRwd.name,
+      description: currentRwd.description,
       totalDevices: newDevices.length,
       onlineDevices: onlineCount,
-      alertCount: currentRwd.room.alertCount,
-      createdAt: currentRwd.room.createdAt,
+      alertCount: currentRwd.alertCount,
+      createdAt: currentRwd.createdAt,
     );
 
     emit(
       state.copyWith(
-        roomWithDevices: RoomWithDevices(room: newRoom, devices: newDevices),
+        room: newRoom.copyWith(devices: newDevices),
         hasChanges: true,
       ),
     );
@@ -143,7 +197,7 @@ class RoomManageCubit extends Cubit<RoomManageState> {
     } catch (_) {
       emit(
         state.copyWith(
-          roomWithDevices: currentRwd,
+          room: currentRwd,
           errorMessage: 'Không thể xoá thiết bị. Vui lòng thử lại.',
         ),
       );
@@ -153,24 +207,24 @@ class RoomManageCubit extends Cubit<RoomManageState> {
 
   // Assign Existing Devices (Gán thiết bị chưa có phòng vào phòng này)
   Future<bool> assignExistingDevices(List<DeviceEntity> devicesToAdd) async {
-    final currentRwd = state.roomWithDevices;
+    final currentRwd = state.room;
     if (currentRwd == null) return false;
 
     final newDevices = [...currentRwd.devices, ...devicesToAdd];
     final onlineCount = newDevices.where((d) => d.isOnline).length;
     final newRoom = RoomEntity(
-      id: currentRwd.room.id,
-      name: currentRwd.room.name,
-      description: currentRwd.room.description,
+      id: currentRwd.id,
+      name: currentRwd.name,
+      description: currentRwd.description,
       totalDevices: newDevices.length,
       onlineDevices: onlineCount,
-      alertCount: currentRwd.room.alertCount,
-      createdAt: currentRwd.room.createdAt,
+      alertCount: currentRwd.alertCount,
+      createdAt: currentRwd.createdAt,
     );
 
     emit(
       state.copyWith(
-        roomWithDevices: RoomWithDevices(room: newRoom, devices: newDevices),
+        room: newRoom.copyWith(devices: newDevices),
         hasChanges: true,
       ),
     );
@@ -181,7 +235,7 @@ class RoomManageCubit extends Cubit<RoomManageState> {
     } catch (_) {
       emit(
         state.copyWith(
-          roomWithDevices: currentRwd,
+          room: currentRwd,
           errorMessage: 'Không thể gán thiết bị. Vui lòng thử lại.',
         ),
       );
@@ -191,25 +245,22 @@ class RoomManageCubit extends Cubit<RoomManageState> {
 
   //  Rename Room
   Future<bool> renameRoom(String newName) async {
-    final currentRwd = state.roomWithDevices;
+    final currentRwd = state.room;
     if (currentRwd == null) return false;
 
     final updatedRoom = RoomEntity(
-      id: currentRwd.room.id,
+      id: currentRwd.id,
       name: newName,
-      description: currentRwd.room.description,
-      totalDevices: currentRwd.room.totalDevices,
-      onlineDevices: currentRwd.room.onlineDevices,
-      alertCount: currentRwd.room.alertCount,
-      createdAt: currentRwd.room.createdAt,
+      description: currentRwd.description,
+      totalDevices: currentRwd.totalDevices,
+      onlineDevices: currentRwd.onlineDevices,
+      alertCount: currentRwd.alertCount,
+      createdAt: currentRwd.createdAt,
     );
 
     emit(
       state.copyWith(
-        roomWithDevices: RoomWithDevices(
-          room: updatedRoom,
-          devices: currentRwd.devices,
-        ),
+        room: updatedRoom.copyWith(devices: currentRwd.devices),
         hasChanges: true,
       ),
     );
@@ -218,14 +269,14 @@ class RoomManageCubit extends Cubit<RoomManageState> {
       await Future.delayed(const Duration(milliseconds: 300));
       return true;
     } catch (_) {
-      emit(state.copyWith(roomWithDevices: currentRwd));
+      emit(state.copyWith(room: currentRwd));
       return false;
     }
   }
 
   // ── Delete Room (chỉ cho phép khi không còn thiết bị)
   Future<bool> deleteRoom() async {
-    final currentRwd = state.roomWithDevices;
+    final currentRwd = state.room;
     if (currentRwd == null) return false;
     if (currentRwd.devices.isNotEmpty) return false; // Business rule
 
@@ -239,12 +290,6 @@ class RoomManageCubit extends Cubit<RoomManageState> {
       emit(state.copyWith(status: RoomManageStatus.success));
       return false;
     }
-  }
-
-  // ── Get unassigned devices (mock) ─────────────────────────────────────────
-  Future<List<DeviceEntity>> getUnassignedDevices() async {
-    await Future.delayed(const Duration(milliseconds: 200));
-    return buildUnassignedDevices();
   }
 
   // ── Clear error ───────────────────────────────────────────────────────────

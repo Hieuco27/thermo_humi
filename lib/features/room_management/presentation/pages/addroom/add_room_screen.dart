@@ -95,7 +95,6 @@ class _AddRoomViewState extends State<_AddRoomView> {
               ),
             ),
           );
-          context.read<AddRoomCubit>().clearError();
         }
       },
       builder: (context, state) {
@@ -118,12 +117,7 @@ class _AddRoomViewState extends State<_AddRoomView> {
                         if (state.isNewRoomMode) ...[
                           const SectionLabel(label: 'Thêm phòng mới'),
                           SizedBox(height: 12.h),
-                          RoomNameInput(
-                            controller: _roomNameCtrl,
-                            onChanged: context
-                                .read<AddRoomCubit>()
-                                .updateRoomName,
-                          ),
+
                           SizedBox(height: 20.h),
                         ],
 
@@ -319,39 +313,22 @@ class _AddRoomViewState extends State<_AddRoomView> {
     }
   }
 
-  // ── Activate ─────────────────────────────────────────────────────────────
+  // ── Activate
   Future<void> _onActivate(BuildContext context) async {
     // Ẩn bàn phím
     FocusScope.of(context).unfocus();
 
     final cubit = context.read<AddRoomCubit>();
-    final result = await cubit.activate();
-
-    if (result != null && context.mounted) {
-      context.pop(result); // Trả kết quả về màn trước
-    }
   }
 
-  // ── Room Picker (flexible mode) ───────────────────────────────────────────
+  // ── Room Picker (flexible mode)
   Future<void> _showRoomPicker(BuildContext context) async {
     final cubit = context.read<AddRoomCubit>();
 
     // Lazy-load phòng lần đầu bấm mở picker
-    await cubit.loadAvailableRoomsIfNeeded();
 
     if (!context.mounted) return;
 
     final state = cubit.state;
-    showModalBottomSheet(
-      context: context,
-      useRootNavigator: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => RoomPickerSheet(
-        rooms: state.availableRooms,
-        isLoading: state.isLoadingRooms,
-        selectedRoomId: state.selectedRoomId,
-        onSelected: (roomId, roomName) => cubit.selectRoom(roomId, roomName),
-      ),
-    );
   }
 }

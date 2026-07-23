@@ -5,8 +5,7 @@ import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
 import 'package:thermo_humi/common/widgets/app_background.dart';
 import '../../../domain/entities/device_entity.dart';
-import '../../bloc/threshold_settings/threshold_settings_bloc.dart';
-import '../../bloc/threshold_settings/threshold_settings_event.dart';
+import '../../bloc/threshold_settings/threshold_settings_cubit.dart';
 import '../../bloc/threshold_settings/threshold_settings_state.dart';
 import '../../widgets/threshold_settings/temperature_threshold_card.dart';
 import '../../widgets/threshold_settings/humidity_threshold_card.dart';
@@ -18,7 +17,7 @@ class ThresholdSettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ThresholdSettingsBloc(),
+      create: (context) => ThresholdSettingsCubit(device),
       child: AppBackground(
         child: Scaffold(
           backgroundColor: Colors.transparent,
@@ -48,7 +47,7 @@ class ThresholdSettingsScreen extends StatelessWidget {
             ),
           ),
           body: SafeArea(
-            child: BlocListener<ThresholdSettingsBloc, ThresholdSettingsState>(
+            child: BlocListener<ThresholdSettingsCubit, ThresholdSettingsState>(
               listenWhen: (previous, current) =>
                   previous.status != current.status,
               listener: (context, state) {
@@ -95,7 +94,7 @@ class ThresholdSettingsScreen extends StatelessWidget {
   }
 
   Widget _buildPrimaryButton() {
-    return BlocBuilder<ThresholdSettingsBloc, ThresholdSettingsState>(
+    return BlocBuilder<ThresholdSettingsCubit, ThresholdSettingsState>(
       buildWhen: (previous, current) => previous.status != current.status,
       builder: (context, state) {
         final isLoading = state.status == ThresholdSettingsStatus.loading;
@@ -106,9 +105,7 @@ class ThresholdSettingsScreen extends StatelessWidget {
             onPressed: isLoading
                 ? null
                 : () {
-                    context.read<ThresholdSettingsBloc>().add(
-                      ApplySettingsRequested(device.id),
-                    );
+                    context.read<ThresholdSettingsCubit>().applySettings(device.id);
                   },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF1976D2),
@@ -192,9 +189,7 @@ class ThresholdSettingsScreen extends StatelessWidget {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              blocContext.read<ThresholdSettingsBloc>().add(
-                const ApplyToAllRequested(),
-              );
+              blocContext.read<ThresholdSettingsCubit>().applyToAll();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF1976D2),

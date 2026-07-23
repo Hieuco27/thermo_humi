@@ -1,21 +1,29 @@
+import 'dart:convert';
 import 'dart:math';
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
+import 'package:thermo_humi/core/constants/app_constants.dart';
+import 'package:thermo_humi/core/storage/secure_storage.dart';
+import 'package:thermo_humi/core/di/injection_container.dart';
+import 'package:thermo_humi/features/device/data/datasources/device_remote_data_source.dart';
 import 'package:thermo_humi/features/device/domain/entities/device_entity.dart';
 import 'package:thermo_humi/features/device/domain/entities/device_history_entity.dart';
 import 'package:thermo_humi/features/device/domain/entities/hourly_report_entity.dart';
 import 'package:thermo_humi/features/device/domain/repositories/device_repository.dart';
-import 'package:thermo_humi/features/room/domain/entities/room_entity.dart';
-import 'package:thermo_humi/common/mock/mock_room_data.dart';
 
 class DeviceRepositoryImpl implements DeviceRepository {
-  final _mockRooms = buildMockRooms();
+  final DeviceRemoteDataSource _dataSource;
 
+  DeviceRepositoryImpl(this._dataSource);
+
+  // ─────────────────────────────────────────────────────────────
+  // getDeviceHistory — mock (chưa có API thật)
+  // ─────────────────────────────────────────────────────────────
   @override
   Future<Either<String, DeviceHistoryDataEntity>> getDeviceHistory(
     String deviceId, {
     String range = '24h',
   }) async {
-    // Simulate network delay
     await Future.delayed(const Duration(seconds: 1));
 
     try {
@@ -52,24 +60,9 @@ class DeviceRepositoryImpl implements DeviceRepository {
     }
   }
 
-  @override
-  Future<Either<String, List<RoomEntity>>> getRooms() async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    return Right(_mockRooms.map((r) => r.room).toList());
-  }
-
-  @override
-  Future<Either<String, List<DeviceEntity>>> getRoomDevices(
-    String roomId,
-  ) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    final room = _mockRooms.where((r) => r.room.id == roomId).firstOrNull;
-    if (room != null) {
-      return Right(room.devices);
-    }
-    return Left('Room not found');
-  }
-
+  // ─────────────────────────────────────────────────────────────
+  // getDeviceReport — mock (chưa có API thật)
+  // ─────────────────────────────────────────────────────────────
   @override
   Future<Either<String, List<HourlyReportEntity>>> getDeviceReport(
     String deviceId,
@@ -78,33 +71,15 @@ class DeviceRepositoryImpl implements DeviceRepository {
     await Future.delayed(const Duration(seconds: 1));
 
     try {
-      // Find the device to get its thresholds
-      DeviceEntity? targetDevice;
-      for (final room in _mockRooms) {
-        final device = room.devices.where((d) => d.id == deviceId).firstOrNull;
-        if (device != null) {
-          targetDevice = device;
-          break;
-        }
-      }
-
-      final maxTemp = targetDevice?.threshold?.tempHigh ?? 35.0;
-      final maxHumid = targetDevice?.threshold?.humidHigh ?? 80.0;
-
+      const maxTemp = 35.0;
+      const maxHumid = 80.0;
       final random = Random();
       final List<HourlyReportEntity> reportData = [];
 
-      // Generate 24 records for the specified date (from 00:00 to 23:00)
       for (int i = 0; i < 24; i++) {
         final time = DateTime(date.year, date.month, date.day, i, 0);
-
-        // Randomly generate values around thresholds to show alerts
-        final temp =
-            maxTemp - 10 + random.nextDouble() * 20; // Some will exceed
-        final humid =
-            maxHumid - 20 + random.nextDouble() * 40; // Some will exceed
-
-        // Random signal strength (-50 to -110)
+        final temp = maxTemp - 10 + random.nextDouble() * 20;
+        final humid = maxHumid - 20 + random.nextDouble() * 40;
         final signalStr = -50 - random.nextInt(60);
 
         ConnectionStatus status;
@@ -137,6 +112,9 @@ class DeviceRepositoryImpl implements DeviceRepository {
     }
   }
 
+  // ─────────────────────────────────────────────────────────────
+  // getDevices — 1 API call duy nhất lấy tất cả thiết bị
+  // ─────────────────────────────────────────────────────────────
   @override
   Future<Either<String, PaginatedDeviceResult>> getDevices({
     String? roomId,
@@ -146,64 +124,113 @@ class DeviceRepositoryImpl implements DeviceRepository {
     int page = 1,
     int limit = 20,
   }) async {
-    // Giả lập network delay
     await Future.delayed(const Duration(milliseconds: 500));
 
     try {
-      List<DeviceEntity> allDevices = [];
-
-      // Phẳng hoá danh sách thiết bị từ các phòng và gán tên phòng
-      for (final roomWithDevices in buildMockRooms()) {
-        for (final device in roomWithDevices.devices) {
-          allDevices.add(device.copyWith(roomName: roomWithDevices.room.name));
-        }
-      }
-      
-      // Thêm các thiết bị chưa gán phòng
-      for (final device in buildUnassignedDevices()) {
-         allDevices.add(device.copyWith(roomName: null));
+      // 1. Lấy userId từ SecureStorage
+      final storage = sl<SecureStorage>();
+      final userDataStr = await storage.read(AppConstants.kUserData);
+      String? userId;
+      if (userDataStr != null) {
+        final Map<String, dynamic> userJson = jsonDecode(userDataStr);
+        userId = userJson['id']?.toString();
       }
 
-      // 1. Lọc theo phòng (nếu có)
+      if (userId == null) {
+        return const Right(PaginatedDeviceResult(devices: [], totalCount: 0));
+      }
+
+      // 2. Một API call duy nhất — trả về tất cả devices (có phòng + chưa gán)
+      List<DeviceEntity> allDevices = await _dataSource.getAllDevices(userId);
+
+      // 3. Lọc theo phòng
       if (roomId != null && roomId.isNotEmpty) {
         allDevices = allDevices.where((d) => d.roomId == roomId).toList();
       }
 
-      // 2. Lọc theo trạng thái
+      // 4. Lọc theo trạng thái
       if (statusFilter != null && statusFilter != 'all') {
         if (statusFilter == 'online') {
-          allDevices = allDevices.where((d) => d.status == DeviceStatus.online).toList();
+          allDevices = allDevices
+              .where((d) => d.status == DeviceStatus.online)
+              .toList();
         } else if (statusFilter == 'offline') {
-          allDevices = allDevices.where((d) => d.status == DeviceStatus.offline).toList();
+          allDevices = allDevices
+              .where((d) => d.status == DeviceStatus.offline)
+              .toList();
         }
       }
 
-      // 3. Tìm kiếm theo tên
+      // 5. Tìm kiếm theo tên
       if (search != null && search.trim().isNotEmpty) {
         final q = search.trim().toLowerCase();
-        allDevices = allDevices.where((d) => d.name.toLowerCase().contains(q)).toList();
+        allDevices = allDevices
+            .where((d) => d.name.toLowerCase().contains(q))
+            .toList();
       }
 
-      // 4. Sắp xếp
-      // Mặc định là A-Z
+      // 6. Sắp xếp A-Z (mặc định) hoặc Z-A
       allDevices.sort((a, b) => a.name.compareTo(b.name));
       if (sortOrder == 'Z-A') {
         allDevices = allDevices.reversed.toList();
       }
 
-      // 5. Phân trang
+      // 7. Phân trang
       final totalCount = allDevices.length;
       final startIndex = (page - 1) * limit;
-      
       List<DeviceEntity> pagedDevices = [];
       if (startIndex < totalCount) {
         final endIndex = min(startIndex + limit, totalCount);
         pagedDevices = allDevices.sublist(startIndex, endIndex);
       }
 
-      return Right(PaginatedDeviceResult(devices: pagedDevices, totalCount: totalCount));
+      return Right(
+        PaginatedDeviceResult(devices: pagedDevices, totalCount: totalCount),
+      );
     } catch (e) {
       return Left(e.toString());
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // addDevice — delegate sang datasource
+  // ─────────────────────────────────────────────────────────────
+  @override
+  Future<Either<String, void>> addDevice({
+    required String imei,
+    required String deviceName,
+    required String userId,
+  }) async {
+    try {
+      await _dataSource.addDevice(
+        imei: imei,
+        deviceName: deviceName,
+        userId: userId,
+      );
+      return const Right(null);
+    } on DioException catch (e) {
+      return Left('Lỗi kết nối: ${e.message}');
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // getUnassignedDevices — lấy tất cả rồi lọc chưa gán phòng
+  // ─────────────────────────────────────────────────────────────
+  @override
+  Future<Either<String, List<DeviceEntity>>> getUnassignedDevices(
+    String userId,
+  ) async {
+    try {
+      final all = await _dataSource.getAllDevices(userId);
+      // Lọc ra thiết bị không có roomName = chưa gán phòng
+      final unassigned = all.where((d) => d.roomName == null).toList();
+      return Right(unassigned);
+    } on DioException catch (e) {
+      return Left('Lỗi kết nối: ${e.message}');
+    } catch (e) {
+      return Left('Đã có lỗi xảy ra: $e');
     }
   }
 }

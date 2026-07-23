@@ -19,6 +19,12 @@ String _formatRelativeTime(DateTime? dt) {
   return '${diff.inDays} ngày';
 }
 
+String _formatExact(double? val) {
+  if (val == null) return '--';
+  if (val == val.toInt()) return val.toInt().toString();
+  return val.toString();
+}
+
 class DeviceListItem extends StatefulWidget {
   final DeviceEntity device;
   final VoidCallback? onTap;
@@ -98,7 +104,7 @@ class _DeviceListItemState extends State<DeviceListItem> {
               boxShadow: [
                 BoxShadow(
                   color: isAlert
-                      ? AppColors.dashboardWarning.withValues(alpha: 0.2)
+                      ? AppColors.dashboardWarning.withValues(alpha: 0.3)
                       : AppColors.backgroundColor.withValues(alpha: 0.3),
                   blurRadius: 6,
                   offset: const Offset(0, 2),
@@ -141,7 +147,7 @@ class _DeviceListItemState extends State<DeviceListItem> {
                             Flexible(
                               child: Text(
                                 widget.device.name,
-                                style: AppTextStyles.titleSmall3(),
+                                style: AppTextStyles.labelLarge2().copyWith(),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
@@ -154,7 +160,7 @@ class _DeviceListItemState extends State<DeviceListItem> {
                             _MetricChip(
                               icon: Icons.thermostat_outlined,
                               value: widget.device.currentTemperature != null
-                                  ? '${widget.device.currentTemperature!.toStringAsFixed(1)}°C'
+                                  ? '${_formatExact(widget.device.currentTemperature)}°C'
                                   : '--',
                               isAlert: widget.device.isTemperatureAlert,
                             ),
@@ -162,7 +168,7 @@ class _DeviceListItemState extends State<DeviceListItem> {
                             _MetricChip(
                               icon: Icons.water_drop_outlined,
                               value: widget.device.currentHumidity != null
-                                  ? '${widget.device.currentHumidity!.toStringAsFixed(0)}%'
+                                  ? '${_formatExact(widget.device.currentHumidity)}%'
                                   : '--',
                               isAlert: widget.device.isHumidityAlert,
                             ),
@@ -187,12 +193,12 @@ class _DeviceListItemState extends State<DeviceListItem> {
                           Icon(
                             Icons.access_time_rounded,
                             size: 15.sp,
-                            color: const Color(0xFF8E8E93),
+                            color: AppColors.textSecondary,
                           ),
                           SizedBox(width: 3.w),
                           Text(
                             _formatRelativeTime(widget.device.lastUpdatedAt),
-                            style: AppTextStyles.titleSmall(),
+                            style: AppTextStyles.label13(),
                           ),
                         ],
                       ),
@@ -208,7 +214,7 @@ class _DeviceListItemState extends State<DeviceListItem> {
   }
 }
 
-// ── Status dot ─────────────────────────────────────────────────────────────
+// Status dot
 class _StatusDot extends StatelessWidget {
   final bool isOnline;
   final bool hasAlert;
@@ -232,13 +238,7 @@ class _StatusDot extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: color,
-            boxShadow: [
-              BoxShadow(
-                color: color.withValues(alpha: 0.1),
-                blurRadius: 6,
-                spreadRadius: 1,
-              ),
-            ],
+            boxShadow: [],
           ),
         ),
       ],
@@ -246,7 +246,7 @@ class _StatusDot extends StatelessWidget {
   }
 }
 
-// ── Metric chip
+// Metric chip
 class _MetricChip extends StatelessWidget {
   final IconData icon;
   final String value;
@@ -268,14 +268,13 @@ class _MetricChip extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(width: 15.w),
-        Icon(icon, size: 12.sp, color: color),
+        Icon(icon, size: 15.sp, color: color),
         SizedBox(width: 3.w),
         Text(
           value,
-          style: GoogleFonts.inter(
-            fontSize: 12.sp,
-            fontWeight: isAlert ? FontWeight.w700 : FontWeight.w500,
+          style: AppTextStyles.label13(
             color: color,
+            fontWeight: isAlert ? FontWeight.w700 : FontWeight.w500,
           ),
         ),
       ],
@@ -283,7 +282,7 @@ class _MetricChip extends StatelessWidget {
   }
 }
 
-// ── Connectivity widget ─────────────────────────────────────────────────────
+// Connectivity widget
 class _ConnectivityWidget extends StatelessWidget {
   final ConnectivityStatus status;
 
@@ -321,9 +320,9 @@ class _ConnectivityWidget extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 14.sp, color: color),
+        Icon(icon, size: 15.sp, color: color),
         SizedBox(width: 3.w),
-        Text(label, style: AppTextStyles.titleSmall()),
+        Text(label, style: AppTextStyles.label13()),
       ],
     );
   }

@@ -26,12 +26,6 @@ class DeviceManagementCubit extends Cubit<DeviceManagementState> {
       limit: _limit,
     );
 
-    // tải các phòng nếu chưa được tải
-    if (state.rooms.isEmpty) {
-      final roomsResult = await _repository.getRooms();
-      roomsResult.fold((l) => null, (r) => emit(state.copyWith(rooms: r)));
-    }
-
     result.fold(
       (failure) => emit(state.copyWith(isLoading: false, error: failure)),
       (data) {

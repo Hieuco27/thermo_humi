@@ -9,7 +9,7 @@ import 'package:thermo_humi/core/di/injection_container.dart';
 import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/features/room/presentation/bloc/room_list/room_list_cubit.dart';
 import 'package:thermo_humi/features/room/presentation/bloc/room_list/room_list_state.dart';
-import 'package:thermo_humi/features/room/presentation/models/room_with_devices.dart';
+
 import 'package:thermo_humi/features/room/presentation/pages/room_detail_page.dart';
 import 'package:thermo_humi/features/room/presentation/widgets/room_list/animated_item.dart';
 import 'package:thermo_humi/features/room/presentation/widgets/room_list/global_summary_bar.dart';
@@ -41,7 +41,6 @@ class _RoomListViewState extends State<_RoomListView>
   late AnimationController _fadeCtrl;
   late Animation<double> _fadeAnim;
 
-  // Phòng nào đang mở rộng
   final Set<String> _expandedRooms = {};
 
   @override
@@ -71,10 +70,10 @@ class _RoomListViewState extends State<_RoomListView>
     });
   }
 
-  void _navigateToRoomDetail(RoomWithDevices rwd) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => RoomDetailPage(roomId: rwd.room.id)),
-    );
+  void _navigateToRoomDetail(String roomId) {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => RoomDetailPage(roomId: roomId)));
   }
 
   @override
@@ -92,20 +91,15 @@ class _RoomListViewState extends State<_RoomListView>
         ),
         body: BlocConsumer<RoomListCubit, RoomListState>(
           listener: (context, state) {
-            // Khi load thành công → chạy animation fade-in
             if (state.isSuccess) {
               _fadeCtrl.forward(from: 0);
             }
           },
           builder: (context, state) {
-            // ── Loading ──
             if (state.isLoading) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
+              return const Center(child: CircularProgressIndicator());
             }
 
-            // ── Lỗi ──
             if (state.isFailure) {
               return Center(
                 child: Padding(
@@ -140,7 +134,6 @@ class _RoomListViewState extends State<_RoomListView>
               );
             }
 
-            // ── Danh sách trống ──
             if (state.isEmpty) {
               return Center(
                 child: Column(
@@ -154,24 +147,26 @@ class _RoomListViewState extends State<_RoomListView>
                     SizedBox(height: 12.h),
                     Text(
                       'Chưa có phòng nào',
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        color: Colors.white54,
-                      ),
+                      style: TextStyle(fontSize: 14.sp, color: Colors.white54),
                     ),
                   ],
                 ),
               );
             }
 
-            // ── Thành công — hiển thị danh sách ──
             final rooms = state.rooms;
-            final int totalDevices =
-                rooms.fold(0, (sum, r) => sum + r.room.totalDevices);
-            final int totalOnline =
-                rooms.fold(0, (sum, r) => sum + r.room.onlineDevices);
-            final int totalAlerts =
-                rooms.fold(0, (sum, r) => sum + r.room.alertCount);
+            final int totalDevices = rooms.fold(
+              0,
+              (sum, r) => sum + r.totalDevices,
+            );
+            final int totalOnline = rooms.fold(
+              0,
+              (sum, r) => sum + r.onlineDevices,
+            );
+            final int totalAlerts = rooms.fold(
+              0,
+              (sum, r) => sum + r.alertCount,
+            );
 
             return FadeTransition(
               opacity: _fadeAnim,
@@ -179,33 +174,26 @@ class _RoomListViewState extends State<_RoomListView>
                 onRefresh: () => context.read<RoomListCubit>().refresh(),
                 child: Column(
                   children: [
-                    // ── Global summary bar ──
                     GlobalSummaryBar(
                       totalRooms: rooms.length,
                       totalDevices: totalDevices,
                       totalOnline: totalOnline,
                       totalAlerts: totalAlerts,
                     ),
-
-                    // ── Room list ──
                     Expanded(
                       child: ListView.builder(
-                        padding:
-                            EdgeInsets.only(top: 8.h, bottom: 24.h),
+                        padding: EdgeInsets.only(top: 8.h, bottom: 24.h),
                         itemCount: rooms.length,
                         itemBuilder: (context, index) {
-                          final rwd = rooms[index];
-                          final isExpanded =
-                              _expandedRooms.contains(rwd.room.id);
+                          final room = rooms[index];
+                          final isExpanded = _expandedRooms.contains(room.id);
                           return AnimatedItem(
                             index: index,
                             child: RoomCard(
-                              rwd: rwd,
+                              room: room,
                               isExpanded: isExpanded,
-                              onHeaderTap: () =>
-                                  _toggleRoom(rwd.room.id),
-                              onViewAll: () =>
-                                  _navigateToRoomDetail(rwd),
+                              onHeaderTap: () => _toggleRoom(room.id),
+                              onViewAll: () => _navigateToRoomDetail(room.id),
                             ),
                           );
                         },
