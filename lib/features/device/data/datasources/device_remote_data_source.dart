@@ -2,7 +2,7 @@
 /// Định nghĩa contract cho tất cả các lời gọi HTTP liên quan đến thiết bị.
 library;
 
-import 'package:thermo_humi/features/room/data/models/device_model.dart';
+import 'package:thermo_humi/features/device/data/models/device_model.dart';
 
 abstract class DeviceRemoteDataSource {
   Future<List<DeviceModel>> getAllDevices(String userId);

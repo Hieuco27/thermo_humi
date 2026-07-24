@@ -26,4 +26,20 @@ class RoomRepositoryImpl implements RoomRepository {
       return Left(e.toString());
     }
   }
+
+  @override
+  Future<Either<String, void>> addRoom(String name) async {
+    try {
+      await _remoteDataSource.addRoom(name);
+      return const Right(null);
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      final errorMessage = (data is Map && data.containsKey('message')) 
+          ? data['message'] 
+          : e.message;
+      return Left(errorMessage?.toString() ?? 'Unknown error');
+    } catch (e) {
+      return Left(e.toString());
+    }
+  }
 }

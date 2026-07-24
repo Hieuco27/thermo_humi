@@ -107,86 +107,96 @@ class _RoomManagementScreenState extends State<RoomManagementScreen> {
 
                     // Bloc Builder
                     Expanded(
-                      child: BlocBuilder<RoomManagementListCubit, RoomManagementListState>(
-                        builder: (context, state) {
-                          if (state.isLoading) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          } else if (state.isFailure) {
-                            return Center(
-                              child: Text('Lỗi: ${state.errorMessage}'),
-                            );
-                          }
+                      child:
+                          BlocBuilder<
+                            RoomManagementListCubit,
+                            RoomManagementListState
+                          >(
+                            builder: (context, state) {
+                              if (state.isLoading) {
+                                return const Center(
+                                  child: CircularProgressIndicator(),
+                                );
+                              } else if (state.isFailure) {
+                                return Center(
+                                  child: Text('Lỗi: ${state.errorMessage}'),
+                                );
+                              }
 
-                          final allRooms = state.rooms;
-                          final filteredRooms = _searchQuery.isEmpty
-                              ? allRooms
-                              : allRooms
-                                    .where(
-                                      (room) => room.name
-                                          .toLowerCase()
-                                          .contains(_searchQuery),
-                                    )
-                                    .toList();
+                              final allRooms = state.rooms;
+                              final displayRooms = allRooms
+                                  .where((r) => r.id != 'UNASSIGNED')
+                                  .toList();
+                              final filteredRooms = _searchQuery.isEmpty
+                                  ? displayRooms
+                                  : displayRooms
+                                        .where(
+                                          (room) => room.name
+                                              .toLowerCase()
+                                              .contains(_searchQuery),
+                                        )
+                                        .toList();
 
-                          return Column(
-                            children: [
-                              // Summary line
-                              Padding(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: 12.w,
-                                  vertical: 10.h,
-                                ),
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    '${allRooms.length} phòng · ${_getTotalDevices(allRooms)} thiết bị',
-                                    style: AppTextStyles.bodyMedium(
-                                      color: Colors.grey,
+                              return Column(
+                                children: [
+                                  // Summary line
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 12.w,
+                                      vertical: 10.h,
                                     ),
-                                  ),
-                                ),
-                              ),
-
-                              // Room List
-                              Expanded(
-                                child: filteredRooms.isEmpty
-                                    ? EmptySearchState(query: _searchQuery)
-                                    : RefreshIndicator(
-                                        onRefresh: () async {
-                                          await context
-                                              .read<RoomManagementListCubit>()
-                                              .refresh();
-                                        },
-                                        child: ListView.separated(
-                                          padding: EdgeInsets.only(
-                                            left: 8.w,
-                                            right: 8.w,
-                                            top: 4.h,
-                                            // Chừa khoảng trống cho nút AddRoomButton ở dưới cùng
-                                            bottom: 80.h,
-                                          ),
-                                          itemCount: filteredRooms.length,
-                                          separatorBuilder: (_, __) =>
-                                              SizedBox(height: 14.h),
-                                          itemBuilder: (context, index) {
-                                            final room = filteredRooms[index];
-                                            return RoomManagementCard(
-                                              room: room,
-                                              onTap: () => _openRoomDetail(
-                                                context,
-                                                room,
-                                              ),
-                                            );
-                                          },
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        '${displayRooms.length} phòng ',
+                                        style: AppTextStyles.bodyMedium(
+                                          color: Colors.grey,
                                         ),
                                       ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
+                                    ),
+                                  ),
+
+                                  // Room List
+                                  Expanded(
+                                    child: filteredRooms.isEmpty
+                                        ? EmptySearchState(query: _searchQuery)
+                                        : RefreshIndicator(
+                                            onRefresh: () async {
+                                              await context
+                                                  .read<
+                                                    RoomManagementListCubit
+                                                  >()
+                                                  .refresh();
+                                            },
+                                            child: ListView.separated(
+                                              padding: EdgeInsets.only(
+                                                left: 8.w,
+                                                right: 8.w,
+                                                top: 4.h,
+                                                // Chừa khoảng trống cho nút AddRoomButton ở dưới cùng
+                                                bottom: 80.h,
+                                              ),
+                                              itemCount: filteredRooms.length,
+                                              separatorBuilder: (_, __) =>
+                                                  SizedBox(height: 14.h),
+                                              itemBuilder: (context, index) {
+                                                final room =
+                                                    filteredRooms[index];
+                                                return RoomManagementCard(
+                                                  room: room,
+                                                  onTap: () => _openRoomDetail(
+                                                    context,
+                                                    room,
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
                     ),
                   ],
                 ),
@@ -225,7 +235,6 @@ class _RoomManagementScreenState extends State<RoomManagementScreen> {
     );
 
     if (result != null && mounted) {
-      // Reload rooms to get updated details (like device counts, room names)
       context.read<RoomManagementListCubit>().refresh();
     }
   }

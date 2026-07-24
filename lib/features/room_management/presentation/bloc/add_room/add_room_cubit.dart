@@ -92,4 +92,31 @@ class AddRoomCubit extends Cubit<AddRoomState> {
       emit(state.copyWith(clearDeviceCode: true, validationError: error));
     }
   }
+
+  void updateRoomName(String value) {
+    emit(state.copyWith(roomName: value, clearErrorMessage: true));
+  }
+
+  Future<void> createRoom() async {
+    if (!state.canActivate) return;
+    emit(
+      state.copyWith(status: AddRoomStatus.submitting, clearErrorMessage: true),
+    );
+    
+    if (state.isNewRoomMode) {
+      final result = await _repository.addRoom(state.roomName);
+      result.fold(
+        (error) => emit(state.copyWith(
+          status: AddRoomStatus.error, 
+          errorMessage: error,
+        )),
+        (_) => emit(state.copyWith(status: AddRoomStatus.success)),
+      );
+    } else {
+      // Fake logic cho tính năng Thêm thiết bị vào phòng có sẵn (chưa có API yêu cầu triển khai)
+      Future.delayed(const Duration(seconds: 1), () {
+        emit(state.copyWith(status: AddRoomStatus.success));
+      });
+    }
+  }
 }

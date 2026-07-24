@@ -12,18 +12,53 @@ class RoomRemoteDataSourceImpl implements RoomRemoteDataSource {
   @override
   Future<List<RoomModel>> getRooms(String userId) async {
     final response = await _dio.post(
-      '${AppConfig.baseUrl}${ApiEndpoints.locationQuery}',
-      data: {"type": 4},
+      ApiEndpoints.deviceQuery,
+      data: {"type": 1},
     );
 
-    dynamic data = response.data;
-    if (data is Map && data.containsKey('data')) {
-      data = data['data'];
-    }
+    if (response.statusCode == 200 && response.data != null) {
+      final body = response.data;
+      if (body['success'] == true && body['data'] != null) {
+        final dataObj = body['data'];
+        if (dataObj['locations'] is List) {
+          final List locations = dataObj['locations'];
+          final List<RoomModel> allRooms = [];
 
-    if (data is List) {
-      return data.map((e) => RoomModel.fromJson(e)).toList();
+          for (final loc in locations) {
+            // Chỉ lấy các phòng có tên (bỏ qua phòng không tên / UNASSIGNED nếu có)
+            if (loc['name'] != null &&
+                loc['name'].toString().trim().isNotEmpty) {
+              allRooms.add(RoomModel.fromJson(loc as Map<String, dynamic>));
+            }
+          }
+
+          return allRooms;
+        }
+      }
     }
     return [];
+  }
+
+  @override
+  Future<void> addRoom(String name) async {
+    final response = await _dio.post(
+      ApiEndpoints.locationUpdate,
+      data: {
+        "actionType": 4,
+        "info": {"name": name},
+      },
+    );
+
+    if (response.statusCode != null &&
+        response.statusCode! >= 200 &&
+        response.statusCode! < 300 &&
+        response.data != null) {
+      final body = response.data;
+      if (body['success'] != true) {
+        throw Exception(body['message'] ?? 'Lỗi khi tạo phòng mới');
+      }
+    } else {
+      throw Exception('Lỗi kết nối máy chủ khi tạo phòng');
+    }
   }
 }

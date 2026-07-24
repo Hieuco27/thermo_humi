@@ -147,14 +147,33 @@ class _HomeView extends StatelessWidget {
                       )
                     // Danh sách khu vực
                     else
-                      ListView.separated(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: rooms.length,
-                        separatorBuilder: (_, __) => SizedBox(height: 12.h),
-                        itemBuilder: (context, index) {
-                          return AreaListItem(room: rooms[index]);
-                        },
+                      Builder(
+                        builder: (context) {
+                          final displayRooms = rooms.where((r) => r.id != 'UNASSIGNED').toList();
+                          if (displayRooms.isEmpty) {
+                            return Center(
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(vertical: 24.h),
+                                child: Text(
+                                  'Chưa có khu vực nào',
+                                  style: TextStyle(
+                                    fontSize: 13.sp,
+                                    color: Colors.white54,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+                          return ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: displayRooms.length,
+                            separatorBuilder: (_, __) => SizedBox(height: 12.h),
+                            itemBuilder: (context, index) {
+                              return AreaListItem(room: displayRooms[index]);
+                            },
+                          );
+                        }
                       ),
 
                     SizedBox(height: 20.h),

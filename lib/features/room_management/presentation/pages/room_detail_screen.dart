@@ -26,11 +26,11 @@ class RoomDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) =>
-          RoomManageCubit(
-            getRoomsUseCase: sl<GetRoomsUseCase>(),
-            deviceRepository: sl(),
-          )..loadRoomData(roomId),
+      create: (_) => RoomManageCubit(
+        getRoomsUseCase: sl<GetRoomsUseCase>(),
+        getUnassignedDevicesUseCase: sl(),
+        getUserProfileUseCase: sl(),
+      )..loadRoomData(roomId),
       child: const _RoomDetailView(),
     );
   }
@@ -65,10 +65,30 @@ class _RoomDetailView extends StatelessWidget {
       },
       builder: (context, state) {
         if (state.status == RoomManageStatus.initial ||
-            (state.status == RoomManageStatus.loading && state.room == null)) {
-          return const Scaffold(
+            state.status == RoomManageStatus.loading) {
+          if (state.room == null) {
+            return const Scaffold(
+              backgroundColor: Colors.white,
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+        }
+
+        if (state.room == null) {
+          return Scaffold(
             backgroundColor: Colors.white,
-            body: Center(child: CircularProgressIndicator()),
+            appBar: AppBar(
+              title: const Text('Lỗi'),
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+            body: Center(
+              child: Text(
+                state.errorMessage ?? 'Không tìm thấy thông tin phòng.',
+              ),
+            ),
           );
         }
 
@@ -191,7 +211,7 @@ class _RoomDetailView extends StatelessWidget {
     String roomName,
   ) async {
     final cubit = context.read<RoomManageCubit>();
-    
+
     // Show loading
     showDialog(
       context: context,
@@ -200,7 +220,7 @@ class _RoomDetailView extends StatelessWidget {
     );
 
     final devices = await cubit.fetchUnassignedDevices();
-    
+
     if (context.mounted) {
       Navigator.pop(context); // close loading
     }
@@ -212,10 +232,8 @@ class _RoomDetailView extends StatelessWidget {
       useRootNavigator: true,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (_) => UnassignedDevicesSheet(
-        devices: devices,
-        roomName: roomName,
-      ),
+      builder: (_) =>
+          UnassignedDevicesSheet(devices: devices, roomName: roomName),
     );
 
     if (result != null && result.isNotEmpty && context.mounted) {

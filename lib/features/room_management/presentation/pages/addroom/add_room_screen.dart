@@ -1,10 +1,3 @@
-/// AddRoomScreen — màn hình thêm phòng / thêm thiết bị
-/// 3 mode:
-///  - forceNewRoom  (existingRoomId=null, isFlexible=false) → tạo phòng + thiết bị tùy chọn
-///  - lockedToRoom  (existingRoomId!=null, isFlexible=false) → chỉ thêm thiết bị vào phòng cố định
-///  - flexible      (existingRoomId=null, isFlexible=true)  → chọn phòng từ picker hoặc không gán
-library;
-
 import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
+
 import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
 import 'package:thermo_humi/core/di/injection_container.dart';
@@ -26,13 +20,10 @@ import 'package:thermo_humi/features/room_management/presentation/pages/addroom/
 import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/add_room/qr_scanner_sheet.dart';
 import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/add_room/room_name_input.dart';
 import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/add_room/scan_option_sheet.dart';
-import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/add_room/room_picker_sheet.dart';
-import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/room_selector_field.dart';
 import 'package:thermo_humi/features/room_management/presentation/pages/addroom/widgets/section_label.dart';
 
 class AddRoomScreen extends StatelessWidget {
   final String? existingRoomId;
-
   final bool isFlexible;
 
   const AddRoomScreen({
@@ -79,11 +70,21 @@ class _AddRoomViewState extends State<_AddRoomView> {
       listenWhen: (prev, curr) =>
           prev.status != curr.status || prev.errorMessage != curr.errorMessage,
       listener: (context, state) {
-        // Thành công → pop về màn trước với result
         if (state.status == AddRoomStatus.success) {
-          // Result đã được trả từ cubit.activate() — xử lý trong _onActivate
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.isNewRoomMode ? 'Thêm phòng thành công!' : 'Thêm thiết bị thành công!'),
+              backgroundColor: AppColors.dashboardSuccess,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.r),
+              ),
+            ),
+          );
+          // Return the room name when popping so caller knows what was created
+          context.pop(state.roomName);
         }
-        // Lỗi API → show snackbar
+
         if (state.errorMessage != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -106,36 +107,19 @@ class _AddRoomViewState extends State<_AddRoomView> {
             child: LayoutBuilder(
               builder: (_, constraints) => SingleChildScrollView(
                 child: ConstrainedBox(
-                  // Container luôn kéo dài ít nhất bằng toàn bộ chiều cao còn lại
                   constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: Container(
                     padding: EdgeInsets.all(12.w),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // ── forceNewRoom: ô nhập tên phòng ──
                         if (state.isNewRoomMode) ...[
-                          const SectionLabel(label: 'Thêm phòng mới'),
+                          const SectionLabel(label: 'Tên phòng mới'),
                           SizedBox(height: 12.h),
-
-                          SizedBox(height: 20.h),
-                        ],
-
-                        // ── flexible: ô chọn phòng từ picker ──
-                        if (state.isFlexibleMode) ...[
-                          const SectionLabel(label: 'Chọn phòng'),
-                          SizedBox(height: 6.h),
-                          Text(
-                            'Tùy chọn — thiết bị có thể hoạt động mà không cần gán phòng',
-                            style: AppTextStyles.bodySmall(color: Colors.grey),
+                          RoomNameInput(
+                            controller: _roomNameCtrl,
+                            onChanged: context.read<AddRoomCubit>().updateRoomName,
                           ),
-                          SizedBox(height: 10.h),
-                          RoomSelectorField(
-                            selectedRoomName: state.selectedRoomName,
-                            onTap: () => _showRoomPicker(context),
-                          ),
-                          SizedBox(height: 10.h),
-                          Divider(color: Colors.grey.shade200, height: 1),
                           SizedBox(height: 20.h),
                         ],
 
@@ -156,9 +140,7 @@ class _AddRoomViewState extends State<_AddRoomView> {
                         // Ô nhập IMEI
                         ImeiInputField(
                           controller: _imeiCtrl,
-                          onChanged: context
-                              .read<AddRoomCubit>()
-                              .updateImeiInput,
+                          onChanged: context.read<AddRoomCubit>().updateImeiInput,
                           errorText: state.validationError,
                         ),
 
@@ -170,12 +152,16 @@ class _AddRoomViewState extends State<_AddRoomView> {
                             source: state.deviceSource,
                           ),
                         ],
-                        // ── Nút Kích hoạt ở cuối container ──
-                        SizedBox(height: 20.h),
+
+                        SizedBox(height: 40.h),
                         ActivateButton(
+                          title: state.isNewRoomMode ? 'Tạo phòng' : 'Thêm thiết bị',
                           isEnabled: state.canActivate,
                           isLoading: state.isSubmitting,
-                          onTap: () => _onActivate(context),
+                          onTap: () {
+                            FocusScope.of(context).unfocus();
+                            context.read<AddRoomCubit>().createRoom();
+                          },
                         ),
                       ],
                     ),
@@ -190,14 +176,6 @@ class _AddRoomViewState extends State<_AddRoomView> {
   }
 
   AppBar _buildAppBar(BuildContext context, AddRoomState state) {
-    final String title;
-    if (state.isFlexibleMode) {
-      title = 'Thêm thiết bị mới';
-    } else if (state.isNewRoomMode) {
-      title = 'Thêm phòng mới';
-    } else {
-      title = 'Thêm thiết bị';
-    }
     return AppBar(
       backgroundColor: AppColors.gradientEnd,
       elevation: 0,
@@ -211,20 +189,18 @@ class _AddRoomViewState extends State<_AddRoomView> {
         onPressed: () => context.pop(),
       ),
       title: Text(
-        title,
+        state.isNewRoomMode ? 'Thêm phòng mới' : 'Thêm thiết bị',
         style: AppTextStyles.titleMediumAppBar(color: Colors.white),
       ),
     );
   }
 
-  // ── Action sheet chọn phương thức quét ──────────────────────────────────
   void _showScanOptions(BuildContext context) {
     final cubit = context.read<AddRoomCubit>();
     showModalBottomSheet(
       context: context,
       useRootNavigator: true,
       backgroundColor: Colors.transparent,
-      // Dùng sheetCtx (context của sheet) để pop — tránh crash khi context cha detached
       builder: (sheetCtx) => ScanOptionSheet(
         onCamera: () async {
           Navigator.pop(sheetCtx);
@@ -240,12 +216,7 @@ class _AddRoomViewState extends State<_AddRoomView> {
     );
   }
 
-  // ── Camera scanner ───────────────────────────────────────────────────────
-  Future<void> _openCameraScanner(
-    BuildContext context,
-    AddRoomCubit cubit,
-  ) async {
-    // Xin quyền camera trước khi mở scanner
+  Future<void> _openCameraScanner(BuildContext context, AddRoomCubit cubit) async {
     final status = await Permission.camera.request();
     if (!context.mounted) return;
 
@@ -275,20 +246,14 @@ class _AddRoomViewState extends State<_AddRoomView> {
       useRootNavigator: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) =>
-          QrScannerSheet(onScanned: (raw) => cubit.handleScannedCode(raw)),
+      builder: (_) => QrScannerSheet(onScanned: (raw) => cubit.handleScannedCode(raw)),
     );
   }
 
-  // ── Image picker + QR decode ─────────────────────────────────────────────
-  Future<void> _pickFromGallery(
-    BuildContext context,
-    AddRoomCubit cubit,
-  ) async {
+  Future<void> _pickFromGallery(BuildContext context, AddRoomCubit cubit) async {
     final image = await _imagePicker.pickImage(source: ImageSource.gallery);
     if (image == null) return;
 
-    // Dùng mobile_scanner BarcodeCapture để decode từ file ảnh
     final result = await MobileScannerController().analyzeImage(image.path);
     if (!context.mounted) return;
 
@@ -300,9 +265,7 @@ class _AddRoomViewState extends State<_AddRoomView> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text(
-            'Không tìm thấy mã QR trong ảnh. Vui lòng chọn ảnh khác.',
-          ),
+          content: const Text('Không tìm thấy mã QR trong ảnh. Vui lòng chọn ảnh khác.'),
           backgroundColor: Colors.orange.shade700,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
@@ -311,24 +274,5 @@ class _AddRoomViewState extends State<_AddRoomView> {
         ),
       );
     }
-  }
-
-  // ── Activate
-  Future<void> _onActivate(BuildContext context) async {
-    // Ẩn bàn phím
-    FocusScope.of(context).unfocus();
-
-    final cubit = context.read<AddRoomCubit>();
-  }
-
-  // ── Room Picker (flexible mode)
-  Future<void> _showRoomPicker(BuildContext context) async {
-    final cubit = context.read<AddRoomCubit>();
-
-    // Lazy-load phòng lần đầu bấm mở picker
-
-    if (!context.mounted) return;
-
-    final state = cubit.state;
   }
 }

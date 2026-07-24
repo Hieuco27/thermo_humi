@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:thermo_humi/core/constants/api_endpoints.dart';
 import 'package:thermo_humi/features/device/data/datasources/device_remote_data_source.dart';
-import 'package:thermo_humi/features/room/data/models/device_model.dart';
+import 'package:thermo_humi/features/device/data/models/device_model.dart';
 
 class DeviceRemoteDataSourceImpl implements DeviceRemoteDataSource {
   final Dio _dio;
@@ -12,41 +12,61 @@ class DeviceRemoteDataSourceImpl implements DeviceRemoteDataSource {
   Future<List<DeviceModel>> getAllDevices(String userId) async {
     final response = await _dio.post(
       ApiEndpoints.deviceQuery,
-      data: {"type": 2, "userId": userId},
+      data: {"type": 1},
     );
 
     if (response.statusCode == 200 && response.data != null) {
       final body = response.data;
-      if (body['success'] == true && body['data'] is List) {
-        final List locations = body['data'];
+      if (body['success'] == true && body['data'] != null) {
+        final dataObj = body['data'];
         final List<DeviceModel> allDevices = [];
 
-        for (final location in locations) {
-          final isUnassigned = location['locationId'] == 'UNASSIGNED';
-          // Phòng thật có tên, UNASSIGNED dùng null để tile hiện "Chưa gán phòng"
-          final String? roomName = isUnassigned ? null : location['name'] as String?;
+        // Lấy danh sách thiết bị đã được gán vào phòng
+        if (dataObj['locations'] is List) {
+          final List locations = dataObj['locations'];
+          for (final location in locations) {
+            final String? roomName = location['name'] as String?;
 
-          if (location['devices'] is List) {
-            final List devicesList = location['devices'];
-            for (final d in devicesList) {
-              final device = DeviceModel.fromJson(d as Map<String, dynamic>);
-              // Gán roomName vào device (dùng copyWith từ DeviceEntity)
-              allDevices.add(
-                DeviceModel(
-                  id: device.id,
-                  name: device.name,
-                  roomId: device.roomId,
-                  roomName: roomName,
-                  serialNumber: device.serialNumber,
-                  status: device.status,
-                  connectivity: device.connectivity,
-                  currentTemperature: device.currentTemperature,
-                  currentHumidity: device.currentHumidity,
-                  threshold: device.threshold,
-                  lastUpdatedAt: device.lastUpdatedAt,
-                ),
-              );
+            if (location['devices'] is List) {
+              final List devicesList = location['devices'];
+              for (final d in devicesList) {
+                final device = DeviceModel.fromJson(d as Map<String, dynamic>);
+                allDevices.add(
+                  DeviceModel(
+                    id: device.id,
+                    name: device.name,
+                    roomId: device.roomId,
+                    roomName: roomName,
+                    serialNumber: device.serialNumber,
+                    status: device.status,
+                    connectivity: device.connectivity,
+                    sensors: device.sensors,
+                    lastUpdatedAt: device.lastUpdatedAt,
+                  ),
+                );
+              }
             }
+          }
+        }
+
+        // Lấy danh sách thiết bị chưa gán phòng
+        if (dataObj['deviceUnassgin'] is List) {
+          final List unassignedList = dataObj['deviceUnassgin'];
+          for (final d in unassignedList) {
+            final device = DeviceModel.fromJson(d as Map<String, dynamic>);
+            allDevices.add(
+              DeviceModel(
+                id: device.id,
+                name: device.name,
+                roomId: device.roomId,
+                roomName: null, // Chưa gán phòng
+                serialNumber: device.serialNumber,
+                status: device.status,
+                connectivity: device.connectivity,
+                sensors: device.sensors,
+                lastUpdatedAt: device.lastUpdatedAt,
+              ),
+            );
           }
         }
 

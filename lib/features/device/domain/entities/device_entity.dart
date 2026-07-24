@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:thermo_humi/features/device/domain/entities/sensor_entity.dart';
 
 class DeviceEntity extends Equatable {
   final String id;
@@ -8,10 +9,12 @@ class DeviceEntity extends Equatable {
   final String? serialNumber;
   final DeviceStatus status;
   final ConnectivityStatus connectivity;
-  final double? currentTemperature;
-  final double? currentHumidity;
-  final ThresholdEntity? threshold;
+  final List<SensorEntity> sensors;
   final DateTime? lastUpdatedAt;
+  final double temperatureMin;
+  final double temperatureMax;
+  final double humidityMin;
+  final double humidityMax;
 
   const DeviceEntity({
     required this.id,
@@ -21,26 +24,55 @@ class DeviceEntity extends Equatable {
     this.serialNumber,
     required this.status,
     required this.connectivity,
-    this.currentTemperature,
-    this.currentHumidity,
-    this.threshold,
+    this.sensors = const [],
     this.lastUpdatedAt,
+    this.temperatureMin = 0.0,
+    this.temperatureMax = 0.0,
+    this.humidityMin = 0.0,
+    this.humidityMax = 0.0,
   });
+
+  double? get currentTemperature =>
+      sensors.isNotEmpty ? sensors.first.temperature : null;
+  double? get currentHumidity =>
+      sensors.isNotEmpty ? sensors.first.humidity : null;
+
+  ThresholdEntity? get threshold {
+    return ThresholdEntity(
+      tempHigh: temperatureMax,
+      tempLow: temperatureMin,
+      humidHigh: humidityMax,
+      humidLow: humidityMin,
+    );
+  }
 
   bool get isOnline => status == DeviceStatus.online;
   bool get isOffline =>
       status == DeviceStatus.offline || connectivity == ConnectivityStatus.none;
 
   bool get isTemperatureAlert {
-    if (threshold == null || currentTemperature == null) return false;
-    return currentTemperature! > threshold!.tempHigh ||
-        currentTemperature! < threshold!.tempLow;
+    if (sensors.isEmpty) return false;
+    for (final s in sensors) {
+      if (s.temperature != null) {
+        if (s.temperature! > temperatureMax ||
+            s.temperature! < temperatureMin) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   bool get isHumidityAlert {
-    if (threshold == null || currentHumidity == null) return false;
-    return currentHumidity! > threshold!.humidHigh ||
-        currentHumidity! < threshold!.humidLow;
+    if (sensors.isEmpty) return false;
+    for (final s in sensors) {
+      if (s.humidity != null) {
+        if (s.humidity! > humidityMax || s.humidity! < humidityMin) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   bool get hasAlert => isTemperatureAlert || isHumidityAlert;
@@ -53,10 +85,12 @@ class DeviceEntity extends Equatable {
     String? serialNumber,
     DeviceStatus? status,
     ConnectivityStatus? connectivity,
-    double? currentTemperature,
-    double? currentHumidity,
-    ThresholdEntity? threshold,
+    List<SensorEntity>? sensors,
     DateTime? lastUpdatedAt,
+    double? temperatureMin,
+    double? temperatureMax,
+    double? humidityMin,
+    double? humidityMax,
   }) {
     return DeviceEntity(
       id: id ?? this.id,
@@ -66,10 +100,12 @@ class DeviceEntity extends Equatable {
       serialNumber: serialNumber ?? this.serialNumber,
       status: status ?? this.status,
       connectivity: connectivity ?? this.connectivity,
-      currentTemperature: currentTemperature ?? this.currentTemperature,
-      currentHumidity: currentHumidity ?? this.currentHumidity,
-      threshold: threshold ?? this.threshold,
+      sensors: sensors ?? this.sensors,
       lastUpdatedAt: lastUpdatedAt ?? this.lastUpdatedAt,
+      temperatureMin: temperatureMin ?? this.temperatureMin,
+      temperatureMax: temperatureMax ?? this.temperatureMax,
+      humidityMin: humidityMin ?? this.humidityMin,
+      humidityMax: humidityMax ?? this.humidityMax,
     );
   }
 
@@ -81,9 +117,12 @@ class DeviceEntity extends Equatable {
     roomName,
     status,
     connectivity,
-    currentTemperature,
-    currentHumidity,
+    sensors,
     lastUpdatedAt,
+    temperatureMin,
+    temperatureMax,
+    humidityMin,
+    humidityMax,
   ];
 }
 

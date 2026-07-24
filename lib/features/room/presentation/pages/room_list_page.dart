@@ -168,6 +168,8 @@ class _RoomListViewState extends State<_RoomListView>
               (sum, r) => sum + r.alertCount,
             );
 
+            final displayRooms = rooms.where((r) => r.id != 'UNASSIGNED').toList();
+
             return FadeTransition(
               opacity: _fadeAnim,
               child: RefreshIndicator(
@@ -175,29 +177,47 @@ class _RoomListViewState extends State<_RoomListView>
                 child: Column(
                   children: [
                     GlobalSummaryBar(
-                      totalRooms: rooms.length,
+                      totalRooms: displayRooms.length,
                       totalDevices: totalDevices,
                       totalOnline: totalOnline,
                       totalAlerts: totalAlerts,
                     ),
                     Expanded(
-                      child: ListView.builder(
-                        padding: EdgeInsets.only(top: 8.h, bottom: 24.h),
-                        itemCount: rooms.length,
-                        itemBuilder: (context, index) {
-                          final room = rooms[index];
-                          final isExpanded = _expandedRooms.contains(room.id);
-                          return AnimatedItem(
-                            index: index,
-                            child: RoomCard(
-                              room: room,
-                              isExpanded: isExpanded,
-                              onHeaderTap: () => _toggleRoom(room.id),
-                              onViewAll: () => _navigateToRoomDetail(room.id),
+                      child: displayRooms.isEmpty 
+                        ? Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.meeting_room_outlined,
+                                  size: 56.sp,
+                                  color: Colors.white38,
+                                ),
+                                SizedBox(height: 12.h),
+                                Text(
+                                  'Chưa có phòng nào',
+                                  style: TextStyle(fontSize: 14.sp, color: Colors.white54),
+                                ),
+                              ],
                             ),
-                          );
-                        },
-                      ),
+                          )
+                        : ListView.builder(
+                            padding: EdgeInsets.only(top: 8.h, bottom: 24.h),
+                            itemCount: displayRooms.length,
+                            itemBuilder: (context, index) {
+                              final room = displayRooms[index];
+                              final isExpanded = _expandedRooms.contains(room.id);
+                              return AnimatedItem(
+                                index: index,
+                                child: RoomCard(
+                                  room: room,
+                                  isExpanded: isExpanded,
+                                  onHeaderTap: () => _toggleRoom(room.id),
+                                  onViewAll: () => _navigateToRoomDetail(room.id),
+                                ),
+                              );
+                            },
+                          ),
                     ),
                   ],
                 ),

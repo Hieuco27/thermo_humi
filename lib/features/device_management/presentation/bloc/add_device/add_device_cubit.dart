@@ -1,18 +1,19 @@
-import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:thermo_humi/core/constants/app_constants.dart';
-import 'package:thermo_humi/core/storage/secure_storage.dart';
-import 'package:thermo_humi/core/di/injection_container.dart';
 import 'package:thermo_humi/features/device/domain/repositories/device_repository.dart';
+import 'package:thermo_humi/features/profile/domain/usecases/get_user_profile_usecase.dart';
 
 part 'add_device_state.dart';
 
 class AddDeviceCubit extends Cubit<AddDeviceState> {
   final DeviceRepository _repository;
+  final GetUserProfileUseCase _getUserProfileUseCase;
 
-  AddDeviceCubit({required DeviceRepository repository})
-      : _repository = repository,
+  AddDeviceCubit({
+    required DeviceRepository repository,
+    required GetUserProfileUseCase getUserProfileUseCase,
+  })  : _repository = repository,
+        _getUserProfileUseCase = getUserProfileUseCase,
         super(const AddDeviceState());
 
   Future<void> submitDevice({
@@ -55,13 +56,10 @@ class AddDeviceCubit extends Cubit<AddDeviceState> {
 
   Future<String?> _getUserId() async {
     try {
-      final storage = sl<SecureStorage>();
-      final userDataStr = await storage.read(AppConstants.kUserData);
-      if (userDataStr != null) {
-        final Map<String, dynamic> userJson = jsonDecode(userDataStr);
-        return userJson['id']?.toString();
-      }
-    } catch (_) {}
-    return null;
+      final user = await _getUserProfileUseCase.execute();
+      return user?.id;
+    } catch (_) {
+      return null;
+    }
   }
 }

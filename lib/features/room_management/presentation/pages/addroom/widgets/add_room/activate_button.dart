@@ -8,10 +8,13 @@ class ActivateButton extends StatelessWidget {
   final bool isLoading;
   final VoidCallback? onTap;
 
+  final String title;
+
   const ActivateButton({
     super.key,
     required this.isEnabled,
     required this.isLoading,
+    this.title = 'Kích hoạt',
     this.onTap,
   });
 
@@ -45,7 +48,7 @@ class ActivateButton extends StatelessWidget {
                   ),
                 )
               : Text(
-                  'Kích hoạt',
+                  title,
                   style: AppTextStyles.titleMedium(color: Colors.white),
                 ),
         ),

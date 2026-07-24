@@ -6,11 +6,10 @@ class AppConfig {
   static String get baseUrl =>
       dotenv.env['BASE_URL'] ?? 'http://103.249.158.28:8999';
 
-  static String get authBaseUrl =>
-      dotenv.env['AUTH_BASE_URL'] ?? 'http://103.249.158.28:8999';
+  static String get authBaseUrl => baseUrl;
 
-  static String get dashboardBaseUrl =>
-      dotenv.env['DASHBOARD_BASE_URL'] ?? 'http://103.249.158.28:8888';
+  static String get devicesBaseUrl =>
+      dotenv.env['DEVICES_BASE_URL'] ?? 'http://103.249.158.28:8888';
 
   static String get realtimeType => dotenv.env['REALTIME_TYPE'] ?? 'POLLING';
 

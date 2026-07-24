@@ -35,10 +35,12 @@ class DeviceHiveModel extends HiveObject {
       serialNumber: serialNumber,
       status: DeviceStatus.unknown, // Default for offline cache
       connectivity: ConnectivityStatus.none,
-      currentTemperature: null, // Don't cache real-time sensor data
-      currentHumidity: null,
-      threshold: null,
+      sensors: const [],
       lastUpdatedAt: null,
+      temperatureMin: 0.0,
+      temperatureMax: 0.0,
+      humidityMin: 0.0,
+      humidityMax: 0.0,
     );
   }
 }

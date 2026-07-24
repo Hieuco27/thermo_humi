@@ -1,26 +1,27 @@
-import 'dart:convert';
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:thermo_humi/core/constants/app_constants.dart';
-import 'package:thermo_humi/core/storage/secure_storage.dart';
-import 'package:thermo_humi/core/di/injection_container.dart';
+
 import 'package:thermo_humi/features/device/domain/entities/device_entity.dart';
 import 'package:thermo_humi/features/room/domain/entities/room_entity.dart';
 import 'package:thermo_humi/features/room/domain/usecases/get_room_usecase.dart';
 import 'package:thermo_humi/features/room_management/presentation/bloc/room_manage_state.dart';
 import 'package:thermo_humi/features/room/presentation/widgets/room_detail/device_filter_bar.dart';
-import 'package:thermo_humi/features/device/domain/repositories/device_repository.dart';
+import 'package:thermo_humi/features/device/domain/usecases/get_unassigned_devices_usecase.dart';
+import 'package:thermo_humi/features/profile/domain/usecases/get_user_profile_usecase.dart';
 
 class RoomManageCubit extends Cubit<RoomManageState> {
   final GetRoomsUseCase _getRoomsUseCase;
-  final DeviceRepository _deviceRepository;
+  final GetUnassignedDevicesUseCase _getUnassignedDevicesUseCase;
+  final GetUserProfileUseCase _getUserProfileUseCase;
 
   RoomManageCubit({
     required GetRoomsUseCase getRoomsUseCase,
-    required DeviceRepository deviceRepository,
+    required GetUnassignedDevicesUseCase getUnassignedDevicesUseCase,
+    required GetUserProfileUseCase getUserProfileUseCase,
   }) : _getRoomsUseCase = getRoomsUseCase,
-       _deviceRepository = deviceRepository,
+       _getUnassignedDevicesUseCase = getUnassignedDevicesUseCase,
+       _getUserProfileUseCase = getUserProfileUseCase,
        super(const RoomManageState());
 
   // ── Load ──────────────────────────────────────────────────────────────────
@@ -31,68 +32,73 @@ class RoomManageCubit extends Cubit<RoomManageState> {
     if (userId == null) {
       emit(
         state.copyWith(
-          status: RoomManageStatus.success, // Keep UI running
+          status: RoomManageStatus.success,
           errorMessage: 'User ID not found',
         ),
       );
       return;
     }
 
-    final result = await _getRoomsUseCase.execute(userId);
+    try {
+      final result = await _getRoomsUseCase.execute(userId);
 
-    result.fold(
-      (error) => emit(
-        state.copyWith(
-          status: RoomManageStatus.success, // Keep UI from crashing
-          errorMessage: error,
-        ),
-      ),
-      (rooms) {
-        final roomWithDevices = rooms.firstWhere(
-          (r) => r.id == roomId,
-          orElse: () => RoomEntity(
-            id: roomId,
-            name: 'Phòng không xác định',
-            totalDevices: 0,
-            onlineDevices: 0,
-            alertCount: 0,
-            createdAt: DateTime.now(),
-          ),
-        );
-
-        emit(
+      result.fold(
+        (error) => emit(
           state.copyWith(
-            status: RoomManageStatus.success,
-            room: roomWithDevices,
-            hasChanges: false,
+            status: RoomManageStatus.success, // Keep UI from crashing
+            errorMessage: error,
           ),
-        );
-      },
-    );
+        ),
+        (rooms) {
+          final roomWithDevices =
+              rooms.where((r) => r.id == roomId).firstOrNull ??
+              RoomEntity(
+                id: roomId,
+                name: 'Phòng không xác định',
+                totalDevices: 0,
+                onlineDevices: 0,
+                alertCount: 0,
+                createdAt: DateTime.now(),
+              );
+
+          emit(
+            state.copyWith(
+              status: RoomManageStatus.success,
+              room: roomWithDevices,
+              hasChanges: false,
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          status: RoomManageStatus.success,
+          errorMessage: 'Lỗi tải dữ liệu: $e',
+        ),
+      );
+    }
   }
 
   Future<List<DeviceEntity>> fetchUnassignedDevices() async {
     final userId = await _getUserId();
     if (userId == null) return [];
 
-    final result = await _deviceRepository.getUnassignedDevices(userId);
+    final result = await _getUnassignedDevicesUseCase.execute(userId);
     return result.fold(
       (error) => [], // Trả về mảng rỗng nếu lỗi (có thể xử lý log lỗi)
       (devices) => devices,
     );
   }
 
-  // Lấy userId từ storage
+  // Lấy userId từ storage thông qua UseCase
   Future<String?> _getUserId() async {
     try {
-      final storage = sl<SecureStorage>();
-      final userDataStr = await storage.read(AppConstants.kUserData);
-      if (userDataStr != null) {
-        final Map<String, dynamic> userJson = jsonDecode(userDataStr);
-        return userJson['id']?.toString();
-      }
-    } catch (_) {}
-    return null;
+      final user = await _getUserProfileUseCase.execute();
+      return user?.id;
+    } catch (_) {
+      return null;
+    }
   }
 
   // Filter

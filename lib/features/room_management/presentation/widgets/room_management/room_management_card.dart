@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:thermo_humi/core/theme/app_colors.dart';
 import 'package:thermo_humi/core/theme/text_styles.dart';
 import 'package:thermo_humi/features/room/domain/entities/room_entity.dart';
 
@@ -17,15 +16,6 @@ class RoomManagementCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasDevices = room.totalDevices > 0;
-    final allOnline = hasDevices && room.onlineDevices == room.totalDevices;
-    final hasOffline = hasDevices && room.offlineDevices > 0;
-
-    // Màu chấm trạng thái
-    final Color statusColor = !hasDevices
-        ? Colors.transparent
-        : allOnline
-        ? AppColors.appBarBg
-        : Colors.red.shade400;
 
     return GestureDetector(
       onTap: onTap,
@@ -72,19 +62,12 @@ class RoomManagementCard extends StatelessWidget {
                         Container(
                           width: 8.w,
                           height: 8.w,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: statusColor,
-                          ),
+                          decoration: BoxDecoration(shape: BoxShape.circle),
                         ),
                         SizedBox(width: 6.w),
                         Text(
-                          '${room.totalDevices} thiết bị · ${room.onlineDevices} online',
-                          style: AppTextStyles.bodyMedium(
-                            color: hasOffline
-                                ? Colors.red.shade400
-                                : Colors.grey.shade500,
-                          ),
+                          '${room.totalDevices} thiết bị',
+                          style: AppTextStyles.bodyMedium(),
                         ),
                       ],
                     ),

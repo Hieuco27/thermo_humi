@@ -1,5 +1,6 @@
 import 'package:thermo_humi/features/room/domain/entities/room_entity.dart';
-import 'package:thermo_humi/features/room/data/models/device_model.dart';
+import 'package:thermo_humi/features/device/data/models/device_model.dart';
+import 'package:thermo_humi/features/device/domain/entities/device_entity.dart';
 
 class RoomModel extends RoomEntity {
   const RoomModel({
@@ -14,21 +15,51 @@ class RoomModel extends RoomEntity {
   });
 
   factory RoomModel.fromJson(Map<String, dynamic> json) {
+    final roomId = json['id'] as String? ?? json['locationId'] as String? ?? '';
+    final String roomName = (json['name'] as String?)?.isNotEmpty == true
+        ? json['name'] as String
+        : (roomId == 'UNASSIGNED' ? 'Chưa gán phòng' : '');
+
+    final parsedDevices =
+        (json['devices'] as List?)?.map((e) {
+          final deviceMap = Map<String, dynamic>.from(e as Map);
+          if (!deviceMap.containsKey('roomId') ||
+              deviceMap['roomId'] == null ||
+              (deviceMap['roomId'] as String).isEmpty) {
+            deviceMap['roomId'] = roomId;
+          }
+          if (!deviceMap.containsKey('roomName') ||
+              deviceMap['roomName'] == null ||
+              (deviceMap['roomName'] as String).isEmpty) {
+            deviceMap['roomName'] = roomId == 'UNASSIGNED' ? null : roomName;
+          }
+          return DeviceModel.fromJson(deviceMap);
+        }).toList() ??
+        const [];
+
+    final int totalDevices =
+        json['totalDevices'] as int? ?? parsedDevices.length;
+    final int onlineDevices =
+        json['onlineDevices'] as int? ??
+        parsedDevices.where((d) => d.status == DeviceStatus.online).length;
+
+    final int alertCount =
+        json['alertCount'] as int? ??
+        parsedDevices
+            .where((d) => d.status == DeviceStatus.offline || d.hasAlert)
+            .length;
+
     return RoomModel(
-      id: json['id'] as String? ?? '',
-      name: json['name'] as String? ?? '',
+      id: roomId,
+      name: roomName,
       description: json['description'] as String?,
-      totalDevices: json['totalDevices'] as int? ?? 0,
-      onlineDevices: json['onlineDevices'] as int? ?? 0,
-      alertCount: json['alertCount'] as int? ?? 0,
+      totalDevices: totalDevices,
+      onlineDevices: onlineDevices,
+      alertCount: alertCount,
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt']) ?? DateTime.now()
           : DateTime.now(),
-      devices:
-          (json['devices'] as List?)
-              ?.map((e) => DeviceModel.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          const [],
+      devices: parsedDevices,
     );
   }
 }

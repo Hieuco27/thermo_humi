@@ -24,9 +24,9 @@ class DeviceDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     // Provide Cubit
     return BlocProvider(
-      create: (context) => DeviceHistoryCubit(
-        repository: DeviceRepositoryImpl(sl()), // Mock Repo
-      )..fetchHistory(device.id),
+      create: (context) =>
+          DeviceHistoryCubit(repository: DeviceRepositoryImpl(sl()))
+            ..fetchHistory(device.id),
       child: _DeviceDetailView(device: device),
     );
   }

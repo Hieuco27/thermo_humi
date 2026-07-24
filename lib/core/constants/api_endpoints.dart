@@ -1,3 +1,5 @@
+import 'package:thermo_humi/core/config/app_config.dart';
+
 class ApiEndpoints {
   ApiEndpoints._();
 
@@ -14,9 +16,11 @@ class ApiEndpoints {
   // ── Rooms ─────────────────────────────────────────────────────────────────
   static String getListRoom(String userId) => '/api/Dashboard/$userId/rooms';
   static const String locationQuery = '/location/query';
+  static const String locationUpdate = '/location/update';
 
   // ── Devices ───────────────────────────────────────────────────────────────
-  static const String deviceQuery = '/device/query';
+  static String get deviceQuery =>
+      '${AppConfig.devicesBaseUrl}/device-online/query';
 
   // ── Profile ───────────────────────────────────────────────────────────────
   static const String profile = '/api/v1/profile';

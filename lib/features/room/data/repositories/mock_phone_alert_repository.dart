@@ -12,15 +12,9 @@ class MockPhoneAlertRepository implements PhoneAlertRepository {
   Future<Either<String, void>> sendOtp({required String phone}) async {
     await Future.delayed(const Duration(milliseconds: 1500));
 
-    // ── Để test case lỗi, bỏ comment dòng dưới ──
-    // return const Left('Số điện thoại không hợp lệ hoặc đã đăng ký.');
-
     return const Right(null);
   }
 
-  /// Giả lập xác minh OTP thành công sau 1.2 giây
-  /// Chỉ chấp nhận mã "123456" để test case thành công
-  /// Các mã khác sẽ trả về lỗi để test case thất bại
   @override
   Future<Either<String, void>> verifyOtp({
     required String roomId,

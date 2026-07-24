@@ -50,6 +50,7 @@ import 'package:thermo_humi/features/device_management/presentation/bloc/device_
 import 'package:thermo_humi/features/device_management/presentation/bloc/add_device/add_device_cubit.dart';
 import 'package:thermo_humi/features/device/presentation/bloc/device_detail/device_history_cubit.dart';
 import 'package:thermo_humi/features/device/domain/repositories/device_repository.dart';
+import 'package:thermo_humi/features/device/domain/usecases/get_unassigned_devices_usecase.dart';
 import 'package:thermo_humi/features/device/data/repositories/device_repository_impl.dart';
 import 'package:thermo_humi/features/device/data/datasources/device_remote_data_source.dart';
 import 'package:thermo_humi/features/device/data/datasources/device_remote_data_source_impl.dart';
@@ -59,6 +60,8 @@ import 'package:thermo_humi/features/room_management/domain/usecases/get_rooms_u
 import 'package:thermo_humi/features/room_management/presentation/bloc/room_list/room_management_list_cubit.dart';
 
 // --- Room Feature imports ---
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:thermo_humi/features/room/data/models/hive/room_hive_model.dart';
 import 'package:thermo_humi/features/room/data/models/hive/device_hive_model.dart';
@@ -85,7 +88,12 @@ final sl = GetIt.instance;
 
 Future<void> init() async {
   // --- Hive Initialization ---
-  await Hive.initFlutter();
+  final appDocumentDir = await getApplicationDocumentsDirectory();
+  final hiveDir = Directory(appDocumentDir.path);
+  if (!await hiveDir.exists()) {
+    await hiveDir.create(recursive: true);
+  }
+  Hive.init(hiveDir.path);
   Hive.registerAdapter(RoomHiveModelAdapter());
   Hive.registerAdapter(DeviceHiveModelAdapter());
   await Hive.openBox<RoomHiveModel>(RoomLocalDataSourceImpl.boxName);
@@ -170,8 +178,13 @@ Future<void> init() async {
     () => DeviceRepositoryImpl(sl<DeviceRemoteDataSource>()),
   );
 
+  // 3. UseCases
+  sl.registerLazySingleton(() => GetUnassignedDevicesUseCase(sl()));
+
   sl.registerFactory(() => DeviceManagementCubit(repository: sl()));
-  sl.registerFactory(() => AddDeviceCubit(repository: sl()));
+  sl.registerFactory(
+    () => AddDeviceCubit(repository: sl(), getUserProfileUseCase: sl()),
+  );
   sl.registerFactory(() => DeviceHistoryCubit(repository: sl()));
 
   // --- Request Access Feature ---
@@ -197,7 +210,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetRoomsManagementUseCase(sl()));
 
   // 4. Cubit
-  sl.registerFactory(() => RoomManagementListCubit(sl()));
+  sl.registerFactory(() => RoomManagementListCubit(sl(), sl()));
 
   // --- Room Feature (device-online/query) ---
 
@@ -218,19 +231,10 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetRoomsUseCase(sl()));
 
   // 4. Cubit (registerFactory → mỗi lần tạo instance mới)
-  sl.registerFactory(() => RoomListCubit(sl()));
-  sl.registerFactory(() => RoomDetailCubit(sl()));
+  sl.registerFactory(() => RoomListCubit(sl(), sl()));
+  sl.registerFactory(() => RoomDetailCubit(sl(), sl()));
 
-  // --- Phone Alert Feature ---
-  //   1. Bỏ comment 2 dòng đăng ký DataSource + Impl bên dưới
-  //   2. Xoá dòng Mock
-  // sl.registerLazySingleton<PhoneAlertRemoteDataSource>(
-  //   () => PhoneAlertRemoteDataSourceImpl(sl<Dio>()),
-  // );
-  // sl.registerLazySingleton<PhoneAlertRepository>(
-  //   () => PhoneAlertRepositoryImpl(sl()),
-  // );
   sl.registerLazySingleton<PhoneAlertRepository>(
-    () => MockPhoneAlertRepository(), // ← Xoá dòng này khi BE xong
+    () => MockPhoneAlertRepository(),
   );
 }

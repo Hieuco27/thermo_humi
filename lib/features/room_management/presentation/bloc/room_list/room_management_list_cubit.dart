@@ -1,16 +1,16 @@
-import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:thermo_humi/features/room_management/domain/usecases/get_rooms_usecase.dart';
 import 'package:thermo_humi/features/room_management/presentation/bloc/room_list/room_management_list_state.dart';
-import 'package:thermo_humi/core/storage/secure_storage.dart';
-import 'package:thermo_humi/core/constants/app_constants.dart';
-import 'package:thermo_humi/core/di/injection_container.dart';
+import 'package:thermo_humi/features/profile/domain/usecases/get_user_profile_usecase.dart';
 
 class RoomManagementListCubit extends Cubit<RoomManagementListState> {
   final GetRoomsManagementUseCase _getRoomsUseCase;
+  final GetUserProfileUseCase _getUserProfileUseCase;
 
-  RoomManagementListCubit(this._getRoomsUseCase)
-    : super(const RoomManagementListState());
+  RoomManagementListCubit(
+    this._getRoomsUseCase,
+    this._getUserProfileUseCase,
+  ) : super(const RoomManagementListState());
 
   Future<void> loadRooms() async {
     if (state.isLoading) return;
@@ -81,13 +81,10 @@ class RoomManagementListCubit extends Cubit<RoomManagementListState> {
 
   Future<String?> _getUserId() async {
     try {
-      final storage = sl<SecureStorage>();
-      final userDataStr = await storage.read(AppConstants.kUserData);
-      if (userDataStr != null) {
-        final Map<String, dynamic> userJson = jsonDecode(userDataStr);
-        return userJson['id']?.toString();
-      }
-    } catch (_) {}
-    return null;
+      final user = await _getUserProfileUseCase.execute();
+      return user?.id;
+    } catch (_) {
+      return null;
+    }
   }
 }
